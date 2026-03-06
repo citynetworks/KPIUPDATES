@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>chargeFUZE — City Network Placement Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --navy:#0B1120; --gold:#1A6EFF; --blue:#1A6EFF; --sky:#EBF2FF;
+  --green:#16A34A; --green-lt:#DCFCE7; --yellow:#CA8A04; --yellow-lt:#FEF9C3;
+  --orange:#EA580C; --orange-lt:#FFEDD5; --red:#DC2626; --red-lt:#FEE2E2;
+  --gray:#64748B; --border:#DDE4EF; --bg:#F0F4FA; --card:#FFFFFF; --text:#0B1120;
+  --cf-blue:#1A6EFF; --cf-dark:#0B1120; --cf-mid:#10192E; --cf-accent:#4D96FF;
+  --cf-glow:rgba(26,110,255,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ─── Header ─── */
+header{
+  background:linear-gradient(135deg,var(--cf-dark) 0%,var(--cf-mid) 100%);
+  color:#fff;padding:0 28px;display:flex;align-items:center;
+  justify-content:space-between;height:68px;
+  box-shadow:0 2px 20px rgba(0,0,0,.5);position:sticky;top:0;z-index:200;
+  border-bottom:2px solid var(--cf-blue);
+}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand-icon{
+  width:42px;height:42px;background:var(--cf-blue);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;
+  color:#fff;letter-spacing:-0.5px;box-shadow:0 0 18px var(--cf-glow);
+  font-style:italic;
+}
+.brand-wordmark{display:flex;flex-direction:column;}
+.brand-wordmark .wm-top{font-size:18px;font-weight:800;line-height:1.1;letter-spacing:-.3px;}
+.brand-wordmark .wm-top .fuze{color:var(--cf-blue);}
+.brand-wordmark .wm-sub{font-size:10.5px;opacity:.5;margin-top:2px;letter-spacing:.5px;text-transform:uppercase;}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+
+/* Sync status pill */
+.sync-pill{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:5px 14px;font-size:12px;color:rgba(255,255,255,.85);
+}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#4ADE80;flex-shrink:0;}
+.sync-dot.syncing{background:var(--cf-blue);animation:pulse 1s infinite;}
+.sync-dot.error{background:var(--red);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+.btn-refresh{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);
+  color:#fff;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;
+  cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:6px;
+}
+.btn-refresh:hover{background:rgba(255,255,255,.22);}
+.btn-refresh:disabled{opacity:.5;cursor:not-allowed;}
+
+.btn-settings{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.7);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .15s;
+}
+.btn-settings:hover{background:rgba(255,255,255,.16);color:#fff;}
+
+.btn-load{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.7);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .15s;
+}
+.btn-load:hover{background:rgba(255,255,255,.16);color:#fff;}
+
+/* ─── State screens ─── */
+.state-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:calc(100vh - 64px);padding:40px;
+}
+.state-card{
+  background:var(--card);border-radius:20px;
+  box-shadow:0 8px 40px rgba(0,0,0,.1);
+  padding:48px 60px;text-align:center;max-width:640px;width:100%;
+}
+.state-card .icon{font-size:52px;margin-bottom:16px;}
+.state-card h2{font-size:22px;color:var(--cf-dark);margin-bottom:8px;}
+.state-card p{color:var(--gray);font-size:14px;line-height:1.65;margin-bottom:20px;}
+
+/* Spinner */
+.spinner{
+  width:48px;height:48px;border:4px solid var(--border);
+  border-top-color:var(--navy);border-radius:50%;
+  animation:spin 0.8s linear infinite;margin:0 auto 20px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.btn-primary{
+  background:var(--cf-blue);color:#fff;border:none;border-radius:10px;
+  padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;transition:background .2s,transform .1s;
+  box-shadow:0 4px 14px var(--cf-glow);
+}
+.btn-primary:hover{background:var(--cf-accent);transform:translateY(-1px);}
+.btn-secondary{
+  background:none;color:var(--cf-dark);border:1px solid var(--border);border-radius:10px;
+  padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;
+  display:inline-flex;align-items:center;gap:6px;transition:background .15s;
+}
+.btn-secondary:hover{background:var(--sky);}
+
+.error-detail{
+  background:var(--red-lt);border:1px solid #FECACA;border-radius:10px;
+  padding:14px 18px;font-size:12px;color:#991B1B;text-align:left;
+  margin-bottom:18px;line-height:1.7;
+}
+.error-detail strong{display:block;margin-bottom:4px;}
+
+/* ─── Setup Screen ─── */
+.setup-steps{text-align:left;margin-bottom:20px;}
+.step{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--cf-blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.step-body{flex:1;}
+.step-body strong{display:block;font-size:13px;color:var(--cf-dark);margin-bottom:3px;}
+.step-body p{font-size:12px;color:var(--gray);line-height:1.5;}
+.step-body a{color:var(--cf-blue);font-size:12px;}
+
+.code-block{
+  background:#0F172A;border-radius:10px;padding:14px 16px;text-align:left;
+  font-family:'Courier New',monospace;font-size:11px;color:#E2E8F0;
+  line-height:1.55;margin:8px 0 4px;position:relative;overflow-x:auto;
+  white-space:pre;
+}
+.btn-copy{
+  position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.2);color:#E2E8F0;border-radius:6px;
+  padding:3px 10px;font-size:11px;cursor:pointer;
+}
+.btn-copy:hover{background:rgba(255,255,255,.22);}
+.btn-copy.copied{background:#16A34A;border-color:#16A34A;}
+
+.url-input-wrap{display:flex;gap:10px;margin-top:8px;}
+.url-input{
+  flex:1;border:2px solid var(--border);border-radius:10px;
+  padding:10px 14px;font-size:13px;outline:none;
+}
+.url-input:focus{border-color:var(--cf-blue);}
+.url-input.valid{border-color:var(--green);}
+.url-input.invalid{border-color:var(--red);}
+
+.divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--gray);font-size:12px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ─── Dashboard ─── */
+#dashboard{display:none;padding:24px 28px;max-width:1440px;margin:0 auto;}
+
+/* Sheet tabs */
+.sheet-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.tab{padding:8px 18px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:13px;font-weight:600;color:var(--gray);cursor:pointer;transition:all .15s;}
+.tab.active{background:var(--cf-blue);color:#fff;border-color:var(--cf-blue);box-shadow:0 2px 10px var(--cf-glow);}
+.tab:hover:not(.active){background:var(--sky);border-color:var(--cf-blue);color:var(--cf-blue);}
+.tab-count{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:1px 7px;font-size:11px;margin-left:4px;}
+.tab:not(.active) .tab-count{background:var(--bg);color:var(--gray);}
+
+/* Filter bar */
+.filter-bar{background:var(--card);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px;box-shadow:0 1px 5px rgba(0,0,0,.06);}
+.filter-bar label{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;}
+.filter-bar select,.filter-bar input{border:1px solid var(--border);border-radius:7px;padding:6px 11px;font-size:13px;color:var(--text);background:var(--bg);outline:none;}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--cf-blue);}
+.spacer{flex:1;}
+.btn-clear{background:none;border:1px solid var(--border);border-radius:7px;padding:6px 14px;font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;transition:background .15s;}
+.btn-clear:hover{background:var(--sky);}
+
+/* KPI row */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:20px;}
+.kpi{background:var(--card);border-radius:13px;padding:18px 20px;box-shadow:0 2px 10px rgba(0,0,0,.07);border-top:4px solid var(--cf-blue);position:relative;overflow:hidden;}
+.kpi.k-gold{border-top-color:var(--cf-blue);} .kpi.k-green{border-top-color:var(--green);} .kpi.k-blue{border-top-color:var(--cf-accent);} .kpi.k-orange{border-top-color:var(--orange);} .kpi.k-red{border-top-color:var(--red);}
+.kpi-icon{position:absolute;right:16px;top:14px;font-size:26px;opacity:.13;}
+.kpi-lbl{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}
+.kpi-val{font-size:28px;font-weight:800;color:var(--navy);line-height:1;}
+.kpi-sub{font-size:11px;color:var(--gray);margin-top:5px;}
+
+/* Main grid */
+.main-grid{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:18px;margin-bottom:20px;}
+.panel{background:var(--card);border-radius:13px;padding:20px;box-shadow:0 1px 7px rgba(0,0,0,.07);}
+.panel-title{font-size:12px;font-weight:700;color:var(--cf-blue);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;}
+canvas{max-height:220px;}
+
+/* Leaderboard */
+.lb{display:flex;flex-direction:column;gap:7px;}
+.lb-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;transition:background .12s;}
+.lb-row:hover{background:var(--bg);}
+.lb-rank{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
+.r1{background:var(--cf-blue);} .r2{background:#94A3B8;} .r3{background:#60A5FA;} .rn{background:var(--cf-dark);}
+.lb-info{flex:1;min-width:0;}
+.lb-name{font-size:13px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-sub{font-size:11px;color:var(--gray);}
+.lb-bar-wrap{flex:2;background:var(--bg);border-radius:5px;height:7px;overflow:hidden;}
+.lb-bar{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--cf-blue),var(--cf-accent));transition:width .5s ease;}
+.lb-num{text-align:right;min-width:28px;}
+.lb-n{font-size:14px;font-weight:800;color:var(--navy);}
+.lb-lbl{font-size:11px;color:var(--gray);}
+
+/* Table */
+.table-panel{background:var(--card);border-radius:13px;padding:20px;box-shadow:0 1px 7px rgba(0,0,0,.07);margin-bottom:24px;}
+.table-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.search{border:1px solid var(--border);border-radius:8px;padding:7px 12px 7px 32px;font-size:13px;width:240px;outline:none;background:var(--bg);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2364748B' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.44 1.47a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center;}
+.search:focus{border-color:var(--cf-blue);}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+thead th{background:var(--cf-dark);color:#fff;padding:10px 12px;text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;user-select:none;white-space:nowrap;}
+thead th:hover{background:#1a2540;}
+thead th.asc::after{content:" ▲";opacity:.7;}
+thead th.desc::after{content:" ▼";opacity:.7;}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
+tbody tr:hover{background:#F8FAFC;}
+tbody td{padding:9px 12px;vertical-align:middle;}
+.venue-name{font-weight:700;color:var(--navy);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.address-cell{color:var(--gray);font-size:11.5px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* Badges */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.2px;white-space:nowrap;}
+.b-installed{background:var(--green-lt);color:var(--green);}
+.b-pending{background:var(--yellow-lt);color:var(--yellow);}
+.b-declined{background:var(--red-lt);color:var(--red);}
+.b-other{background:var(--bg);color:var(--gray);}
+
+/* Onboarding dots */
+.ob-dots{display:flex;gap:4px;align-items:center;}
+.ob-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;cursor:default;}
+.ob-yes{background:var(--green);}
+.ob-no{background:var(--border);color:var(--gray);}
+
+/* Contract link */
+.contract-link{display:inline-flex;align-items:center;gap:4px;color:var(--cf-blue);font-size:12px;text-decoration:none;padding:3px 8px;border-radius:6px;border:1px solid var(--border);transition:background .12s;}
+.contract-link:hover{background:var(--sky);}
+
+/* Pagination */
+.pagination{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:12.5px;color:var(--gray);}
+.page-btns{display:flex;gap:5px;}
+.pg{border:1px solid var(--border);border-radius:6px;padding:4px 10px;background:#fff;cursor:pointer;font-size:12px;transition:background .12s;}
+.pg:hover{background:var(--sky);border-color:var(--cf-blue);}
+.pg.on{background:var(--cf-blue);color:#fff;border-color:var(--cf-blue);}
+.pg:disabled{opacity:.4;cursor:not-allowed;}
+#no-rows{text-align:center;color:var(--gray);padding:36px;font-size:13px;display:none;}
+
+/* Partial-load notice */
+.partial-notice{background:var(--yellow-lt);border:1px solid #FDE68A;border-radius:10px;padding:10px 16px;font-size:12px;color:#92400E;margin-bottom:16px;display:none;}
+
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr);}.main-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:700px){.kpi-row{grid-template-columns:1fr 1fr;}.main-grid{grid-template-columns:1fr;}#dashboard{padding:14px;}.state-card{padding:32px 24px;}}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="brand">
+    <div class="brand-icon">CF</div>
+    <div class="brand-wordmark">
+      <div class="wm-top">charge<span class="fuze">FUZE</span></div>
+      <div class="wm-sub">City Network · Placement Tracker</div>
+    </div>
+  </div>
+  <div class="hdr-right" id="hdr-right">
+    <div class="sync-pill" id="sync-pill" style="display:none">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-label">Connecting…</span>
+    </div>
+    <button class="btn-refresh" id="btn-refresh" style="display:none" onclick="loadFromAppsScript(true)" title="Refresh now">
+      ↻ Refresh
+    </button>
+    <button class="btn-settings" id="btn-settings" style="display:none" onclick="showSetupFromHeader()" title="Change Apps Script URL">
+      ⚙ Settings
+    </button>
+    <label class="btn-load" title="Load from Excel file instead">
+      📂 File fallback
+      <input type="file" id="fi" accept=".xlsx,.xls" style="display:none" onchange="loadFile(event)"/>
+    </label>
+  </div>
+</header>
+
+<!-- ═══ STATE: SETUP ═══ -->
+<div class="state-screen" id="screen-setup">
+  <div class="state-card" style="max-width:700px;">
+    <div class="icon">🔗</div>
+    <h2>Connect to Google Sheets</h2>
+    <p>To load live data, you need to deploy a small Google Apps Script in your spreadsheet. This is a one-time setup that takes about 2 minutes.</p>
+
+    <div class="setup-steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Open your Google Sheet</strong>
+          <p>Go to your <a href="https://docs.google.com/spreadsheets/d/1aRP9xWFsqOoh-zAXKI4olsCjn29Q_sf-1xKsHUptLQs/edit" target="_blank" rel="noopener">City Network spreadsheet ↗</a>, then click <strong>Extensions → Apps Script</strong> in the top menu.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Paste this code</strong>
+          <p>Select all the existing code in the editor and replace it with the code below, then click <strong>Save (Ctrl+S)</strong>. If you already deployed a previous version, you'll need to <strong>redeploy</strong> with this updated code.</p>
+          <div class="code-block" id="apps-script-code">const SPREADSHEET_ID = '1aRP9xWFsqOoh-zAXKI4olsCjn29Q_sf-1xKsHUptLQs';
+const SHEET_NAMES = ['Full Time Rep - Install', '1099 B - Rep Install', 'CN Installs - Onboarding'];
+
+function doGet(e) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const result = {};
+    SHEET_NAMES.forEach(function(name) {
+      const sheet = ss.getSheetByName(name);
+      result[name] = sheet ? sheet.getDataRange().getValues() : [];
+    });
+    const json = JSON.stringify({ ok: true, data: result });
+    const cb = e && e.parameter && e.parameter.callback;
+    const output = ContentService.createTextOutput(cb ? (cb + '(' + json + ')') : json);
+    output.setMimeType(cb ? ContentService.MimeType.JAVASCRIPT : ContentService.MimeType.JSON);
+    return output;
+  } catch(err) {
+    const json = JSON.stringify({ ok: false, error: err.toString() });
+    const cb = e && e.parameter && e.parameter.callback;
+    const output = ContentService.createTextOutput(cb ? (cb + '(' + json + ')') : json);
+    output.setMimeType(cb ? ContentService.MimeType.JAVASCRIPT : ContentService.MimeType.JSON);
+    return output;
+  }
+}</div>
+          <button class="btn-copy" id="copy-btn" onclick="copyCode()">Copy</button>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Deploy as a Web App</strong>
+          <p>Click <strong>Deploy → New deployment</strong>. Set type to <strong>Web app</strong>. Under "Execute as" choose <strong>Me</strong>. Under "Who has access" choose <strong>Anyone</strong>. Click <strong>Deploy</strong> and authorize when prompted.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Paste the Web App URL below</strong>
+          <p>After deploying, copy the Web App URL (it looks like <code style="font-size:11px;background:var(--bg);padding:1px 5px;border-radius:4px;">https://script.google.com/macros/s/…/exec</code>) and paste it here.</p>
+          <div class="url-input-wrap">
+            <input type="url" class="url-input" id="script-url-input"
+              placeholder="https://script.google.com/macros/s/…/exec"
+              oninput="validateUrlInput()" onpaste="setTimeout(validateUrlInput,0)"/>
+            <button class="btn-primary" onclick="saveAndConnect()" id="btn-connect" style="padding:10px 20px;font-size:13px;">Connect</button>
+          </div>
+          <p id="url-hint" style="font-size:11px;color:var(--gray);margin-top:6px;text-align:left;"></p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="divider">or</div>
+
+    <label class="btn-secondary" style="justify-content:center;">
+      📂 Load from Excel file instead
+      <input type="file" id="fi-setup" accept=".xlsx,.xls" style="display:none" onchange="loadFile(event)"/>
+    </label>
+  </div>
+</div>
+
+<!-- ═══ STATE: LOADING ═══ -->
+<div class="state-screen" id="screen-loading" style="display:none">
+  <div class="state-card">
+    <div class="spinner"></div>
+    <h2>Loading from Google Sheets…</h2>
+    <p>Fetching your live contract data. This only takes a second.</p>
+  </div>
+</div>
+
+<!-- ═══ STATE: ERROR ═══ -->
+<div class="state-screen" id="screen-error" style="display:none">
+  <div class="state-card">
+    <div class="icon">⚠️</div>
+    <h2>Couldn't Load Data</h2>
+    <div class="error-detail">
+      <strong id="error-msg">Unknown error.</strong>
+      The Apps Script returned an error or could not be reached.
+    </div>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:18px;">
+      Make sure the Web App is deployed with <strong>Execute as: Me</strong> and <strong>Who has access: Anyone</strong>. If you recently redeployed, update the URL below.
+    </p>
+    <button class="btn-primary" onclick="loadFromAppsScript(true)">↻ Retry</button>
+    <br>
+    <button class="btn-secondary" style="margin-top:10px;" onclick="showSetup()">⚙ Change Apps Script URL</button>
+    <br>
+    <label class="btn-secondary" style="margin-top:10px;justify-content:center;">
+      📂 Or load from Excel file instead
+      <input type="file" id="fi-err" accept=".xlsx,.xls" style="display:none" onchange="loadFile(event)"/>
+    </label>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="dashboard">
+
+  <div class="partial-notice" id="partial-notice"></div>
+
+  <!-- Sheet tabs -->
+  <div class="sheet-tabs" id="sheet-tabs"></div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <label>Rep</label>
+    <select id="f-rep" onchange="applyFilters()"><option value="">All Reps</option></select>
+    <label>Install Status</label>
+    <select id="f-install" onchange="applyFilters()">
+      <option value="">All</option>
+      <option>Installed, CN</option>
+      <option>Pending Intall</option>
+      <option>Install Declined</option>
+    </select>
+    <label>From</label>
+    <input type="date" id="f-from" onchange="applyFilters()"/>
+    <label>To</label>
+    <input type="date" id="f-to" onchange="applyFilters()"/>
+    <div class="spacer"></div>
+    <button class="btn-clear" onclick="clearFilters()">✕ Clear</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi k-gold"><div class="kpi-icon">📋</div><div class="kpi-lbl">Total Signed</div><div class="kpi-val" id="k-total">—</div><div class="kpi-sub" id="k-total-sub"></div></div>
+    <div class="kpi k-green"><div class="kpi-icon">✅</div><div class="kpi-lbl">Installed</div><div class="kpi-val" id="k-installed">—</div><div class="kpi-sub" id="k-installed-sub"></div></div>
+    <div class="kpi k-orange"><div class="kpi-icon">⏳</div><div class="kpi-lbl">Pending Install</div><div class="kpi-val" id="k-pending">—</div><div class="kpi-sub" id="k-pending-sub"></div></div>
+    <div class="kpi k-red"><div class="kpi-icon">❌</div><div class="kpi-lbl">Declined</div><div class="kpi-val" id="k-declined">—</div><div class="kpi-sub" id="k-declined-sub"></div></div>
+    <div class="kpi k-blue"><div class="kpi-icon">🏆</div><div class="kpi-lbl">Top Rep</div><div class="kpi-val" id="k-top" style="font-size:17px;">—</div><div class="kpi-sub" id="k-top-sub"></div></div>
+  </div>
+
+  <!-- Charts + Leaderboard -->
+  <div class="main-grid">
+    <div class="panel"><div class="panel-title">📊 Placements by Rep</div><canvas id="chart-rep"></canvas></div>
+    <div class="panel"><div class="panel-title">🔧 Install Status Breakdown</div><canvas id="chart-status"></canvas></div>
+    <div class="panel"><div class="panel-title">🏆 Leaderboard — Placements</div><div class="lb" id="leaderboard"></div></div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="table-panel">
+    <div class="table-hdr">
+      <div class="panel-title" style="margin:0;">📋 All Contracts</div>
+      <input class="search" id="search" placeholder="Search venue, rep, city…" oninput="applyFilters()"/>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('venue_name')">Venue</th>
+          <th onclick="sortBy('venue_address')">Address</th>
+          <th onclick="sortBy('sales_rep')">Rep</th>
+          <th onclick="sortBy('station')">Station</th>
+          <th onclick="sortBy('signed_at')">Signed</th>
+          <th onclick="sortBy('scheduled_date')">Scheduled</th>
+          <th onclick="sortBy('installed')">Install Status</th>
+          <th>Onboarding</th>
+          <th>Contract</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div id="no-rows">No records match the current filters.</div>
+    <div class="pagination">
+      <span id="pg-info"></span>
+      <div class="page-btns" id="pg-btns"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════════════════
+const SHEET_NAMES = ['Full Time Rep - Install', '1099 B - Rep Install', 'CN Installs - Onboarding'];
+const REFRESH_INTERVAL_MS = 3 * 60 * 1000; // 3 minutes
+const COLORS = ['#1A6EFF','#0B1120','#16A34A','#4D96FF','#7C3AED','#0891B2','#EA580C','#BE185D'];
+const LS_KEY = 'cn_apps_script_url';
+// Default Apps Script Web App URL — update this if you redeploy
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBFt_n1Lm5N5lWpzmB4OwnTyuL0q59-binDi2n6mTrIL4MZK_c0eAol6CygH1w5iFT/exec';
+
+// ─── State ────────────────────────────────────────────────────
+let sheetsData = {};
+let activeSheet = '';
+let allRows = [];
+let filtered = [];
+let sortKey = 'signed_at', sortDir = 'desc';
+let page = 1;
+const PER = 15;
+let charts = {};
+let refreshTimer = null;
+
+// ════════════════════════════════════════════════════════════════
+// SETUP SCREEN
+// ════════════════════════════════════════════════════════════════
+function getSavedUrl() { try { return localStorage.getItem(LS_KEY) || DEFAULT_SCRIPT_URL; } catch(e) { return DEFAULT_SCRIPT_URL; } }
+function saveUrl(url)  { try { localStorage.setItem(LS_KEY, url); } catch(e) {} }
+function clearUrl()    { try { localStorage.removeItem(LS_KEY); } catch(e) {} }
+
+function showSetup() {
+  document.getElementById('screen-setup').style.display   = 'flex';
+  document.getElementById('screen-loading').style.display = 'none';
+  document.getElementById('screen-error').style.display   = 'none';
+  document.getElementById('dashboard').style.display      = 'none';
+  document.getElementById('sync-pill').style.display      = 'none';
+  document.getElementById('btn-refresh').style.display    = 'none';
+  document.getElementById('btn-settings').style.display   = 'none';
+  // Pre-fill saved URL (or default)
+  const saved = getSavedUrl();
+  document.getElementById('script-url-input').value = saved;
+  validateUrlInput();
+}
+
+function showSetupFromHeader() {
+  showSetup();
+}
+
+function validateUrlInput() {
+  const v = document.getElementById('script-url-input').value.trim();
+  const hint = document.getElementById('url-hint');
+  const input = document.getElementById('script-url-input');
+  if (!v) { input.className='url-input'; hint.textContent=''; return; }
+  if (v.includes('script.google.com/macros/s/') && v.endsWith('/exec')) {
+    input.className='url-input valid';
+    hint.style.color='var(--green)';
+    hint.textContent='✓ URL looks valid!';
+  } else {
+    input.className='url-input invalid';
+    hint.style.color='var(--red)';
+    hint.textContent='URL should look like: https://script.google.com/macros/s/…/exec';
+  }
+}
+
+function saveAndConnect() {
+  const url = document.getElementById('script-url-input').value.trim();
+  if (!url) { alert('Please paste the Apps Script Web App URL first.'); return; }
+  if (!url.includes('script.google.com')) {
+    if (!confirm('The URL doesn\'t look like a Google Apps Script URL. Continue anyway?')) return;
+  }
+  saveUrl(url);
+  loadFromAppsScript(true);
+}
+
+function copyCode() {
+  const code = document.getElementById('apps-script-code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = code; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// SCREEN HELPERS
+// ════════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.getElementById('screen-setup').style.display   = 'none';
+  document.getElementById('screen-loading').style.display = 'none';
+  document.getElementById('screen-error').style.display   = 'none';
+  document.getElementById('dashboard').style.display      = 'none';
+  if (id) document.getElementById(id).style.display = 'flex';
+}
+function showDashboard() {
+  document.getElementById('screen-setup').style.display   = 'none';
+  document.getElementById('screen-loading').style.display = 'none';
+  document.getElementById('screen-error').style.display   = 'none';
+  document.getElementById('dashboard').style.display      = 'block';
+  document.getElementById('sync-pill').style.display      = 'flex';
+  document.getElementById('btn-refresh').style.display    = 'flex';
+  document.getElementById('btn-settings').style.display   = 'flex';
+}
+
+// ════════════════════════════════════════════════════════════════
+// SYNC UI
+// ════════════════════════════════════════════════════════════════
+function setSyncing() {
+  document.getElementById('sync-dot').className = 'sync-dot syncing';
+  document.getElementById('sync-label').textContent = 'Syncing…';
+  document.getElementById('btn-refresh').disabled = true;
+}
+function setSynced() {
+  const t = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  document.getElementById('sync-dot').className = 'sync-dot';
+  document.getElementById('sync-label').textContent = `Synced ${t}`;
+  document.getElementById('btn-refresh').disabled = false;
+}
+function setSyncError(msg) {
+  document.getElementById('sync-dot').className = 'sync-dot error';
+  document.getElementById('sync-label').textContent = 'Sync failed';
+  document.getElementById('btn-refresh').disabled = false;
+  document.getElementById('error-msg').textContent = msg || 'Unknown error.';
+}
+
+// ════════════════════════════════════════════════════════════════
+// JSONP FETCH  (works from file:// — no CORS issues)
+// ════════════════════════════════════════════════════════════════
+function fetchViaJsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cbName = '__gasCallback_' + Date.now();
+    const scriptId = '_jsonp_' + cbName;
+    let done = false;
+
+    const cleanup = () => {
+      done = true;
+      delete window[cbName];
+      const el = document.getElementById(scriptId);
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    };
+
+    window[cbName] = function(data) {
+      if (done) return;
+      cleanup();
+      resolve(data);
+    };
+
+    const sep = url.includes('?') ? '&' : '?';
+    const s = document.createElement('script');
+    s.id = scriptId;
+    s.src = url + sep + 'callback=' + cbName + '&_t=' + Date.now();
+    s.onerror = () => {
+      if (done) return;
+      cleanup();
+      reject(new Error(
+        'Could not reach the Apps Script URL. ' +
+        'Make sure it is deployed as a Web App with "Who has access: Anyone".'
+      ));
+    };
+    // Timeout safety net — 15 seconds
+    setTimeout(() => {
+      if (done) return;
+      cleanup();
+      reject(new Error('Request timed out after 15 seconds. Check your Apps Script URL.'));
+    }, 15000);
+
+    document.head.appendChild(s);
+  });
+}
+
+async function loadFromAppsScript(isManual = false) {
+  const scriptUrl = getSavedUrl();
+  if (!scriptUrl) { showSetup(); return; }
+
+  setSyncing();
+  document.getElementById('sync-pill').style.display = 'flex';
+  document.getElementById('btn-refresh').style.display = 'flex';
+  document.getElementById('btn-settings').style.display = 'flex';
+  if (!Object.keys(sheetsData).length) showScreen('screen-loading');
+
+  let json;
+  try {
+    json = await fetchViaJsonp(scriptUrl);
+  } catch(err) {
+    setSyncError(err.message || String(err));
+    showScreen('screen-error');
+    scheduleNextRefresh();
+    return;
+  }
+
+  if (!json.ok) {
+    setSyncError(json.error || 'Apps Script returned an error.');
+    showScreen('screen-error');
+    scheduleNextRefresh();
+    return;
+  }
+
+  // Parse the returned data (object of sheetName -> array of rows)
+  const newData = {};
+  const failedSheets = [];
+  SHEET_NAMES.forEach(sn => {
+    const rawRows = json.data && json.data[sn];
+    if (!rawRows || !Array.isArray(rawRows)) { failedSheets.push(sn); return; }
+    const rows = parseSheetRows(rawRows, sn);
+    if (rows.length) newData[sn] = rows;
+    else failedSheets.push(sn);
+  });
+
+  if (!Object.keys(newData).length) {
+    setSyncError('No data rows found in any sheet. Check that sheet names match exactly.');
+    showScreen('screen-error');
+    scheduleNextRefresh();
+    return;
+  }
+
+  sheetsData = newData;
+  setSynced();
+  showDashboard();
+
+  const notice = document.getElementById('partial-notice');
+  if (failedSheets.length) {
+    notice.style.display = 'block';
+    notice.textContent = `⚠️ No data found in: ${failedSheets.join(', ')}. Other sheets loaded fine.`;
+  } else {
+    notice.style.display = 'none';
+  }
+
+  const prevSheet = activeSheet;
+  buildTabs();
+  const sheetToSelect = (prevSheet && (prevSheet === '__all__' || newData[prevSheet]))
+    ? prevSheet : Object.keys(newData)[0];
+  setActiveSheet(sheetToSelect);
+  scheduleNextRefresh();
+}
+
+function scheduleNextRefresh() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(() => loadFromAppsScript(false), REFRESH_INTERVAL_MS);
+}
+
+// ════════════════════════════════════════════════════════════════
+// ROW PARSER  (input: array-of-arrays from Apps Script JSON)
+// ════════════════════════════════════════════════════════════════
+function toDate(v) {
+  if (!v) return null;
+  if (v instanceof Date) return isNaN(v) ? null : v;
+  if (typeof v === 'number') return new Date(Math.round((v - 25569) * 86400 * 1000));
+  const s = String(v).trim();
+  if (!s) return null;
+  // Apps Script returns Date objects serialised as "Date(yyyy,mm,dd)" strings sometimes
+  const dm = s.match(/^Date\((\d+),(\d+),(\d+)/);
+  if (dm) return new Date(+dm[1], +dm[2], +dm[3]);
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
+function isRealRep(name) {
+  if (!name) return false;
+  return !/^[0-9a-f]{8}-/.test(String(name)) && String(name).trim().length > 1;
+}
+
+function parseSheetRows(raw, sheetName) {
+  if (!raw || !raw.length) return [];
+
+  // Find header row: look for a row containing 'venue'
+  let hrow = -1;
+  for (let i = 0; i < Math.min(raw.length, 8); i++) {
+    if (raw[i].some(c => String(c).toLowerCase().includes('venue'))) { hrow = i; break; }
+  }
+  if (hrow === -1) return [];
+
+  const hdrs = raw[hrow].map(h => String(h).trim().toLowerCase());
+  const idx = k => hdrs.findIndex(h => h.includes(k));
+
+  const iVenue=idx('venue_name'), iAddr=idx('venue_address'), iPoc=idx('poc_name');
+  const iStation=idx('station_detail'), iRevShare=idx('revenue_share');
+  const iStatus=idx('status'), iSigned=idx('signed_at');
+  const iSched=idx('scheduled_date'), iRep=idx('sales_rep');
+  const iInstalled=idx('installed'), iSF=idx('salesforce');
+  const iFD=idx('fuzedash'), iStripe=idx('stripe');
+  const iContract=idx('contract');
+
+  const rows = [];
+  for (let r = hrow + 1; r < raw.length; r++) {
+    const row = raw[r];
+    const venue = iVenue >= 0 ? String(row[iVenue] || '').trim() : '';
+    if (!venue) continue;
+    const repRaw = iRep >= 0 ? String(row[iRep] || '').trim() : '';
+    rows.push({
+      _sheet: sheetName,
+      venue_name: venue,
+      venue_address: iAddr >= 0 ? String(row[iAddr] || '').trim() : '',
+      poc_name: iPoc >= 0 ? String(row[iPoc] || '').trim() : '',
+      station: iStation >= 0 ? String(row[iStation] || '').trim() : '',
+      rev_share: iRevShare >= 0 ? String(row[iRevShare] || '').trim() : '',
+      status: iStatus >= 0 ? String(row[iStatus] || '').trim() : '',
+      signed_at: iSigned >= 0 ? toDate(row[iSigned]) : null,
+      scheduled_date: iSched >= 0 ? toDate(row[iSched]) : null,
+      sales_rep: isRealRep(repRaw) ? repRaw : '',
+      installed: iInstalled >= 0 ? String(row[iInstalled] || '').trim() : '',
+      sf:     iSF >= 0     ? row[iSF]     : '',
+      fd:     iFD >= 0     ? row[iFD]     : '',
+      stripe: iStripe >= 0 ? row[iStripe] : '',
+      contract_url: iContract >= 0 ? String(row[iContract] || '').trim() : '',
+    });
+  }
+  return rows;
+}
+
+// ════════════════════════════════════════════════════════════════
+// EXCEL FILE FALLBACK
+// ════════════════════════════════════════════════════════════════
+function loadFile(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const doLoad = () => {
+    const reader = new FileReader();
+    reader.onload = evt => {
+      try {
+        const wb = XLSX.read(new Uint8Array(evt.target.result), {type:'array', cellDates:true});
+        const newData = {};
+        SHEET_NAMES.forEach(sn => {
+          if (!wb.SheetNames.includes(sn)) return;
+          const ws = wb.Sheets[sn];
+          const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+          const rows = parseSheetRows(raw, sn);
+          if (rows.length) newData[sn] = rows;
+        });
+        if (!Object.keys(newData).length) { alert('No recognized sheets found.'); return; }
+        sheetsData = newData;
+        if (refreshTimer) { clearTimeout(refreshTimer); refreshTimer = null; }
+        document.getElementById('sync-dot').className = 'sync-dot';
+        document.getElementById('sync-label').textContent = `Loaded: ${file.name}`;
+        document.getElementById('partial-notice').style.display = 'none';
+        showDashboard();
+        buildTabs();
+        setActiveSheet(Object.keys(newData)[0]);
+      } catch(err) { alert('Error reading file: ' + err.message); }
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = '';
+  };
+  if (typeof XLSX !== 'undefined') { doLoad(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  s.onload = doLoad;
+  document.head.appendChild(s);
+  e.target.value = '';
+}
+
+// ════════════════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════════════════
+function buildTabs() {
+  const el = document.getElementById('sheet-tabs');
+  const allCount = Object.values(sheetsData).flat().length;
+  let html = `<div class="tab" onclick="setActiveSheet('__all__')" id="tab___all__">All Sheets <span class="tab-count">${allCount}</span></div>`;
+  Object.entries(sheetsData).forEach(([sn, rows]) => {
+    const id = 'tab_' + sn.replace(/\W+/g,'_');
+    html += `<div class="tab" onclick="setActiveSheet('${sn.replace(/'/g,"\\'")}\')" id="${id}">${sn} <span class="tab-count">${rows.length}</span></div>`;
+  });
+  el.innerHTML = html;
+}
+
+function setActiveSheet(sn) {
+  activeSheet = sn;
+  document.querySelectorAll('.sheet-tabs .tab').forEach(t => t.classList.remove('active'));
+  const id = sn === '__all__' ? 'tab___all__' : 'tab_' + sn.replace(/\W+/g,'_');
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  allRows = sn === '__all__' ? Object.values(sheetsData).flat() : (sheetsData[sn] || []);
+  populateRepFilter();
+  applyFilters();
+}
+
+function populateRepFilter() {
+  const reps = [...new Set(allRows.map(r => r.sales_rep).filter(Boolean))].sort();
+  const el = document.getElementById('f-rep');
+  const cur = el.value;
+  el.innerHTML = '<option value="">All Reps</option>' + reps.map(r => `<option ${r===cur?'selected':''}>${r}</option>`).join('');
+}
+
+// ════════════════════════════════════════════════════════════════
+// FILTERS
+// ════════════════════════════════════════════════════════════════
+function applyFilters() {
+  const rep   = document.getElementById('f-rep').value;
+  const inst  = document.getElementById('f-install').value;
+  const from  = document.getElementById('f-from').value;
+  const to    = document.getElementById('f-to').value;
+  const q     = document.getElementById('search').value.toLowerCase();
+  filtered = allRows.filter(r => {
+    if (rep  && r.sales_rep !== rep) return false;
+    if (inst && r.installed !== inst) return false;
+    if (from && r.signed_at && r.signed_at < new Date(from+'T00:00:00')) return false;
+    if (to   && r.signed_at && r.signed_at > new Date(to+'T23:59:59'))   return false;
+    if (q) {
+      const hay = [r.venue_name, r.venue_address, r.sales_rep, r.station, r.installed, r.poc_name].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  page = 1;
+  renderAll();
+}
+
+function clearFilters() {
+  ['f-rep','f-install','f-from','f-to'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('search').value = '';
+  applyFilters();
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════════════════════════
+function fmtDate(v) {
+  if (!v) return '—';
+  const d = v instanceof Date ? v : new Date(v);
+  if (isNaN(d)) return String(v).split('T')[0] || '—';
+  return d.toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'numeric'});
+}
+
+function installBadge(v) {
+  const s = String(v||'').trim();
+  if (s === 'Installed, CN') return `<span class="badge b-installed">✓ Installed</span>`;
+  if (s.toLowerCase().includes('pending')) return `<span class="badge b-pending">⏳ Pending</span>`;
+  if (s.toLowerCase().includes('decline')) return `<span class="badge b-declined">✗ Declined</span>`;
+  if (s) return `<span class="badge b-other">${s}</span>`;
+  return '<span class="badge b-other">—</span>';
+}
+
+function obDot(label, val) {
+  const yes = val && String(val).trim() && String(val).toLowerCase() !== 'nan' && String(val).toLowerCase() !== 'false';
+  return `<div class="ob-dot ${yes?'ob-yes':'ob-no'}" title="${label}">${label[0]}</div>`;
+}
+
+function renderAll() { renderKPIs(); renderCharts(); renderLeaderboard(); renderTable(); }
+
+function renderKPIs() {
+  const d = filtered, total = d.length;
+  const installed = d.filter(r => r.installed === 'Installed, CN').length;
+  const pending   = d.filter(r => r.installed && r.installed.toLowerCase().includes('pending')).length;
+  const declined  = d.filter(r => r.installed && r.installed.toLowerCase().includes('decline')).length;
+  const repMap = {};
+  d.forEach(r => { if(r.sales_rep){ repMap[r.sales_rep] = (repMap[r.sales_rep]||0) + 1; } });
+  const topEntry = Object.entries(repMap).sort((a,b) => b[1]-a[1])[0];
+  document.getElementById('k-total').textContent = total;
+  document.getElementById('k-total-sub').textContent = `${Object.keys(repMap).length} reps`;
+  document.getElementById('k-installed').textContent = installed;
+  document.getElementById('k-installed-sub').textContent = total ? `${Math.round(installed/total*100)}% of total` : '';
+  document.getElementById('k-pending').textContent = pending;
+  document.getElementById('k-pending-sub').textContent = pending ? 'Awaiting installation' : 'None pending';
+  document.getElementById('k-declined').textContent = declined;
+  document.getElementById('k-declined-sub').textContent = declined ? `${Math.round(declined/total*100)}% decline rate` : '';
+  document.getElementById('k-top').textContent = topEntry ? topEntry[0].split(' ')[0] : '—';
+  document.getElementById('k-top-sub').textContent = topEntry ? `${topEntry[1]} placement${topEntry[1]!==1?'s':''}` : '';
+}
+
+function destroyChart(id) { if(charts[id]){charts[id].destroy();delete charts[id];} }
+
+function renderCharts() {
+  destroyChart('rep');
+  const repMap = {};
+  filtered.forEach(r => { if(r.sales_rep) repMap[r.sales_rep] = (repMap[r.sales_rep]||0) + 1; });
+  const repEntries = Object.entries(repMap).sort((a,b) => b[1]-a[1]);
+  charts['rep'] = new Chart(document.getElementById('chart-rep').getContext('2d'), {
+    type:'bar',
+    data:{labels:repEntries.map(e=>e[0]),datasets:[{label:'Placements',data:repEntries.map(e=>e[1]),backgroundColor:repEntries.map((_,i)=>COLORS[i%COLORS.length]),borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#F1F5F9'},ticks:{stepSize:1,font:{size:11}}}}}
+  });
+
+  destroyChart('status');
+  const inst2 = filtered.filter(r=>r.installed==='Installed, CN').length;
+  const pend2 = filtered.filter(r=>r.installed&&r.installed.toLowerCase().includes('pending')).length;
+  const decl2 = filtered.filter(r=>r.installed&&r.installed.toLowerCase().includes('decline')).length;
+  const oth2  = filtered.length - inst2 - pend2 - decl2;
+  charts['status'] = new Chart(document.getElementById('chart-status').getContext('2d'), {
+    type:'doughnut',
+    data:{labels:['Installed','Pending','Declined','Other'],datasets:[{data:[inst2,pend2,decl2,oth2>0?oth2:undefined].filter(v=>v!==undefined),backgroundColor:['#16A34A','#CA8A04','#DC2626','#94A3B8'],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:11,padding:10}}}}
+  });
+}
+
+function renderLeaderboard() {
+  const repMap = {};
+  filtered.forEach(r => {
+    if(r.sales_rep){
+      if(!repMap[r.sales_rep]) repMap[r.sales_rep] = {count:0, installed:0};
+      repMap[r.sales_rep].count++;
+      if(r.installed === 'Installed, CN') repMap[r.sales_rep].installed++;
+    }
+  });
+  const sorted = Object.entries(repMap).sort((a,b) => b[1].count - a[1].count);
+  const max = sorted[0] ? sorted[0][1].count : 1;
+  const lb = document.getElementById('leaderboard');
+  if(!sorted.length){ lb.innerHTML='<div style="color:var(--gray);text-align:center;padding:20px;font-size:13px;">No data</div>'; return; }
+  lb.innerHTML = sorted.slice(0,8).map(([name,info],i) => {
+    const rc = i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+    const pct = max > 0 ? Math.round(info.count/max*100) : 0;
+    return `<div class="lb-row"><div class="lb-rank ${rc}">${i+1}</div><div class="lb-info"><div class="lb-name" title="${name}">${name}</div><div class="lb-sub">${info.installed}/${info.count} installed</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${pct}%"></div></div><div class="lb-num"><div class="lb-n">${info.count}</div><div class="lb-lbl">placements</div></div></div>`;
+  }).join('');
+}
+
+function sortBy(key) {
+  if (sortKey===key) sortDir = sortDir==='asc'?'desc':'asc'; else { sortKey=key; sortDir='asc'; }
+  document.querySelectorAll('thead th').forEach(th => { th.classList.remove('asc','desc'); });
+  const keyMap = {venue_name:0,venue_address:1,sales_rep:2,station:3,signed_at:4,scheduled_date:5,installed:6};
+  const ki = keyMap[key];
+  if(ki !== undefined) document.querySelectorAll('thead th')[ki].classList.add(sortDir);
+  filtered.sort((a,b) => {
+    let va=a[key], vb=b[key];
+    if(va instanceof Date && vb instanceof Date) return sortDir==='asc' ? va-vb : vb-va;
+    if(typeof va==='number' && typeof vb==='number') return sortDir==='asc' ? va-vb : vb-va;
+    va=String(va||'').toLowerCase(); vb=String(vb||'').toLowerCase();
+    return sortDir==='asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+  renderTable();
+}
+
+function renderTable() {
+  const tbody  = document.getElementById('tbody');
+  const noRows = document.getElementById('no-rows');
+  const total  = filtered.length;
+  const pages  = Math.max(1, Math.ceil(total/PER));
+  if(page > pages) page = pages;
+  const start = (page-1)*PER;
+  const slice = filtered.slice(start, start+PER);
+  if(!total){ tbody.innerHTML=''; noRows.style.display='block'; document.getElementById('pg-info').textContent=''; document.getElementById('pg-btns').innerHTML=''; return; }
+  noRows.style.display = 'none';
+  tbody.innerHTML = slice.map(r => {
+    const stationClean = (r.station||'').replace(/[\[\]"]/g,'').trim();
+    const contractHtml = r.contract_url ? `<a class="contract-link" href="${r.contract_url}" target="_blank" rel="noopener">📄 View</a>` : '—';
+    const obHtml = `<div class="ob-dots">${obDot('Salesforce',r.sf)}${obDot('FUZEDash',r.fd)}${obDot('Stripe',r.stripe)}</div>`;
+    const repLabel = r.sales_rep || `<span style="color:var(--gray);font-size:11px;">—</span>`;
+    return `<tr>
+      <td><div class="venue-name" title="${r.venue_name}">${r.venue_name}</div></td>
+      <td><div class="address-cell" title="${r.venue_address}">${r.venue_address||'—'}</div></td>
+      <td><strong>${repLabel}</strong></td>
+      <td style="font-size:11.5px;color:var(--gray);">${stationClean||'—'}</td>
+      <td style="white-space:nowrap;">${fmtDate(r.signed_at)}</td>
+      <td style="white-space:nowrap;">${fmtDate(r.scheduled_date)}</td>
+      <td>${installBadge(r.installed)}</td>
+      <td>${obHtml}</td>
+      <td>${contractHtml}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('pg-info').textContent = `Showing ${start+1}–${Math.min(start+PER,total)} of ${total}`;
+  const pgs = document.getElementById('pg-btns');
+  let h = `<button class="pg" onclick="goPage(${page-1})" ${page===1?'disabled':''}>‹</button>`;
+  const rng = [];
+  for(let i=1;i<=pages;i++){
+    if(i===1||i===pages||(i>=page-2&&i<=page+2)) rng.push(i);
+    else if(rng[rng.length-1]!=='…') rng.push('…');
+  }
+  rng.forEach(p => {
+    if(p==='…') h += `<span class="pg" style="cursor:default">…</span>`;
+    else h += `<button class="pg ${p===page?'on':''}" onclick="goPage(${p})">${p}</button>`;
+  });
+  h += `<button class="pg" onclick="goPage(${page+1})" ${page===pages?'disabled':''}>›</button>`;
+  pgs.innerHTML = h;
+}
+
+function goPage(p){ const pages=Math.ceil(filtered.length/PER); if(p<1||p>pages)return; page=p; renderTable(); }
+
+// ════════════════════════════════════════════════════════════════
+// INIT — check for saved URL, go straight to loading if found
+// ════════════════════════════════════════════════════════════════
+(function init() {
+  const saved = getSavedUrl();
+  if (saved) {
+    loadFromAppsScript();
+  } else {
+    showSetup();
+  }
+})();
+</script>
+</body>
+</html>
