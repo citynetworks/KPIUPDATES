@@ -14,179 +14,167 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-/* HEADER */
 header{background:linear-gradient(135deg,var(--cf-dark) 0%,var(--cf-mid) 100%);border-bottom:2px solid var(--cf-blue);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.4);}
 .brand{display:flex;align-items:center;gap:10px;}
 .brand-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--cf-blue),#0050CC);display:flex;align-items:center;justify-content:center;font-weight:900;font-style:italic;font-size:14px;color:#fff;box-shadow:0 0 12px var(--cf-glow);}
-.brand-name{font-size:19px;font-weight:700;color:#fff;} .brand-name span{color:var(--cf-blue);}
+.brand-name{font-size:19px;font-weight:700;color:#fff;}.brand-name span{color:var(--cf-blue);}
 .brand-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px;}
 .header-right{display:flex;align-items:center;gap:8px;}
 .sync-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(255,255,255,.7);}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
 .sync-dot.loading{background:var(--orange);animation:pulse 1s infinite;}
-.hbtn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;transition:all .2s;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hbtn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-radius:8px;padding:6px 13px;font-size:12px;cursor:pointer;}
 .hbtn:hover{background:rgba(255,255,255,.14);border-color:var(--cf-blue);}
 .hbtn.primary{background:var(--cf-blue);border-color:var(--cf-blue);color:#fff;}
-/* NAV TABS (top level: Tracker / ROI) */
+/* NAV TABS */
 .main-nav{background:var(--cf-dark);border-bottom:1px solid rgba(255,255,255,.08);padding:0 24px;display:flex;gap:4px;}
 .nav-btn{padding:10px 18px;font-size:13px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.nav-btn:hover{color:rgba(255,255,255,.85);}
 .nav-btn.active{color:#fff;border-bottom-color:var(--cf-blue);}
-.nav-btn:hover{color:rgba(255,255,255,.8);}
-/* LAYOUT */
-.main{padding:20px 24px;max-width:1400px;margin:0 auto;}
-.view{display:none;} .view.active{display:block;}
-/* SHEET TABS */
-.tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
-.tab{padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;border:1.5px solid var(--border);background:var(--card);color:var(--muted);transition:all .2s;display:flex;align-items:center;gap:7px;}
-.tab:hover{border-color:var(--cf-blue);color:var(--cf-blue);}
-.tab.active{background:var(--cf-blue);border-color:var(--cf-blue);color:#fff;}
-.tab .badge{background:rgba(255,255,255,.25);border-radius:12px;padding:1px 7px;font-size:11px;font-weight:700;}
-.tab:not(.active) .badge{background:var(--bg);color:var(--muted);}
+/* TABS (sheet tabs) */
+.tabs-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:4px;overflow-x:auto;}
+.tab{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--cf-blue);border-bottom-color:var(--cf-blue);font-weight:600;}
+.tab-count{background:var(--bg);border-radius:10px;padding:2px 7px;font-size:11px;margin-left:5px;}
 /* FILTERS */
-.filters{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.filter-group{display:flex;align-items:center;gap:8px;}
-.filter-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;}
-select,input[type=date],input[type=number]{padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;color:var(--text);background:#fff;cursor:pointer;transition:border-color .2s;}
-select:focus,input:focus{outline:none;border-color:var(--cf-blue);}
-.btn-clear{padding:6px 14px;border-radius:7px;border:1.5px solid var(--border);background:#fff;color:var(--muted);font-size:12px;cursor:pointer;margin-left:auto;transition:all .2s;font-weight:600;}
-.btn-clear:hover{border-color:var(--red);color:var(--red);}
+.filters-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;flex:1;min-width:180px;}
+.search-box input{border:none;background:transparent;outline:none;width:100%;font-size:13px;color:var(--text);}
+.filters-bar select{padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:#fff;color:var(--text);}
+.date-range{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+.date-range input{padding:6px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;background:#fff;}
 /* COMMISSION BAR */
-.commission-bar{background:linear-gradient(135deg,#0D1526,#162040);border:1px solid rgba(26,110,255,.3);border-radius:12px;padding:14px 20px;margin-bottom:18px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;box-shadow:0 4px 20px rgba(0,0,0,.2);}
-.commission-bar.hidden{display:none;}
-.comm-item{display:flex;flex-direction:column;gap:3px;}
-.comm-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.8px;}
-.comm-val{font-size:22px;font-weight:800;color:#fff;}
-.comm-sub{font-size:11px;color:rgba(255,255,255,.4);}
-.comm-div{width:1px;height:40px;background:rgba(255,255,255,.1);}
-.tier-pills{display:flex;gap:8px;flex-wrap:wrap;}
-.tier-pill{display:flex;align-items:center;gap:6px;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;}
-.tier-pill.a{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22C55E;}
-.tier-pill.b{background:rgba(26,110,255,.15);border:1px solid rgba(26,110,255,.3);color:#4D96FF;}
-.tier-pill.c{background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#A78BFA;}
-.tier-pill .pill-count{font-size:10px;opacity:.7;}
-.needs-review-badge{display:flex;align-items:center;gap:5px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:6px 12px;color:#F59E0B;font-size:12px;font-weight:700;}
-.needs-review-badge.hidden{display:none;}
-/* KPI CARDS */
-.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px;}
-@media(max-width:1000px){.kpi-grid{grid-template-columns:repeat(3,1fr);}}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;border-top:3px solid var(--border);}
-.kpi.blue{border-top-color:var(--cf-blue);} .kpi.green{border-top-color:var(--green);}
-.kpi.orange{border-top-color:var(--orange);} .kpi.red{border-top-color:var(--red);}
-.kpi.purple{border-top-color:var(--purple);}
-.kpi-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
-.kpi-value{font-size:28px;font-weight:800;color:var(--text);}
-.kpi-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+.commission-bar{background:var(--cf-dark);border-bottom:1px solid rgba(255,255,255,.08);padding:10px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.comm-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;}
+.comm-tier{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:6px 14px;}
+.comm-tier-name{font-size:12px;font-weight:700;color:#fff;}
+.comm-tier-amount{font-size:15px;font-weight:800;color:var(--cf-blue);}
+.comm-tier-count{font-size:11px;color:rgba(255,255,255,.4);}
+.comm-divider{width:1px;height:28px;background:rgba(255,255,255,.1);}
+.comm-review{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--orange);}
+/* VIEWS */
+.view{display:none;}.view.active{display:block;}
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;padding:20px 24px;}
+.kpi-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.kpi-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+.kpi-value{font-size:28px;font-weight:800;color:var(--text);line-height:1;}
+.kpi-sub{font-size:12px;color:var(--muted);margin-top:5px;}
+.kpi-card.blue .kpi-value{color:var(--cf-blue);}
+.kpi-card.green .kpi-value{color:var(--green);}
+.kpi-card.orange .kpi-value{color:var(--orange);}
+.kpi-card.red .kpi-value{color:var(--red);}
 /* CHARTS */
-.charts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px;}
-.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;}
-.chart-title{font-size:12px;font-weight:700;color:var(--cf-blue);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;}
-.chart-wrap{position:relative;height:200px;}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 24px 20px;}
+.chart-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.chart-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;}
 /* TABLE */
-.table-section{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-.table-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-.table-title{font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.8px;}
-.search-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;width:220px;}
-.search-box input{border:none;background:transparent;font-size:13px;color:var(--text);width:100%;}
-.search-box input:focus{outline:none;}
-.table-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-thead th{background:#F7F9FC;border-bottom:1.5px solid var(--border);padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;}
-tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
-tbody tr:hover{background:#F7F9FC;}
-tbody tr:last-child{border-bottom:none;}
-td{padding:10px 14px;vertical-align:middle;}
-.venue-name{font-weight:600;}
-.venue-addr{font-size:11px;color:var(--muted);margin-top:2px;}
-.status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-.status-installed{background:#DCFCE7;color:#16A34A;}
-.status-pending{background:#FEF9C3;color:#A16207;}
-.status-declined{background:#FEE2E2;color:#DC2626;}
-.status-other{background:#F3F4F6;color:#6B7280;}
-.odots{display:flex;gap:4px;}
-.odot{width:22px;height:22px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--muted);border:1.5px solid var(--border);}
-.odot.done{background:#DCFCE7;color:#16A34A;border-color:#86EFAC;}
-.view-link{color:var(--cf-blue);font-size:12px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;}
-.view-link:hover{background:rgba(26,110,255,.08);}
-.tier-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;font-size:12px;font-weight:800;}
-.tier-badge.A{background:rgba(34,197,94,.15);color:#16A34A;}
-.tier-badge.B{background:rgba(26,110,255,.15);color:#1A6EFF;}
-.tier-badge.C{background:rgba(139,92,246,.15);color:#7C3AED;}
-.tier-badge.NR{background:rgba(245,158,11,.15);color:#D97706;font-size:9px;width:auto;padding:0 6px;}
-.col-tier,.col-commission{display:none;}
+.table-section{padding:0 24px 24px;}
+.table-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.table-title{font-size:14px;font-weight:700;color:var(--text);}
+.table-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+table{width:100%;border-collapse:collapse;}
+th{background:#F8FAFF;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1.5px solid var(--border);white-space:nowrap;}
+td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#F8FAFF;}
+.venue-name{font-weight:600;color:var(--text);}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.status-installed{background:rgba(34,197,94,.12);color:#16A34A;}
+.status-pending{background:rgba(245,158,11,.12);color:#D97706;}
+.status-declined{background:rgba(239,68,68,.12);color:#DC2626;}
+.status-other{background:rgba(122,135,160,.12);color:var(--muted);}
+.tier-badge{display:inline-block;padding:2px 9px;border-radius:8px;font-size:11px;font-weight:800;}
+.tier-a{background:rgba(34,197,94,.12);color:#16A34A;}
+.tier-b{background:rgba(26,110,255,.12);color:var(--cf-blue);}
+.tier-c{background:rgba(245,158,11,.12);color:#D97706;}
+.tier-review{background:rgba(239,68,68,.1);color:var(--red);font-size:10px;}
+.contract-link{color:var(--cf-blue);text-decoration:none;font-size:12px;}
+.contract-link:hover{text-decoration:underline;}
 /* LEADERBOARD */
-.leaderboard{display:flex;flex-direction:column;gap:10px;}
-.lb-row{display:flex;align-items:center;gap:10px;}
-.lb-rank{width:26px;height:26px;border-radius:50%;background:var(--bg);font-size:12px;font-weight:800;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.lb-rank.r1{background:var(--cf-blue);color:#fff;} .lb-rank.r2{background:#94A3B8;color:#fff;} .lb-rank.r3{background:#B45309;color:#fff;}
-.lb-info{flex:1;min-width:0;}
-.lb-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.lb-detail{font-size:11px;color:var(--muted);}
-.lb-bar-wrap{width:120px;background:var(--bg);border-radius:4px;height:6px;flex-shrink:0;}
-.lb-bar{height:6px;border-radius:4px;background:var(--cf-blue);}
-.lb-count{font-size:13px;font-weight:700;white-space:nowrap;}
-
-/* ═══ ROI TRACKER ═══ */
-.roi-settings{background:linear-gradient(135deg,#0D1526,#162040);border:1px solid rgba(26,110,255,.3);border-radius:12px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
-.roi-settings-title{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;}
-.cost-input-group{display:flex;align-items:center;gap:8px;}
-.cost-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.7);}
-.cost-input{width:90px;padding:5px 8px;border-radius:6px;border:1px solid rgba(26,110,255,.3);background:rgba(255,255,255,.08);color:#fff;font-size:13px;font-weight:700;text-align:center;}
-.cost-input:focus{outline:none;border-color:var(--cf-blue);}
-.roi-kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px;}
-@media(max-width:1100px){.roi-kpi-grid{grid-template-columns:repeat(3,1fr);}}
-.roi-kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;border-top:3px solid var(--border);}
-.roi-kpi.blue{border-top-color:var(--cf-blue);} .roi-kpi.green{border-top-color:var(--green);}
-.roi-kpi.red{border-top-color:var(--red);} .roi-kpi.orange{border-top-color:var(--orange);}
-.roi-kpi.purple{border-top-color:var(--purple);}
-.roi-kpi-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
-.roi-kpi-value{font-size:24px;font-weight:800;color:var(--text);}
-.roi-kpi-sub{font-size:11px;color:var(--muted);margin-top:3px;}
-.roi-table-section{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-.roi-status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-.roi-profitable{background:#DCFCE7;color:#16A34A;}
-.roi-progress{background:#FEF9C3;color:#A16207;}
-.roi-pending{background:#F3F4F6;color:#6B7280;}
-.roi-loss{background:#FEE2E2;color:#DC2626;}
-.progress-bar-wrap{width:100px;background:var(--bg);border-radius:4px;height:6px;display:inline-block;vertical-align:middle;margin-left:6px;}
-.progress-bar-fill{height:6px;border-radius:4px;background:var(--cf-blue);transition:width .4s;}
-.progress-bar-fill.green{background:var(--green);}
-.station-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;}
-.chip-f10{background:rgba(26,110,255,.1);color:#1A6EFF;}
-.chip-f15{background:rgba(139,92,246,.1);color:#7C3AED;}
-.chip-f5{background:rgba(34,197,94,.1);color:#16A34A;}
-.chip-unknown{background:#F3F4F6;color:#6B7280;}
-.na-badge{color:var(--muted);font-size:12px;font-style:italic;}
+.leaderboard{padding:0 24px 24px;}
+.leader-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.leader-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.leader-rank{width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--muted);flex-shrink:0;}
+.leader-rank.gold{background:rgba(245,158,11,.15);color:#D97706;}
+.leader-rank.silver{background:rgba(122,135,160,.15);color:#64748B;}
+.leader-rank.bronze{background:rgba(180,83,9,.1);color:#92400E;}
+.leader-name{font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.leader-count{font-size:18px;font-weight:800;color:var(--cf-blue);}
+/* EMPTY / LOADING / ERROR */
+.empty-state{text-align:center;padding:48px 24px;color:var(--muted);font-size:14px;}
+.hidden{display:none!important;}
+#loading-screen,#error-screen{position:fixed;inset:0;background:var(--cf-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px;}
+.loader{width:40px;height:40px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--cf-blue);border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading-screen p,#error-screen p{color:rgba(255,255,255,.6);font-size:14px;}
+#error-screen{gap:12px;}
+#error-msg{color:#fff;font-size:15px;max-width:400px;text-align:center;line-height:1.6;}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px);}
+.modal{background:var(--cf-dark);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:32px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.modal h2{font-size:20px;font-weight:800;color:#fff;margin-bottom:8px;}.modal h2 span{color:var(--cf-blue);}
+.modal p{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:20px;line-height:1.6;}
+.modal-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:11px 14px;color:#fff;font-size:14px;margin-bottom:12px;outline:none;}
+.modal-input:focus{border-color:var(--cf-blue);}
+.modal-btn{width:100%;background:var(--cf-blue);border:none;border-radius:10px;padding:13px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;}
+.modal-btn:hover{background:#1560e0;}
+.modal-note{font-size:11px;color:rgba(255,255,255,.3);text-align:center;margin-top:10px;}
+/* ROI TRACKER */
+.roi-settings{background:var(--cf-dark);border-bottom:1px solid rgba(255,255,255,.08);padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.roi-settings-title{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;}
+.cost-input-group{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 10px;}
+.cost-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.6);}
+.cost-input{background:transparent;border:none;outline:none;color:#fff;font-size:14px;font-weight:700;width:70px;text-align:right;}
+.roi-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;padding:20px 24px;}
+.roi-kpi{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.roi-kpi-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+.roi-kpi-value{font-size:26px;font-weight:800;line-height:1;}
+.roi-kpi-sub{font-size:12px;color:var(--muted);margin-top:5px;}
+.roi-kpi.blue .roi-kpi-value{color:var(--cf-blue);}
+.roi-kpi.green .roi-kpi-value{color:var(--green);}
+.roi-kpi.orange .roi-kpi-value{color:var(--orange);}
+.roi-kpi.red .roi-kpi-value{color:var(--red);}
+.roi-kpi.purple .roi-kpi-value{color:var(--purple);}
+.roi-table-section{padding:0 24px 24px;}
+.station-chip{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;}
+.chip-f10{background:rgba(26,110,255,.12);color:var(--cf-blue);}
+.chip-f15{background:rgba(139,92,246,.12);color:var(--purple);}
+.chip-f5{background:rgba(34,197,94,.12);color:#16A34A;}
+.chip-unknown{background:rgba(122,135,160,.12);color:var(--muted);}
+.na-badge{color:var(--muted);font-style:italic;font-size:12px;}
+.roi-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.roi-profitable{background:rgba(34,197,94,.12);color:#16A34A;}
+.roi-progress{background:rgba(245,158,11,.1);color:#D97706;}
+.roi-pending{background:rgba(122,135,160,.1);color:var(--muted);}
+.progress-bar-wrap{width:80px;height:4px;background:var(--border);border-radius:2px;margin-top:4px;}
+.progress-bar-fill{height:100%;background:var(--orange);border-radius:2px;}
 .superset-note{font-size:11px;color:var(--muted);padding:10px 18px;border-top:1px solid var(--border);text-align:center;}
-
-/* MODALS / STATES */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;}
-.overlay.hidden{display:none;}
-.modal{background:var(--cf-dark);border:1px solid rgba(26,110,255,.3);border-radius:16px;padding:32px;max-width:560px;width:90%;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5);}
-.modal h2{font-size:20px;font-weight:800;margin-bottom:6px;} .modal h2 span{color:var(--cf-blue);}
-.modal p{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:20px;line-height:1.6;}
-.modal-input{width:100%;padding:10px 14px;border-radius:8px;border:1.5px solid rgba(26,110,255,.3);background:rgba(255,255,255,.06);color:#fff;font-size:13px;margin-bottom:14px;}
-.modal-input:focus{outline:none;border-color:var(--cf-blue);}
-.modal-btn{width:100%;padding:12px;border-radius:8px;border:none;background:var(--cf-blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
-.modal-btn:hover{background:#1560E8;}
-.modal-note{font-size:11px;color:rgba(255,255,255,.4);margin-top:12px;line-height:1.5;}
-.state-screen{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
-.spinner{width:44px;height:44px;border:3px solid rgba(26,110,255,.2);border-top-color:var(--cf-blue);border-radius:50%;animation:spin .9s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-.error-box{background:#FEF2F2;border:1.5px solid #FECACA;border-radius:10px;padding:16px 20px;max-width:480px;color:#DC2626;font-size:13px;line-height:1.6;}
-.empty-state{text-align:center;color:var(--muted);padding:40px;font-size:14px;}
 </style>
 </head>
 <body>
 
+<div id="loading-screen">
+  <div class="loader"></div>
+  <p>Loading City Network data…</p>
+</div>
+<div id="error-screen" style="display:none;">
+  <div style="font-size:32px;">⚠️</div>
+  <p id="error-msg"></p>
+  <button class="hbtn primary" onclick="loadData()">↺ Retry</button>
+  <button class="hbtn" onclick="document.getElementById('setup-overlay').classList.remove('hidden');document.getElementById('error-screen').style.display='none';">⚙ Update Script URL</button>
+</div>
+
 <!-- SETUP MODAL -->
 <div class="overlay hidden" id="setup-overlay">
   <div class="modal">
-    <h2>charge<span>FUZE</span> · Connect Data</h2>
+    <h2>charge<span>FUZE</span> · Connect <span>Data</span></h2>
     <p>Paste your Google Apps Script web app URL to connect live data.</p>
     <input class="modal-input" id="script-url-input" type="url" placeholder="https://script.google.com/macros/s/..."/>
     <button class="modal-btn" onclick="saveScriptUrl()">Connect & Load Data</button>
-    <div class="modal-note">URL is saved locally in your browser. Click ⚙ Settings to update it anytime.</div>
+    <div class="modal-note">URL is saved locally in your browser.</div>
   </div>
 </div>
 
@@ -197,9 +185,9 @@ td{padding:10px 14px;vertical-align:middle;}
     <p>Connect directly to your Superset instance to pull live rental revenue into the ROI Tracker.</p>
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px;">Superset URL</div>
-      <input class="modal-input" id="ss-url-input" type="url" value="https://superset.getchargefuze.com" placeholder="https://superset.getchargefuze.com"/>
+      <input class="modal-input" id="ss-url-input" type="url" value="https://superset.getchargefuze.com" style="margin-bottom:0;"/>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;">
       <div>
         <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px;">Username</div>
         <input class="modal-input" id="ss-user-input" type="text" placeholder="Username" style="margin-bottom:0;"/>
@@ -213,10 +201,10 @@ td{padding:10px 14px;vertical-align:middle;}
       <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px;">Dashboard ID</div>
       <input class="modal-input" id="ss-dash-input" type="number" value="37" style="margin-bottom:0;"/>
     </div>
-    <div id="ss-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 14px;color:#EF4444;font-size:12px;margin-bottom:12px;line-height:1.6;"></div>
+    <div id="ss-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 14px;color:#EF4444;font-size:12px;margin-bottom:12px;line-height:1.6;white-space:pre-line;"></div>
     <button class="modal-btn" id="ss-connect-btn" onclick="doConnectSuperset()">🔌 Connect to Superset</button>
     <div style="display:flex;justify-content:space-between;margin-top:12px;">
-      <div class="modal-note" style="margin:0;">Credentials are stored locally in your browser only.</div>
+      <div class="modal-note" style="margin:0;">Credentials stored locally in your browser only.</div>
       <button onclick="document.getElementById('superset-overlay').classList.add('hidden')" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:12px;cursor:pointer;">✕ Cancel</button>
     </div>
   </div>
@@ -232,10 +220,13 @@ td{padding:10px 14px;vertical-align:middle;}
     </div>
   </div>
   <div class="header-right">
-    <div class="sync-badge"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Loading…</span></div>
-    <button class="hbtn primary" onclick="loadData()">↺ Refresh</button>
+    <div class="sync-badge">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span id="sync-label"></span>
+    </div>
+    <button class="hbtn" onclick="loadData()">↺ Refresh</button>
     <button class="hbtn" onclick="openSettings()">⚙ Settings</button>
-    <button class="hbtn" onclick="document.getElementById('file-input').click()">📄 File fallback</button>
+    <button class="hbtn" onclick="document.getElementById('file-input').click()">📁 File fallback</button>
   </div>
 </header>
 
@@ -245,97 +236,94 @@ td{padding:10px 14px;vertical-align:middle;}
   <div class="nav-btn" id="nav-roi" onclick="switchView('roi')">📈 ROI Tracker</div>
 </div>
 
-<div class="main">
-  <div class="state-screen" id="loading-screen"><div class="spinner"></div><div style="color:var(--muted);font-size:14px;">Loading data from Google Sheets…</div></div>
-  <div id="error-screen" style="display:none;"><div class="state-screen"><div class="error-box" id="error-msg"></div><button class="hbtn primary" style="margin-top:10px;" onclick="openSettings()">⚙ Update Script URL</button></div></div>
-
-  <!-- ══ PLACEMENT TRACKER VIEW ══ -->
-  <div class="view active" id="view-tracker">
-    <div class="tabs" id="tabs"></div>
-    <div class="filters">
-      <div class="filter-group"><span class="filter-label">Rep</span><select id="filter-rep"><option value="">All Reps</option></select></div>
-      <div class="filter-group"><span class="filter-label">Install Status</span><select id="filter-status"><option value="">All</option></select></div>
-      <div class="filter-group" id="tier-filter-group" style="display:none;"><span class="filter-label">Tier</span><select id="filter-tier"><option value="">All</option><option value="A">Tier A</option><option value="B">Tier B</option><option value="C">Tier C</option><option value="NR">Needs Review</option></select></div>
-      <div class="filter-group"><span class="filter-label">From</span><input type="date" id="filter-from"/></div>
-      <div class="filter-group"><span class="filter-label">To</span><input type="date" id="filter-to"/></div>
-      <button class="btn-clear" onclick="clearFilters()">✕ Clear</button>
-    </div>
-    <div class="commission-bar hidden" id="commission-bar">
-      <div class="comm-item"><div class="comm-lbl">💰 Total Commission</div><div class="comm-val" id="c-total">$0</div><div class="comm-sub" id="c-total-sub">0 placements</div></div>
-      <div class="comm-div"></div>
-      <div class="comm-item"><div class="comm-lbl">Tier Breakdown</div><div class="tier-pills">
-        <div class="tier-pill a"><span>A</span><span id="pill-a-val">$0</span><span class="pill-count" id="pill-a-cnt"></span></div>
-        <div class="tier-pill b"><span>B</span><span id="pill-b-val">$0</span><span class="pill-count" id="pill-b-cnt"></span></div>
-        <div class="tier-pill c"><span>C</span><span id="pill-c-val">$0</span><span class="pill-count" id="pill-c-cnt"></span></div>
-      </div></div>
-      <div class="comm-div"></div>
-      <div class="comm-item"><div class="comm-lbl">Avg Per Rep</div><div class="comm-val" id="c-avg">$0</div><div class="comm-sub" id="c-avg-sub"></div></div>
-      <div class="comm-div"></div>
-      <div class="needs-review-badge hidden" id="needs-review-badge">⚠ <span id="nr-count">0</span> Needs Review</div>
-    </div>
-    <div class="kpi-grid" id="kpi-grid"></div>
-    <div class="charts-grid">
-      <div class="chart-card"><div class="chart-title">📊 Placements by Rep</div><div class="chart-wrap"><canvas id="chart-rep"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">🔵 Install Status Breakdown</div><div class="chart-wrap"><canvas id="chart-status"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">🏆 Leaderboard</div><div class="leaderboard" id="leaderboard"></div></div>
-    </div>
-    <div class="table-section">
-      <div class="table-header">
-        <div class="table-title">📋 All Contracts</div>
-        <div class="search-box"><span>🔍</span><input type="text" id="search-input" placeholder="Search venue, rep, city…" oninput="applyFilters()"/></div>
-      </div>
-      <div class="table-wrap">
-        <table><thead><tr>
-          <th>Venue</th><th>Address</th><th>Rep</th><th>Station</th><th>Signed</th><th>Scheduled</th><th>Install Status</th><th>Onboarding</th>
-          <th class="col-tier">Tier</th><th class="col-commission">Commission</th><th>Contract</th>
-        </tr></thead><tbody id="table-body"></tbody></table>
-        <div class="empty-state hidden" id="empty-state">No records match your filters.</div>
-      </div>
+<!-- TRACKER VIEW -->
+<div class="view active" id="view-tracker">
+  <div class="tabs-bar" id="tabs"></div>
+  <div class="filters-bar">
+    <div class="search-box"><span>🔍</span><input type="text" id="search-input" placeholder="Search venue, rep, city…" oninput="applyFilters()"/></div>
+    <select id="filter-rep" onchange="applyFilters()"><option value="">All Reps</option></select>
+    <select id="filter-status" onchange="applyFilters()">
+      <option value="">All Statuses</option>
+      <option value="Installed">Installed</option>
+      <option value="Pending Install">Pending Install</option>
+      <option value="Declined">Declined</option>
+      <option value="Other">Other</option>
+    </select>
+    <select id="filter-tier" onchange="applyFilters()">
+      <option value="">All Tiers</option>
+      <option value="A">Tier A</option>
+      <option value="B">Tier B</option>
+      <option value="C">Tier C</option>
+    </select>
+    <div class="date-range">
+      <span>Signed:</span>
+      <input type="date" id="filter-from"/>
+      <span>–</span>
+      <input type="date" id="filter-to"/>
     </div>
   </div>
+  <div class="commission-bar" id="commission-bar" style="display:none;"></div>
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div class="charts-grid">
+    <div class="chart-card"><div class="chart-title">📊 Status Breakdown</div><canvas id="status-chart" height="200"></canvas></div>
+    <div class="chart-card"><div class="chart-title">🏆 Top Reps by Placements</div><canvas id="rep-chart" height="200"></canvas></div>
+  </div>
+  <div class="leaderboard" id="leaderboard-section">
+    <div class="table-header"><div class="table-title">🏆 Rep Leaderboard</div></div>
+    <div class="leader-grid" id="leader-grid"></div>
+  </div>
+  <div class="table-section">
+    <div class="table-header">
+      <div class="table-title">📋 Contracts</div>
+      <span id="row-count" style="font-size:12px;color:var(--muted);"></span>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr>
+        <th>Venue</th><th>Rep</th><th>Status</th><th>Station</th>
+        <th>Signed</th><th>Scheduled</th><th>S</th><th>F</th><th>S2</th>
+        <th>Tier</th><th>Commission</th><th>Contract</th>
+      </tr></thead><tbody id="contracts-body"></tbody></table>
+      <div class="empty-state hidden" id="empty-state">No records match your filters.</div>
+    </div>
+  </div>
+</div>
 
-  <!-- ══ ROI TRACKER VIEW ══ -->
-  <div class="view" id="view-roi">
-    <!-- Hardware Cost Settings -->
-    <div class="roi-settings">
-      <span class="roi-settings-title">⚙ Hardware Costs</span>
-      <div class="cost-input-group"><span class="cost-label">F10</span><input class="cost-input" type="number" id="cost-f10" value="500" onchange="renderROI()"/></div>
-      <div class="cost-input-group"><span class="cost-label">F15</span><input class="cost-input" type="number" id="cost-f15" value="750" onchange="renderROI()"/></div>
-      <div class="cost-input-group"><span class="cost-label">F5</span><input class="cost-input" type="number" id="cost-f5" value="350" onchange="renderROI()"/></div>
-      <span id="superset-status-badge" onclick="openSupersetModal()" style="font-size:11px;margin-left:auto;padding:4px 10px;border-radius:12px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);cursor:pointer;" title="Click to connect Superset">⏳ Superset: Checking…</span>
-    </div>
-    <!-- ROI KPIs -->
-    <div class="roi-kpi-grid" id="roi-kpi-grid"></div>
-    <!-- ROI Table -->
-    <div class="roi-table-section">
-      <div class="table-header">
-        <div class="table-title">📈 Station ROI Tracker</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <div class="search-box"><span>🔍</span><input type="text" id="roi-search" placeholder="Search venue, market…" oninput="renderROI()"/></div>
-          <select id="roi-filter-station" onchange="renderROI()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;">
-            <option value="">All Station Types</option>
-            <option value="F10">F10</option>
-            <option value="F15">F15</option>
-            <option value="F5">F5</option>
-          </select>
-          <select id="roi-filter-status" onchange="renderROI()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;">
-            <option value="">All Statuses</option>
-            <option value="profitable">Profitable</option>
-            <option value="progress">In Progress</option>
-            <option value="pending">No Revenue Yet</option>
-          </select>
-        </div>
+<!-- ROI TRACKER VIEW -->
+<div class="view" id="view-roi">
+  <div class="roi-settings">
+    <span class="roi-settings-title">⚙ Hardware Costs</span>
+    <div class="cost-input-group"><span class="cost-label">F10</span><input class="cost-input" type="number" id="cost-f10" value="500" onchange="renderROI()"/></div>
+    <div class="cost-input-group"><span class="cost-label">F15</span><input class="cost-input" type="number" id="cost-f15" value="750" onchange="renderROI()"/></div>
+    <div class="cost-input-group"><span class="cost-label">F5</span><input class="cost-input" type="number" id="cost-f5" value="350" onchange="renderROI()"/></div>
+    <span id="superset-status-badge" onclick="openSupersetModal()" style="font-size:11px;margin-left:auto;padding:4px 12px;border-radius:12px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);cursor:pointer;" title="Click to connect Superset">⏳ Superset: Checking…</span>
+  </div>
+  <div class="roi-kpi-grid" id="roi-kpi-grid"></div>
+  <div class="roi-table-section">
+    <div class="table-header">
+      <div class="table-title">📈 Station ROI Tracker</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div class="search-box"><span>🔍</span><input type="text" id="roi-search" placeholder="Search venue, market…" oninput="renderROI()"/></div>
+        <select id="roi-filter-station" onchange="renderROI()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;">
+          <option value="">All Station Types</option>
+          <option value="F10">F10</option><option value="F15">F15</option><option value="F5">F5</option>
+        </select>
+        <select id="roi-filter-status" onchange="renderROI()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;">
+          <option value="">All Statuses</option>
+          <option value="profitable">Profitable</option>
+          <option value="progress">In Progress</option>
+          <option value="pending">No Revenue Yet</option>
+        </select>
       </div>
-      <div class="table-wrap">
-        <table><thead><tr>
-          <th>Venue</th><th>Market (DMA)</th><th>Station</th><th>IMEI</th>
-          <th>Hardware Cost</th><th>Commission</th><th>Total Investment</th>
-          <th>Total Revenue</th><th>Net ROI</th><th>Break-even</th><th>Status</th>
-        </tr></thead><tbody id="roi-table-body"></tbody></table>
-        <div class="empty-state hidden" id="roi-empty-state">No ROI data available yet.</div>
-      </div>
-      <div class="superset-note" id="superset-note"></div>
     </div>
+    <div class="table-wrap">
+      <table><thead><tr>
+        <th>Venue</th><th>Market (DMA)</th><th>Station</th><th>IMEI</th>
+        <th>Hardware Cost</th><th>Commission</th><th>Total Investment</th>
+        <th>Total Revenue</th><th>Net ROI</th><th>Break-even</th><th>Status</th>
+      </tr></thead><tbody id="roi-table-body"></tbody></table>
+      <div class="empty-state hidden" id="roi-empty-state">No ROI data available yet.</div>
+    </div>
+    <div class="superset-note" id="superset-note"></div>
   </div>
 </div>
 
@@ -367,7 +355,7 @@ const COL = {
 };
 
 let allData = {}, activeSheet = SHEET_NAMES[0], activeView = 'tracker';
-let payoutMap = {}, supersetData = [];
+let payoutMap = {}, supersetData = [], supersetConnected = false;
 let repChart, statusChart, refreshTimer;
 
 // ─── JSONP ───────────────────────────────────────────────────
@@ -390,7 +378,7 @@ function fetchViaJsonp(url) {
 function getScriptUrl(){ return localStorage.getItem(LS_KEY) || DEFAULT_URL; }
 function saveScriptUrl(){
   const v = document.getElementById('script-url-input').value.trim();
-  if(!v.startsWith('http')){ alert('Enter a valid URL.'); return; }
+  if(!v) return;
   localStorage.setItem(LS_KEY, v);
   document.getElementById('setup-overlay').classList.add('hidden');
   loadData();
@@ -399,41 +387,34 @@ function openSettings(){
   document.getElementById('script-url-input').value = getScriptUrl();
   document.getElementById('setup-overlay').classList.remove('hidden');
 }
-function loadFromFile(e){
-  const r = new FileReader();
-  r.onload = ev => { try { processData(JSON.parse(ev.target.result).data || JSON.parse(ev.target.result)); } catch { alert('Invalid JSON'); } };
-  r.readAsText(e.target.files[0]);
-}
 
-// ─── VIEW NAV ────────────────────────────────────────────────
+// ─── VIEW SWITCHING ───────────────────────────────────────────
 function switchView(v){
   activeView = v;
-  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-  document.getElementById('view-' + v).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('nav-' + v).classList.add('active');
-  if(v === 'roi') renderROI();
+  document.getElementById('view-tracker').classList.toggle('active', v==='tracker');
+  document.getElementById('view-roi').classList.toggle('active', v==='roi');
+  document.getElementById('nav-tracker').classList.toggle('active', v==='tracker');
+  document.getElementById('nav-roi').classList.toggle('active', v==='roi');
+  if(v==='roi') renderROI();
 }
 
-// ─── PAYOUT MAP ──────────────────────────────────────────────
+// ─── PAYOUT MAP ───────────────────────────────────────────────
 function buildPayoutMap(raw) {
   payoutMap = {};
-  if(!raw||!raw.length) return;
-  let hrow = -1;
-  for(let i=0;i<Math.min(raw.length,5);i++){
-    const lower = raw[i].map(c=>String(c).trim().toLowerCase());
-    if(lower.includes('venue')&&lower.includes('tier')){ hrow=i; break; }
-  }
-  if(hrow===-1) return;
-  const hdrs = raw[hrow].map(h=>String(h).trim().toLowerCase());
-  const vi=hdrs.indexOf('venue'), ti=hdrs.indexOf('tier');
-  const pi=hdrs.findIndex(h=>h.includes('payout'));
-  if(vi===-1||ti===-1) return;
+  if(!raw||raw.length<2) return;
+  let hrow=0;
+  for(let i=0;i<Math.min(raw.length,5);i++) if(raw[i].filter(c=>String(c).trim()).length>2){ hrow=i; break; }
+  const h = raw[hrow].map(x=>String(x).trim().toLowerCase());
+  const vi=h.findIndex(x=>x.includes('venue'));
+  const ti=h.findIndex(x=>x==='tier'||x.includes('tier'));
+  const pi=h.findIndex(x=>x.includes('payout')||x.includes('commission'));
+  if(vi===-1) return;
   for(let r=hrow+1;r<raw.length;r++){
-    const venue=String(raw[r][vi]||'').trim(); if(!venue) continue;
-    const tier=String(raw[r][ti]||'').trim().toUpperCase();
-    const payout=pi!==-1?parseFloat(String(raw[r][pi]||'0').replace(/[^0-9.]/g,'')):0;
-    if(/^[ABC]$/.test(tier)) payoutMap[venue.toLowerCase()]={ tier, payout: payout||COMMISSION_RATES[tier]||200 };
+    const row=raw[r];
+    const venue=String(row[vi]||'').trim().toLowerCase(); if(!venue) continue;
+    const tier=String(row[ti]||'').trim().toUpperCase();
+    const payout=parseFloat(String(row[pi]||'').replace(/[^0-9.]/g,''))||0;
+    payoutMap[venue]={ tier, payout };
   }
 }
 function findPayoutFuzzy(key){
@@ -441,67 +422,68 @@ function findPayoutFuzzy(key){
   return null;
 }
 
-// ─── STATION TYPE NORMALIZER ──────────────────────────────────
+// ─── STATION NORMALIZER ───────────────────────────────────────
 function normalizeStation(s) {
-  if (!s) return '';
-  // Strip JSON array brackets and quotes: ["F15-White"] → F15-White
-  const str = String(s).replace(/[\[\]"']/g, '').trim();
-  // Extract model: F15, F10, F5 (case-insensitive)
-  if (/f15/i.test(str)) return 'F15';
-  if (/f10/i.test(str)) return 'F10';
-  if (/f5/i.test(str))  return 'F5';
+  if(!s) return '';
+  const str = String(s).replace(/[\[\]"']/g,'').trim();
+  if(/f15/i.test(str)) return 'F15';
+  if(/f10/i.test(str)) return 'F10';
+  if(/f5/i.test(str))  return 'F5';
   return str.toUpperCase();
 }
 
-// ─── SUPERSET DATA ───────────────────────────────────────────
-let supersetConnected = false;
+// ─── STATUS NORMALIZER ────────────────────────────────────────
+function normalizeStatus(s){
+  if(!s) return '';
+  const l=s.toLowerCase().trim();
+  if(l.includes('declin')||l.includes('cancel')||l==='no'||l.includes('not install')) return 'Declined';
+  if(l.includes('installed')||l==='executed'||l.includes('install, cn')||l.includes('installed, cn')) return 'Installed';
+  if(l.includes('pending')||l.includes('scheduled')||l.includes('intall')) return 'Pending Install';
+  if(l==='default'||l===''||l==='n/a') return 'Other';
+  return s;
+}
+
+// ─── SUPERSET DATA ────────────────────────────────────────────
 function processSuperset(raw) {
-  supersetData = [];
-  supersetConnected = false;
+  supersetData = []; supersetConnected = false;
   const badge = document.getElementById('superset-status-badge');
-  if(!raw) {
-    if(badge) { badge.textContent='🔴 Superset: Not Connected'; badge.style.color='rgba(239,68,68,.8)'; badge.style.background='rgba(239,68,68,.1)'; }
+  if(!raw){
+    if(badge){ badge.textContent='🔴 Superset: Not Connected · Click to connect'; badge.style.color='rgba(239,68,68,.8)'; badge.style.background='rgba(239,68,68,.1)'; }
     return;
   }
-  // Handle various response shapes
   let rows = [];
-  if(raw.result && Array.isArray(raw.result)) {
-    const res = raw.result[0] || raw.result;
-    if(res.data) rows = res.data;
-  } else if(raw.data && raw.data.result) {
-    const res = raw.data.result[0] || raw.data.result;
+  if(raw.result && Array.isArray(raw.result)){
+    const res = raw.result[0]||raw.result;
     if(res && res.data) rows = res.data;
-  } else if(Array.isArray(raw)) {
+  } else if(raw.data && raw.data.result){
+    const res = raw.data.result[0]||raw.data.result;
+    if(res && res.data) rows = res.data;
+  } else if(Array.isArray(raw)){
     rows = raw;
   }
-  supersetData = rows.map(r => ({
-    venue:    String(r.venue_name || r.venue || '').trim(),
-    imei:     String(r.imei || '').trim(),
-    station:  normalizeStation(r.station_type || r.station || ''),
-    dma:      String(r.dma_description || r.dma || '').trim(),
-    active:   r.active_placement === true || r.active_placement === 'true',
-    revenue:  parseNum(r['Total Rental Revenue'] || r.total_rental_revenue || r.gross_revenue),
-    rentals:  parseNum(r['Total Rental Count']   || r.total_rental_count   || r.rental_count),
-    netRev:   parseNum(r['Net Rental Revenue']   || r.net_rental_revenue),
-  })).filter(r => r.venue);
+  supersetData = rows.map(r=>({
+    venue:   String(r.venue_name||r.venue||r['Venue Name']||'').trim(),
+    imei:    String(r.imei||r.IMEI||'').trim(),
+    station: normalizeStation(r.station_type||r['Station Type']||r.station||''),
+    dma:     String(r.dma_description||r.dma||r['DMA']||'').trim(),
+    active:  r.active_placement===true||r.active_placement==='true'||r.active_placement==='Yes',
+    revenue: parseNum(r['Total Rental Revenue']||r.total_rental_revenue||r['Gross Revenue']||r.gross_revenue),
+    rentals: parseNum(r['Total Rental Count']||r.total_rental_count||r['Rental Count']||r.rental_count),
+    netRev:  parseNum(r['Net Rental Revenue']||r.net_rental_revenue||r['Net Revenue']||r.net_revenue),
+  })).filter(r=>r.venue);
   supersetConnected = supersetData.length > 0;
-  if(badge) {
-    if(supersetConnected) {
-      badge.textContent='🟢 Superset: Connected · '+supersetData.length+' stations';
-      badge.style.color='rgba(34,197,94,.9)'; badge.style.background='rgba(34,197,94,.12)';
-    } else {
-      badge.textContent='🟡 Superset: Connected · No data rows yet';
-      badge.style.color='rgba(245,158,11,.9)'; badge.style.background='rgba(245,158,11,.1)';
-    }
+  if(badge){
+    if(supersetConnected){ badge.textContent='🟢 Superset: Live · '+supersetData.length+' stations'; badge.style.color='rgba(34,197,94,.9)'; badge.style.background='rgba(34,197,94,.12)'; }
+    else { badge.textContent='🟡 Superset: Connected · Awaiting Redshift'; badge.style.color='rgba(245,158,11,.9)'; badge.style.background='rgba(245,158,11,.1)'; }
   }
 }
 function parseNum(v){
   if(v===null||v===undefined||v==='N/A'||v==='') return null;
-  const n = parseFloat(String(v).replace(/[^0-9.-]/g,''));
-  return isNaN(n) ? null : n;
+  const n=parseFloat(String(v).replace(/[^0-9.-]/g,''));
+  return isNaN(n)?null:n;
 }
 
-// ─── LOAD DATA ───────────────────────────────────────────────
+// ─── LOAD DATA ────────────────────────────────────────────────
 async function loadData(){
   document.getElementById('loading-screen').style.display='flex';
   document.getElementById('error-screen').style.display='none';
@@ -510,8 +492,9 @@ async function loadData(){
   setSyncLoading(true);
   try {
     const resp = await fetchViaJsonp(getScriptUrl());
-    if(!resp.ok) throw new Error(resp.error||'Apps Script error');
-    processData(resp.data);
+    // resp IS the data object (ok, __tiers__, sheet data all at top level)
+    if(!resp.ok) throw new Error(resp.error||'Apps Script returned an error');
+    processData(resp);
     setSyncDone();
   } catch(err) {
     document.getElementById('loading-screen').style.display='none';
@@ -528,14 +511,13 @@ function setSyncError(){ document.getElementById('sync-dot').style.background='v
 
 function processData(data){
   buildPayoutMap(data['__tiers__']||[]);
-  // If __superset__ key is missing entirely, Apps Script hasn't been deployed with Superset support yet
   if(!('__superset__' in data)){
-    const badge = document.getElementById('superset-status-badge');
-    if(badge){ badge.textContent='🔴 Superset: Deploy updated Apps Script to connect'; badge.style.color='rgba(239,68,68,.8)'; badge.style.background='rgba(239,68,68,.1)'; }
+    const badge=document.getElementById('superset-status-badge');
+    if(badge){ badge.textContent='🔴 Superset: Deploy updated Apps Script · Click to connect directly'; badge.style.color='rgba(239,68,68,.7)'; badge.style.background='rgba(239,68,68,.1)'; }
   } else {
     processSuperset(data['__superset__']);
   }
-  allData = {};
+  allData={};
   SHEET_NAMES.forEach(n=>{ if(data[n]) allData[n]=parseSheet(data[n],n); });
   document.getElementById('loading-screen').style.display='none';
   document.getElementById('view-tracker').classList.add('active');
@@ -543,23 +525,31 @@ function processData(data){
   if(activeView==='roi') renderROI();
 }
 
+// ─── FILE FALLBACK ────────────────────────────────────────────
+function loadFromFile(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{ try{ processData(JSON.parse(ev.target.result)); }catch(err){ alert('Invalid JSON: '+err.message); } };
+  reader.readAsText(file);
+}
+
 // ─── PARSE SHEET ─────────────────────────────────────────────
-function findCol(headers, candidates){
-  const h = headers.map(x=>String(x).trim().toLowerCase());
+function findCol(headers,candidates){
+  const h=headers.map(x=>String(x).trim().toLowerCase());
   for(const c of candidates){ const i=h.indexOf(c); if(i!==-1) return i; }
   for(const c of candidates){ const i=h.findIndex(x=>x.includes(c)); if(i!==-1) return i; }
   return -1;
 }
-function parseSheet(raw, name){
+function parseSheet(raw,name){
   if(!raw||raw.length<2) return [];
   let hrow=0;
   for(let i=0;i<Math.min(raw.length,4);i++) if(raw[i].filter(c=>String(c).trim()).length>3){ hrow=i; break; }
-  const h = raw[hrow];
+  const h=raw[hrow];
   const vi=findCol(h,COL.venue),ri=findCol(h,COL.rep),sti=findCol(h,COL.station);
   const sgi=findCol(h,COL.signed),sci=findCol(h,COL.sched),isi=findCol(h,COL.status);
   const ai=findCol(h,COL.address),ci=findCol(h,COL.city),cli=findCol(h,COL.contract);
   const sdi=findCol(h,COL.s_done),fdi=findCol(h,COL.f_done),s2i=findCol(h,COL.s2_done);
-  const is1099 = name===IS_1099;
+  const is1099=name===IS_1099;
   const rows=[];
   for(let r=hrow+1;r<raw.length;r++){
     const row=raw[r];
@@ -568,7 +558,7 @@ function parseSheet(raw, name){
     const station=normalizeStation(sti!==-1?String(row[sti]||'').trim():'');
     const signed=sgi!==-1?parseDate(row[sgi]):'';
     const sched=sci!==-1?parseDate(row[sci]):'';
-    const status=isi!==-1?String(row[isi]||'').trim():'';
+    const status=isi!==-1?normalizeStatus(String(row[isi]||'').trim()):'';
     const address=ai!==-1?String(row[ai]||'').trim():'';
     const city=ci!==-1?String(row[ci]||'').trim():'';
     const contract=cli!==-1?String(row[cli]||'').trim():'';
@@ -594,214 +584,205 @@ function parseDate(v){
 }
 function isTruthy(v){ return ['true','yes','1','done','✓','x','checked'].includes(String(v||'').trim().toLowerCase()); }
 
-// ─── TABS ────────────────────────────────────────────────────
+// ─── TABS ─────────────────────────────────────────────────────
 function buildTabs(){
   const c=document.getElementById('tabs'); c.innerHTML='';
   const tot=SHEET_NAMES.reduce((s,n)=>s+(allData[n]?allData[n].length:0),0);
   addTab(c,'all','All Sheets',tot);
   SHEET_NAMES.forEach(n=>addTab(c,n,n,allData[n]?allData[n].length:0));
 }
-function addTab(c,key,label,count){
-  const el=document.createElement('div');
-  el.className='tab'+(key===activeSheet?' active':'');
-  el.onclick=()=>switchSheet(key);
-  el.innerHTML=label+' <span class="badge">'+count+'</span>';
-  c.appendChild(el);
+function addTab(c,id,label,count){
+  const d=document.createElement('div');
+  d.className='tab'+(activeSheet===id?' active':'');
+  d.innerHTML=label+'<span class="tab-count">'+count+'</span>';
+  d.onclick=()=>switchSheet(id); c.appendChild(d);
 }
-function switchSheet(key){
-  activeSheet=key;
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['all',...SHEET_NAMES][i]===key));
-  const is1099=key===IS_1099;
-  document.getElementById('tier-filter-group').style.display=is1099?'flex':'none';
-  document.querySelectorAll('.col-tier,.col-commission').forEach(el=>el.style.display=is1099?'':'none');
+function switchSheet(id){
+  activeSheet=id;
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const ids=['all',...SHEET_NAMES];
+    t.classList.toggle('active',ids[i]===id);
+  });
   applyFilters();
 }
 
-// ─── FILTERS ─────────────────────────────────────────────────
-function getRows(){ return activeSheet==='all'?SHEET_NAMES.flatMap(n=>(allData[n]||[])):(allData[activeSheet]||[]); }
-function normalizeStatus(s){
-  if(!s) return '';
-  const l=s.toLowerCase().trim();
-  if(l.includes('declin')||l.includes('cancel')||l.includes('reject')||l==='no'||l==='lost') return 'Declined';
-  if(l.includes('installed')||l==='executed'||l==='complete'||l==='completed'||l==='active'||l==='live') return 'Installed';
-  if(l.includes('pending')||l.includes('schedule')||l.includes('awaiting')||l==='not installed') return 'Pending Install';
-  return l==='default'?'Other':s;
+// ─── FILTERS & RENDER ─────────────────────────────────────────
+function getRows(){
+  if(activeSheet==='all') return SHEET_NAMES.flatMap(n=>allData[n]||[]);
+  return allData[activeSheet]||[];
 }
 function applyFilters(){
+  let rows=getRows();
+  const search=(document.getElementById('search-input').value||'').toLowerCase();
   const rep=document.getElementById('filter-rep').value;
   const status=document.getElementById('filter-status').value;
   const tier=document.getElementById('filter-tier').value;
   const from=document.getElementById('filter-from').value;
   const to=document.getElementById('filter-to').value;
-  const search=document.getElementById('search-input').value.toLowerCase();
-  let rows=getRows();
-  const repSet=new Set(rows.map(r=>r.rep).filter(Boolean));
-  const statusSet=new Set(rows.map(r=>normalizeStatus(r.status)).filter(Boolean));
-  populateSelect('filter-rep',[...repSet].sort(),rep);
-  populateSelect('filter-status',[...statusSet].sort(),status);
+  if(search) rows=rows.filter(r=>(r.venue+r.rep+r.city+r.address).toLowerCase().includes(search));
   if(rep) rows=rows.filter(r=>r.rep===rep);
-  if(status) rows=rows.filter(r=>normalizeStatus(r.status)===status);
-  if(tier){ if(tier==='NR') rows=rows.filter(r=>r.tierNeedsReview); else rows=rows.filter(r=>r.tier===tier); }
-  if(from) rows=rows.filter(r=>r.signed&&new Date(r.signed)>=new Date(from));
-  if(to)   rows=rows.filter(r=>r.signed&&new Date(r.signed)<=new Date(to));
-  if(search) rows=rows.filter(r=>(r.venue+r.rep+r.city+r.address+r.station).toLowerCase().includes(search));
-  renderKPIs(rows); renderCharts(rows); renderTable(rows);
-  if(activeSheet===IS_1099) renderCommissionBar(rows);
-  else document.getElementById('commission-bar').classList.add('hidden');
-}
-function populateSelect(id,opts,cur){
-  const s=document.getElementById(id); const prev=s.value;
-  s.innerHTML='<option value="">'+(id==='filter-rep'?'All Reps':'All')+'</option>';
-  opts.forEach(o=>{ const op=document.createElement('option'); op.value=o; op.textContent=o; if(o===(cur||prev)) op.selected=true; s.appendChild(op); });
-}
-function clearFilters(){
-  ['filter-rep','filter-status','filter-tier','filter-from','filter-to'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('search-input').value=''; applyFilters();
+  if(status) rows=rows.filter(r=>r.status===status);
+  if(tier) rows=rows.filter(r=>r.tier===tier);
+  if(from) rows=rows.filter(r=>r.signed&&r.signed>=from);
+  if(to) rows=rows.filter(r=>r.signed&&r.signed<=to);
+  renderAll(rows);
 }
 
-// ─── COMMISSION BAR ──────────────────────────────────────────
-function renderCommissionBar(rows){
-  document.getElementById('commission-bar').classList.remove('hidden');
-  const total=rows.reduce((s,r)=>s+(r.commission||0),0);
-  const by={A:0,B:0,C:0,Ac:0,Bc:0,Cc:0}; let nr=0; const repT={};
-  rows.forEach(r=>{
-    if(r.tier==='A'){by.A+=r.commission;by.Ac++;} if(r.tier==='B'){by.B+=r.commission;by.Bc++;}
-    if(r.tier==='C'){by.C+=r.commission;by.Cc++;} if(r.tierNeedsReview) nr++;
-    if(r.rep) repT[r.rep]=(repT[r.rep]||0)+(r.commission||0);
-  });
-  const rc=Object.keys(repT).length, avg=rc?Math.round(total/rc):0;
-  document.getElementById('c-total').textContent='$'+total.toLocaleString();
-  document.getElementById('c-total-sub').textContent=rows.length+' placements';
-  document.getElementById('pill-a-val').textContent='$'+by.A.toLocaleString(); document.getElementById('pill-a-cnt').textContent='×'+by.Ac;
-  document.getElementById('pill-b-val').textContent='$'+by.B.toLocaleString(); document.getElementById('pill-b-cnt').textContent='×'+by.Bc;
-  document.getElementById('pill-c-val').textContent='$'+by.C.toLocaleString(); document.getElementById('pill-c-cnt').textContent='×'+by.Cc;
-  document.getElementById('c-avg').textContent='$'+avg.toLocaleString();
-  document.getElementById('c-avg-sub').textContent=rc+' rep'+(rc!==1?'s':'');
-  const nrb=document.getElementById('needs-review-badge');
-  if(nr>0){ nrb.classList.remove('hidden'); document.getElementById('nr-count').textContent=nr; } else nrb.classList.add('hidden');
+function renderAll(rows){
+  renderKPIs(rows);
+  renderCommission(rows);
+  renderCharts(rows);
+  renderLeaderboard(rows);
+  renderTable(rows);
+  // Populate rep filter
+  const allReps=[...new Set(getRows().map(r=>r.rep).filter(Boolean))].sort();
+  const sel=document.getElementById('filter-rep');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">All Reps</option>'+allReps.map(r=>`<option${r===cur?' selected':''}>${r}</option>`).join('');
 }
 
-// ─── KPIs ────────────────────────────────────────────────────
 function renderKPIs(rows){
-  const tot=rows.length, inst=rows.filter(r=>normalizeStatus(r.status)==='Installed').length;
-  const pend=rows.filter(r=>normalizeStatus(r.status)==='Pending Install').length;
-  const dec=rows.filter(r=>normalizeStatus(r.status)==='Declined').length;
-  const rC={}; rows.forEach(r=>{ if(r.rep) rC[r.rep]=(rC[r.rep]||0)+1; });
-  const top=Object.entries(rC).sort((a,b)=>b[1]-a[1])[0];
-  const rc=Object.keys(rC).length;
+  const installed=rows.filter(r=>r.status==='Installed').length;
+  const pending=rows.filter(r=>r.status==='Pending Install').length;
+  const declined=rows.filter(r=>r.status==='Declined').length;
+  const reps=[...new Set(rows.map(r=>r.rep).filter(Boolean))].length;
   document.getElementById('kpi-grid').innerHTML=`
-    <div class="kpi blue"><div class="kpi-label">Total Signed</div><div class="kpi-value">${tot}</div><div class="kpi-sub">${rc} rep${rc!==1?'s':''}</div></div>
-    <div class="kpi green"><div class="kpi-label">Installed</div><div class="kpi-value">${inst}</div><div class="kpi-sub">${tot?Math.round(inst/tot*100):0}% of total</div></div>
-    <div class="kpi orange"><div class="kpi-label">Pending Install</div><div class="kpi-value">${pend}</div><div class="kpi-sub">Awaiting installation</div></div>
-    <div class="kpi red"><div class="kpi-label">Declined</div><div class="kpi-value">${dec}</div><div class="kpi-sub">${tot?Math.round(dec/tot*100):0}% decline rate</div></div>
-    <div class="kpi purple"><div class="kpi-label">Top Rep</div><div class="kpi-value" style="font-size:18px;">${top?top[0].split(' ')[0]:'—'}</div><div class="kpi-sub">${top?top[1]+' placements':'No data'}</div></div>`;
+    <div class="kpi-card blue"><div class="kpi-label">Total Contracts</div><div class="kpi-value">${rows.length}</div><div class="kpi-sub">${reps} reps</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Installed</div><div class="kpi-value">${installed}</div><div class="kpi-sub">${rows.length?Math.round(installed/rows.length*100):0}% conversion</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Pending Install</div><div class="kpi-value">${pending}</div><div class="kpi-sub">Scheduled / In queue</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Declined</div><div class="kpi-value">${declined}</div><div class="kpi-sub">Install declined</div></div>`;
 }
 
-// ─── CHARTS ──────────────────────────────────────────────────
-const COLORS=['#1A6EFF','#22C55E','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F97316','#EC4899'];
+function renderCommission(rows){
+  const bar=document.getElementById('commission-bar');
+  const is1099Sheet = activeSheet===IS_1099||(activeSheet==='all');
+  const commRows = activeSheet===IS_1099 ? rows : (activeSheet==='all' ? rows.filter(r=>r.tier) : []);
+  if(!commRows.length||!commRows.some(r=>r.tier)){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  const tiers={A:{amt:0,count:0},B:{amt:0,count:0},C:{amt:0,count:0}};
+  let review=0;
+  commRows.forEach(r=>{
+    if(r.tier&&tiers[r.tier]){ tiers[r.tier].amt+=r.commission||0; tiers[r.tier].count++; }
+    if(r.tierNeedsReview) review++;
+  });
+  const total=Object.values(tiers).reduce((s,t)=>s+t.amt,0);
+  bar.innerHTML=`<span class="comm-label">Commission</span>
+    ${['A','B','C'].map(t=>`<div class="comm-tier"><span class="comm-tier-name">Tier ${t}</span><span class="comm-tier-amount">$${tiers[t].amt.toLocaleString()}</span><span class="comm-tier-count">×${tiers[t].count}</span></div>`).join('<div class="comm-divider"></div>')}
+    <div class="comm-divider"></div>
+    <div class="comm-tier"><span class="comm-tier-name">Total</span><span class="comm-tier-amount">$${total.toLocaleString()}</span></div>
+    ${review?`<div class="comm-review">⚠ ${review} Needs Review</div>`:''}`;
+}
+
 function renderCharts(rows){
-  const rC={}; rows.forEach(r=>{ if(r.rep) rC[r.rep]=(rC[r.rep]||0)+1; });
-  const rL=Object.keys(rC).sort((a,b)=>rC[b]-rC[a]).slice(0,8);
-  if(repChart) repChart.destroy();
-  repChart=new Chart(document.getElementById('chart-rep'),{type:'bar',data:{labels:rL,datasets:[{data:rL.map(r=>rC[r]),backgroundColor:rL.map((_,i)=>COLORS[i%COLORS.length]),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{size:10}},grid:{color:'#F0F4FA'}},x:{ticks:{font:{size:9},maxRotation:30},grid:{display:false}}}}});
-  const sC={}; rows.forEach(r=>{ const s=normalizeStatus(r.status)||'Other'; sC[s]=(sC[s]||0)+1; });
-  const sL=Object.keys(sC); const sCols=sL.map(s=>s==='Installed'?'#22C55E':s==='Pending Install'?'#F59E0B':s==='Declined'?'#EF4444':'#9CA3AF');
+  const statusCounts={Installed:0,'Pending Install':0,Declined:0,Other:0};
+  rows.forEach(r=>{ if(statusCounts[r.status]!==undefined) statusCounts[r.status]++; else statusCounts['Other']++; });
+  const repMap={};
+  rows.forEach(r=>{ if(r.rep){ repMap[r.rep]=(repMap[r.rep]||0)+1; } });
+  const topReps=Object.entries(repMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
   if(statusChart) statusChart.destroy();
-  statusChart=new Chart(document.getElementById('chart-status'),{type:'doughnut',data:{labels:sL,datasets:[{data:sL.map(s=>sC[s]),backgroundColor:sCols,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}}}}});
-  const is1099=activeSheet===IS_1099;
-  const commR={}; if(is1099) rows.forEach(r=>{ if(r.rep) commR[r.rep]=(commR[r.rep]||0)+(r.commission||0); });
-  const instR={}; rows.forEach(r=>{ if(r.rep&&normalizeStatus(r.status)==='Installed') instR[r.rep]=(instR[r.rep]||0)+1; });
-  const lb=Object.entries(rC).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  const mx=lb[0]?lb[0][1]:1;
-  document.getElementById('leaderboard').innerHTML=lb.map(([rep,cnt],i)=>{
-    const short=rep.length>14?rep.slice(0,14)+'…':rep;
-    const sub=is1099?'$'+(commR[rep]||0).toLocaleString()+' commission':(instR[rep]||0)+'/'+cnt+' installed';
-    return `<div class="lb-row"><div class="lb-rank ${i<3?'r'+(i+1):''}">${i+1}</div><div class="lb-info"><div class="lb-name">${short}</div><div class="lb-detail">${sub}</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${Math.round(cnt/mx*100)}%"></div></div><div class="lb-count">${cnt} <span style="font-size:10px;color:var(--muted)">placements</span></div></div>`;
-  }).join('')||'<div class="empty-state">No data</div>';
+  statusChart=new Chart(document.getElementById('status-chart'),{
+    type:'doughnut',
+    data:{labels:Object.keys(statusCounts),datasets:[{data:Object.values(statusCounts),backgroundColor:['#22C55E','#F59E0B','#EF4444','#7A87A0'],borderWidth:0}]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}}
+  });
+
+  if(repChart) repChart.destroy();
+  repChart=new Chart(document.getElementById('rep-chart'),{
+    type:'bar',
+    data:{labels:topReps.map(r=>r[0]),datasets:[{data:topReps.map(r=>r[1]),backgroundColor:'rgba(26,110,255,.7)',borderRadius:6}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{ticks:{font:{size:10}}}}}
+  });
 }
 
-// ─── TABLE ───────────────────────────────────────────────────
+function renderLeaderboard(rows){
+  const repMap={};
+  rows.forEach(r=>{ if(r.rep){ repMap[r.rep]=(repMap[r.rep]||0)+1; } });
+  const sorted=Object.entries(repMap).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const rankClass=i=>i===0?'gold':i===1?'silver':i===2?'bronze':'';
+  document.getElementById('leader-grid').innerHTML=sorted.map(([name,count],i)=>`
+    <div class="leader-card">
+      <div class="leader-rank ${rankClass(i)}">${i+1}</div>
+      <div class="leader-name">${name}</div>
+      <div class="leader-count">${count}</div>
+    </div>`).join('');
+}
+
 function renderTable(rows){
-  const tbody=document.getElementById('table-body');
+  const tbody=document.getElementById('contracts-body');
   const empty=document.getElementById('empty-state');
-  const is1099=activeSheet===IS_1099;
+  document.getElementById('row-count').textContent=rows.length+' records';
   if(!rows.length){ tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
-  tbody.innerHTML=rows.map(r=>{
-    const st=normalizeStatus(r.status)||r.status||'—';
-    const sc=st==='Installed'?'status-installed':st==='Pending Install'?'status-pending':st==='Declined'?'status-declined':'status-other';
-    const addr=(r.address||'—').substring(0,32);
-    const cl=r.contract&&r.contract.startsWith('http')?`<a class="view-link" href="${r.contract}" target="_blank">📄 View</a>`:'—';
-    const tc=is1099?`<td class="col-tier" style="display:''">${r.tier?`<span class="tier-badge ${r.tierNeedsReview?'NR':r.tier}">${r.tierNeedsReview?'⚠ Review':r.tier}</span>`:'—'}</td>`:'<td class="col-tier"></td>';
-    const cc=is1099?`<td class="col-commission" style="display:''">${r.commission?'$'+r.commission.toLocaleString():'—'}</td>`:'<td class="col-commission"></td>';
-    return `<tr><td><div class="venue-name">${r.venue}</div><div class="venue-addr">${r.city||addr}</div></td><td>${addr}</td><td>${r.rep||'—'}</td><td>${r.station||'—'}</td><td>${r.signed||'—'}</td><td>${r.sched||'—'}</td><td><span class="status-badge ${sc}">${st==='Installed'?'✓ ':''} ${st}</span></td><td><div class="odots"><div class="odot ${r.s_done?'done':''}">S</div><div class="odot ${r.f_done?'done':''}">F</div><div class="odot ${r.s2_done?'done':''}">S</div></div></td>${tc}${cc}<td>${cl}</td></tr>`;
-  }).join('');
-  document.querySelectorAll('.col-tier,.col-commission').forEach(el=>el.style.display=is1099?'':'none');
+  const statusClass=s=>s==='Installed'?'status-installed':s==='Pending Install'?'status-pending':s==='Declined'?'status-declined':'status-other';
+  const dot=v=>`<span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:${v?'var(--green)':'var(--border)'};border:2px solid ${v?'var(--green)':'var(--border)'};"></span>`;
+  tbody.innerHTML=rows.map(r=>`<tr>
+    <td><div class="venue-name">${r.venue}</div>${r.city?`<div style="font-size:11px;color:var(--muted);">${r.city}</div>`:''}</td>
+    <td style="font-size:12px;">${r.rep||'—'}</td>
+    <td><span class="status-badge ${statusClass(r.status)}">${r.status||'—'}</span></td>
+    <td>${r.station?`<span class="station-chip ${r.station==='F10'?'chip-f10':r.station==='F15'?'chip-f15':r.station==='F5'?'chip-f5':'chip-unknown'}">${r.station}</span>`:'—'}</td>
+    <td style="font-size:12px;">${r.signed||'—'}</td>
+    <td style="font-size:12px;">${r.sched||'—'}</td>
+    <td>${dot(r.s_done)}</td><td>${dot(r.f_done)}</td><td>${dot(r.s2_done)}</td>
+    <td>${r.tier?`<span class="tier-badge tier-${r.tier.toLowerCase()}${r.tierNeedsReview?' tier-review':''}">Tier ${r.tier}${r.tierNeedsReview?' ⚠':''}</span>`:'—'}</td>
+    <td>${r.commission?'<strong>$'+r.commission.toLocaleString()+'</strong>':'—'}</td>
+    <td>${r.contract?`<a class="contract-link" href="${r.contract}" target="_blank">📄 View</a>`:'—'}</td>
+  </tr>`).join('');
 }
 
 // ─── ROI TRACKER ─────────────────────────────────────────────
-function getHWCost(stationType){
-  const t=(stationType||'').toUpperCase();
-  if(t==='F10') return parseFloat(document.getElementById('cost-f10').value)||500;
+function getHWCost(t){
   if(t==='F15') return parseFloat(document.getElementById('cost-f15').value)||750;
+  if(t==='F10') return parseFloat(document.getElementById('cost-f10').value)||500;
   if(t==='F5')  return parseFloat(document.getElementById('cost-f5').value)||350;
-  return parseFloat(document.getElementById('cost-f10').value)||500; // default
+  return parseFloat(document.getElementById('cost-f10').value)||500;
 }
 
 function buildROIRows(){
-  // Merge Superset station list with commission data from 1099 sheet
-  const comm1099 = allData[IS_1099] || [];
-  const commMap  = {};
+  const comm1099=allData[IS_1099]||[];
+  const commMap={};
   comm1099.forEach(r=>{ commMap[r.venue.toLowerCase()]={ commission:r.commission, tier:r.tier }; });
-
-  // Use Superset rows as the base (one row per station/IMEI)
   return supersetData.map(s=>{
-    const key   = s.venue.toLowerCase();
-    const cm    = commMap[key] || findPayoutFuzzy(key) || {};
-    const hw    = getHWCost(s.station);
-    const comm  = cm.commission || (cm.payout) || 0;
-    const totalCost = hw + comm;
-    const revenue   = s.revenue; // null = N/A
-    const netROI    = revenue !== null ? revenue - totalCost : null;
-    const breakEven = (revenue !== null && revenue > 0) ? (totalCost / (revenue / 12)).toFixed(1) : null;
-    const pct       = (revenue !== null && totalCost > 0) ? Math.min((revenue / totalCost) * 100, 200) : 0;
-    return { ...s, hw, comm, totalCost, revenue, netROI, breakEven, pct, tier: cm.tier||'' };
+    const key=s.venue.toLowerCase();
+    const cm=commMap[key]||findPayoutFuzzy(key)||{};
+    const hw=getHWCost(s.station);
+    const comm=cm.commission||cm.payout||0;
+    const totalCost=hw+comm;
+    const revenue=s.revenue;
+    const netROI=revenue!==null?revenue-totalCost:null;
+    const breakEven=(revenue!==null&&revenue>0)?(totalCost/(revenue/12)).toFixed(1):null;
+    const pct=(revenue!==null&&totalCost>0)?Math.min((revenue/totalCost)*100,200):0;
+    return {...s,hw,comm,totalCost,revenue,netROI,breakEven,pct,tier:cm.tier||''};
   });
 }
 
 function renderROI(){
-  if(!supersetData.length && !Object.keys(allData).length) return;
-  let rows = buildROIRows();
-
-  // If no Superset data yet, build from Google Sheets placements
+  if(!supersetData.length&&!Object.keys(allData).length) return;
+  let rows=buildROIRows();
   if(!rows.length){
-    const allPlaced = SHEET_NAMES.flatMap(n=>allData[n]||[]);
-    rows = allPlaced.map(r=>{
-      const hw = getHWCost(r.station);
-      const comm = r.commission||0;
-      const total = hw+comm;
-      return { venue:r.venue, dma:'—', station:r.station, imei:'—', active:true, hw, comm, totalCost:total, revenue:null, netROI:null, breakEven:null, pct:0, tier:r.tier };
+    const allPlaced=SHEET_NAMES.flatMap(n=>allData[n]||[]);
+    rows=allPlaced.map(r=>{
+      const hw=getHWCost(r.station);
+      const comm=r.commission||0;
+      return {venue:r.venue,dma:'—',station:r.station,imei:'—',active:true,hw,comm,totalCost:hw+comm,revenue:null,netROI:null,breakEven:null,pct:0,tier:r.tier};
     });
   }
-
-  // Filters
   const search=(document.getElementById('roi-search').value||'').toLowerCase();
   const stF=document.getElementById('roi-filter-station').value;
   const stStatus=document.getElementById('roi-filter-status').value;
   if(search) rows=rows.filter(r=>(r.venue+r.dma).toLowerCase().includes(search));
-  if(stF)    rows=rows.filter(r=>r.station===stF);
+  if(stF) rows=rows.filter(r=>r.station===stF);
   if(stStatus==='profitable') rows=rows.filter(r=>r.netROI!==null&&r.netROI>=0);
   if(stStatus==='progress')   rows=rows.filter(r=>r.netROI!==null&&r.netROI<0);
   if(stStatus==='pending')    rows=rows.filter(r=>r.revenue===null);
 
-  // KPIs
-  const totalHW    = rows.reduce((s,r)=>s+r.hw,0);
-  const totalComm  = rows.reduce((s,r)=>s+r.comm,0);
-  const totalInv   = rows.reduce((s,r)=>s+r.totalCost,0);
-  const hasRev     = rows.filter(r=>r.revenue!==null);
-  const totalRev   = hasRev.reduce((s,r)=>s+(r.revenue||0),0);
-  const netROI     = hasRev.length ? totalRev - hasRev.reduce((s,r)=>s+r.totalCost,0) : null;
-  const profitable = rows.filter(r=>r.netROI!==null&&r.netROI>=0).length;
+  const totalHW=rows.reduce((s,r)=>s+r.hw,0);
+  const totalComm=rows.reduce((s,r)=>s+r.comm,0);
+  const totalInv=rows.reduce((s,r)=>s+r.totalCost,0);
+  const hasRev=rows.filter(r=>r.revenue!==null);
+  const totalRev=hasRev.reduce((s,r)=>s+(r.revenue||0),0);
+  const netROI=hasRev.length?totalRev-hasRev.reduce((s,r)=>s+r.totalCost,0):null;
+  const profitable=rows.filter(r=>r.netROI!==null&&r.netROI>=0).length;
 
   document.getElementById('roi-kpi-grid').innerHTML=`
     <div class="roi-kpi blue"><div class="roi-kpi-label">Total Stations</div><div class="roi-kpi-value">${rows.length}</div><div class="roi-kpi-sub">${rows.filter(r=>r.active).length} active</div></div>
@@ -814,18 +795,16 @@ function renderROI(){
       <div class="roi-kpi-sub">${netROI===null?'Awaiting revenue data':profitable+' profitable stations'}</div>
     </div>`;
 
-  // Table
   const tbody=document.getElementById('roi-table-body');
   const empty=document.getElementById('roi-empty-state');
   if(!rows.length){ tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
-
-  const hasAnyRev = rows.some(r=>r.revenue!==null);
+  const hasAnyRev=rows.some(r=>r.revenue!==null);
   tbody.innerHTML=rows.map(r=>{
     const stChip=`<span class="station-chip ${r.station==='F10'?'chip-f10':r.station==='F15'?'chip-f15':r.station==='F5'?'chip-f5':'chip-unknown'}">${r.station||'?'}</span>`;
-    const revCell = r.revenue!==null?'$'+r.revenue.toLocaleString():'<span class="na-badge">Pending</span>';
-    const roiCell = r.netROI!==null?(r.netROI>=0?'<span style="color:var(--green);font-weight:700;">+$'+r.netROI.toLocaleString()+'</span>':'<span style="color:var(--red);font-weight:700;">-$'+Math.abs(r.netROI).toLocaleString()+'</span>'):'<span class="na-badge">—</span>';
-    const beCell  = r.breakEven!==null?(parseFloat(r.breakEven)<=12?`<span style="color:var(--green);font-weight:700;">${r.breakEven} mo</span>`:`${r.breakEven} mo`):'<span class="na-badge">—</span>';
+    const revCell=r.revenue!==null?'$'+r.revenue.toLocaleString():'<span class="na-badge">Pending</span>';
+    const roiCell=r.netROI!==null?(r.netROI>=0?'<span style="color:var(--green);font-weight:700;">+$'+r.netROI.toLocaleString()+'</span>':'<span style="color:var(--red);font-weight:700;">-$'+Math.abs(r.netROI).toLocaleString()+'</span>'):'<span class="na-badge">—</span>';
+    const beCell=r.breakEven!==null?(parseFloat(r.breakEven)<=12?`<span style="color:var(--green);font-weight:700;">${r.breakEven} mo</span>`:`${r.breakEven} mo`):'<span class="na-badge">—</span>';
     let statusHtml;
     if(r.revenue===null) statusHtml='<span class="roi-status roi-pending">No Revenue Yet</span>';
     else if(r.netROI>=0) statusHtml='<span class="roi-status roi-profitable">✓ Profitable</span>';
@@ -834,159 +813,101 @@ function renderROI(){
       <td><div class="venue-name">${r.venue}</div></td>
       <td style="font-size:12px;color:var(--muted);">${r.dma}</td>
       <td>${stChip}</td>
-      <td style="font-size:11px;color:var(--muted);">${r.imei!=='—'?r.imei.slice(-6):'—'}</td>
+      <td style="font-size:11px;color:var(--muted);">${r.imei&&r.imei!=='—'?r.imei.slice(-6):'—'}</td>
       <td style="font-weight:600;">$${r.hw.toLocaleString()}</td>
       <td>${r.comm?'$'+r.comm.toLocaleString():'<span class="na-badge">—</span>'}</td>
       <td style="font-weight:700;">$${r.totalCost.toLocaleString()}</td>
-      <td>${revCell}</td>
-      <td>${roiCell}</td>
-      <td>${beCell}</td>
-      <td>${statusHtml}</td>
+      <td>${revCell}</td><td>${roiCell}</td><td>${beCell}</td><td>${statusHtml}</td>
     </tr>`;
   }).join('');
 
-  const noteEl = document.getElementById('superset-note');
-  if(hasAnyRev){
-    noteEl.textContent = `✅ Revenue data live from Superset · ${rows.filter(r=>r.revenue===null).length} stations pending Redshift connection`;
-    noteEl.style.color = 'var(--green)';
-  } else if(supersetConnected){
-    noteEl.textContent = '🟡 Superset connected · Revenue shows N/A — waiting on Redshift to sync data';
-    noteEl.style.color = 'var(--orange)';
-  } else {
-    noteEl.textContent = '🔴 Superset not connected · Deploy the updated Apps Script (CityNetwork_AppsScript.gs) to pull live revenue data';
-    noteEl.style.color = 'var(--red)';
-  }
+  const noteEl=document.getElementById('superset-note');
+  if(hasAnyRev){ noteEl.textContent=`✅ Revenue live from Superset · ${rows.filter(r=>r.revenue===null).length} stations pending`; noteEl.style.color='var(--green)'; }
+  else if(supersetConnected){ noteEl.textContent='🟡 Superset connected · Revenue pending Redshift sync'; noteEl.style.color='var(--orange)'; }
+  else { noteEl.textContent='🔴 Superset not connected · Add a Superset_Revenue tab to your sheet, or click the badge above to connect directly'; noteEl.style.color='var(--red)'; }
 }
 
-// ─── SUPERSET DIRECT CONNECTION ──────────────────────────────
-const SS_LS = { url:'cn_ss_url', user:'cn_ss_user', pass:'cn_ss_pass', dash:'cn_ss_dash', token:'cn_ss_token' };
+// ─── SUPERSET DIRECT CONNECTION ───────────────────────────────
+const SS_LS={url:'cn_ss_url',user:'cn_ss_user',pass:'cn_ss_pass',dash:'cn_ss_dash'};
 
 function openSupersetModal(){
-  document.getElementById('ss-url-input').value  = localStorage.getItem(SS_LS.url)  || 'https://superset.getchargefuze.com';
-  document.getElementById('ss-user-input').value = localStorage.getItem(SS_LS.user) || '';
-  document.getElementById('ss-pass-input').value = localStorage.getItem(SS_LS.pass) || '';
-  document.getElementById('ss-dash-input').value = localStorage.getItem(SS_LS.dash) || '37';
+  document.getElementById('ss-url-input').value=localStorage.getItem(SS_LS.url)||'https://superset.getchargefuze.com';
+  document.getElementById('ss-user-input').value=localStorage.getItem(SS_LS.user)||'';
+  document.getElementById('ss-pass-input').value=localStorage.getItem(SS_LS.pass)||'';
+  document.getElementById('ss-dash-input').value=localStorage.getItem(SS_LS.dash)||'37';
   document.getElementById('ss-error').style.display='none';
   document.getElementById('superset-overlay').classList.remove('hidden');
 }
 
 async function doConnectSuperset(){
-  const btn  = document.getElementById('ss-connect-btn');
-  const errEl= document.getElementById('ss-error');
-  const ssUrl  = (document.getElementById('ss-url-input').value||'').trim().replace(/\/$/,'');
-  const ssUser = document.getElementById('ss-user-input').value.trim();
-  const ssPass = document.getElementById('ss-pass-input').value;
-  const ssDash = parseInt(document.getElementById('ss-dash-input').value)||37;
-
-  errEl.style.display='none';
-  btn.textContent='Connecting…'; btn.disabled=true;
-
+  const btn=document.getElementById('ss-connect-btn');
+  const errEl=document.getElementById('ss-error');
+  const ssUrl=(document.getElementById('ss-url-input').value||'').trim().replace(/\/$/,'');
+  const ssUser=document.getElementById('ss-user-input').value.trim();
+  const ssPass=document.getElementById('ss-pass-input').value;
+  const ssDash=parseInt(document.getElementById('ss-dash-input').value)||37;
+  errEl.style.display='none'; btn.textContent='Connecting…'; btn.disabled=true;
   try {
-    // Step 1: Login → get JWT token
-    const loginResp = await fetch(ssUrl+'/api/v1/security/login', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ username:ssUser, password:ssPass, provider:'db', refresh:true })
-    });
-    if(!loginResp.ok){
-      const t=await loginResp.text();
-      throw new Error('Login failed ('+loginResp.status+'). Check your username and password.\n\nDetail: '+t.substring(0,200));
-    }
-    const { access_token } = await loginResp.json();
-    if(!access_token) throw new Error('Login succeeded but no token returned.');
-
-    // Save creds & token
-    localStorage.setItem(SS_LS.url,  ssUrl);
-    localStorage.setItem(SS_LS.user, ssUser);
-    localStorage.setItem(SS_LS.pass, ssPass);
-    localStorage.setItem(SS_LS.dash, ssDash);
-    localStorage.setItem(SS_LS.token, access_token);
-
-    // Step 2: Fetch revenue data
-    await fetchSupersetRevenue(ssUrl, access_token, ssDash);
+    const loginResp=await fetch(ssUrl+'/api/v1/security/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:ssUser,password:ssPass,provider:'db',refresh:true})});
+    if(!loginResp.ok) throw new Error('Login failed ('+loginResp.status+'). Check username/password.');
+    const {access_token}=await loginResp.json();
+    if(!access_token) throw new Error('No token returned from login.');
+    localStorage.setItem(SS_LS.url,ssUrl); localStorage.setItem(SS_LS.user,ssUser);
+    localStorage.setItem(SS_LS.pass,ssPass); localStorage.setItem(SS_LS.dash,ssDash);
+    await fetchSupersetRevenue(ssUrl,access_token,ssDash);
     document.getElementById('superset-overlay').classList.add('hidden');
-
-  } catch(err) {
-    let msg = err.message;
-    if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.toLowerCase().includes('cors')){
-      msg = 'Could not reach Superset — this is usually a CORS issue.\n\n'+
-            'To fix it, ask your Superset admin to add your site to the allowed origins in superset_config.py:\n\n'+
-            'CORS_OPTIONS = { "origins": ["https://citynetworks.github.io", "*"] }\n\n'+
-            'Or use the Apps Script middleware approach (deploy CityNetwork_AppsScript.gs).';
+  } catch(err){
+    let msg=err.message;
+    if(msg.includes('Failed to fetch')||msg.toLowerCase().includes('cors')||msg.includes('NetworkError')){
+      msg='CORS blocked — Superset is not allowing browser requests from this domain.\n\nFix: Deploy the Apps Script (CityNetwork_AppsScript.gs) which fetches server-side and bypasses CORS.\n\nOr ask your Superset admin to enable CORS for https://citynetworks.github.io';
     }
-    errEl.textContent = msg;
-    errEl.style.display='block';
+    errEl.textContent=msg; errEl.style.display='block';
   }
   btn.textContent='🔌 Connect to Superset'; btn.disabled=false;
 }
 
-async function fetchSupersetRevenue(ssUrl, token, dashId) {
-  const badge = document.getElementById('superset-status-badge');
-  const hdrs  = { 'Authorization':'Bearer '+token, 'Content-Type':'application/json' };
-
-  // Get all charts in the dashboard
-  const chartsResp = await fetch(ssUrl+'/api/v1/dashboard/'+dashId+'/charts', { headers:hdrs });
+async function fetchSupersetRevenue(ssUrl,token,dashId){
+  const badge=document.getElementById('superset-status-badge');
+  const hdrs={'Authorization':'Bearer '+token,'Content-Type':'application/json'};
+  const chartsResp=await fetch(ssUrl+'/api/v1/dashboard/'+dashId+'/charts',{headers:hdrs});
   if(!chartsResp.ok) throw new Error('Could not fetch dashboard charts: '+chartsResp.status);
-  const { result: charts } = await chartsResp.json();
+  const {result:charts}=await chartsResp.json();
   if(!charts||!charts.length) throw new Error('No charts found in dashboard '+dashId);
-
-  // Find venue-level chart (prefer one with venue/placement/rental in name)
-  const keywords=['venue','placement','rental','station'];
-  let chart = charts.find(c=>keywords.some(k=>(c.slice_name||'').toLowerCase().includes(k)));
-  if(!chart) chart = charts[0];
-
-  // Fetch chart data
-  let dataResp = await fetch(ssUrl+'/api/v1/chart/'+chart.id+'/data/', { method:'POST', headers:hdrs, body:JSON.stringify({force:false}) });
-  if(!dataResp.ok) dataResp = await fetch(ssUrl+'/api/v1/chart/'+chart.id+'/data/', { headers:hdrs }); // fallback GET
-  if(!dataResp.ok) throw new Error('Could not fetch revenue data for chart '+chart.id+': '+dataResp.status);
-
-  const raw = await dataResp.json();
-  processSuperset(raw);
-  if(badge) {
-    if(supersetConnected){
-      badge.textContent='🟢 Superset: Live · '+supersetData.length+' stations';
-      badge.style.color='rgba(34,197,94,.9)'; badge.style.background='rgba(34,197,94,.12)';
-    } else {
-      badge.textContent='🟡 Superset: Connected · Revenue pending Redshift';
-      badge.style.color='rgba(245,158,11,.9)'; badge.style.background='rgba(245,158,11,.1)';
-    }
-  }
+  const keywords=['venue','placement','rental','station','reporting'];
+  let chart=charts.find(c=>keywords.some(k=>(c.slice_name||'').toLowerCase().includes(k)))||charts[0];
+  let dataResp=await fetch(ssUrl+'/api/v1/chart/'+chart.id+'/data/',{method:'POST',headers:hdrs,body:JSON.stringify({force:false})});
+  if(!dataResp.ok) dataResp=await fetch(ssUrl+'/api/v1/chart/'+chart.id+'/data/',{headers:hdrs});
+  if(!dataResp.ok) throw new Error('Could not fetch chart data: '+dataResp.status);
+  processSuperset(await dataResp.json());
   renderROI();
 }
 
 async function autoConnectSuperset(){
-  const ssUrl  = localStorage.getItem(SS_LS.url);
-  const ssUser = localStorage.getItem(SS_LS.user);
-  const ssPass = localStorage.getItem(SS_LS.pass);
-  const ssDash = parseInt(localStorage.getItem(SS_LS.dash)||'37');
-  if(!ssUrl||!ssUser||!ssPass) return; // No saved creds
+  const ssUrl=localStorage.getItem(SS_LS.url);
+  const ssUser=localStorage.getItem(SS_LS.user);
+  const ssPass=localStorage.getItem(SS_LS.pass);
+  const ssDash=parseInt(localStorage.getItem(SS_LS.dash)||'37');
+  if(!ssUrl||!ssUser||!ssPass) return;
   try {
-    const badge = document.getElementById('superset-status-badge');
-    if(badge){ badge.textContent='⏳ Superset: Connecting…'; badge.style.color='rgba(255,255,255,.6)'; badge.style.background='rgba(255,255,255,.08)'; }
-    // Re-login to get fresh token
-    const loginResp = await fetch(ssUrl+'/api/v1/security/login', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ username:ssUser, password:ssPass, provider:'db', refresh:true })
-    });
-    if(!loginResp.ok) throw new Error('Auto-login failed');
-    const { access_token } = await loginResp.json();
-    if(!access_token) throw new Error('No token');
-    localStorage.setItem(SS_LS.token, access_token);
-    await fetchSupersetRevenue(ssUrl, access_token, ssDash);
-  } catch(e) {
-    const badge = document.getElementById('superset-status-badge');
+    const badge=document.getElementById('superset-status-badge');
+    if(badge){ badge.textContent='⏳ Superset: Connecting…'; }
+    const lr=await fetch(ssUrl+'/api/v1/security/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:ssUser,password:ssPass,provider:'db',refresh:true})});
+    if(!lr.ok) throw new Error('auto-login failed');
+    const {access_token}=await lr.json();
+    if(!access_token) throw new Error('no token');
+    await fetchSupersetRevenue(ssUrl,access_token,ssDash);
+  } catch(e){
+    const badge=document.getElementById('superset-status-badge');
     if(badge){ badge.textContent='🔴 Superset: Click to connect'; badge.style.color='rgba(239,68,68,.7)'; badge.style.background='rgba(239,68,68,.1)'; }
   }
 }
 
-// ─── INIT ────────────────────────────────────────────────────
-window.addEventListener('load', () => {
-  const url = getScriptUrl();
-  if(url) loadData();
-  else { document.getElementById('loading-screen').style.display='none'; document.getElementById('setup-overlay').classList.remove('hidden'); }
-  // Try Superset auto-connect after sheets load (slight delay)
-  setTimeout(autoConnectSuperset, 2000);
+// ─── INIT ─────────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  loadData();
+  setTimeout(autoConnectSuperset,2500);
 });
-['filter-rep','filter-status','filter-tier','filter-from','filter-to'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('change',applyFilters); });
+['filter-from','filter-to'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('change',applyFilters); });
 </script>
 </body>
 </html>
