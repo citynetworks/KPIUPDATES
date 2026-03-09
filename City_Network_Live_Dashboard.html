@@ -281,8 +281,13 @@ const IS_1099     = '1099 B - Rep Install';
 // ── STATE ────────────────────────────────────────────────────────────
 let allInstalls = [];
 let spData      = [];
-let tierMap     = {};  // imei → tier letter (from tier sheet)
-let venueMap    = {};  // venue name (lowercase) → tier letter (fallback)
+// tierDataMap: normImei → { tier:'A'|'B'|'C', amount:number|null, rep, venue }
+let tierDataMap = {};
+// venueDataMap: venue name lowercase → same object (fuzzy fallback)
+let venueDataMap= {};
+// Legacy aliases kept so nothing breaks
+let tierMap     = tierDataMap;
+let venueMap    = venueDataMap;
 let debugLines  = [];
 
 // ── HELPERS ──────────────────────────────────────────────────────────
@@ -370,22 +375,52 @@ function getCommRate(tier){
   return 0;
 }
 
-// ── TIER LOOKUP — 3-level priority ────────────────────────────────────
-// 1. directTier on the install row (read from install sheet itself)
-// 2. tierMap[imei] — IMEI matched against 2026.02.06 tier sheet
-// 3. venueMap[venue] — venue name matched against 2026.02.06 tier sheet
-function getTier(install){
-  if(!install) return '';
-  if(install.directTier) return install.directTier;
+// ── FUZZY VENUE KEY — strips punctuation + extra words for loose matching ─
+function venueKey(s){
+  return String(s||'').toLowerCase()
+    .replace(/[^\w\s]/g,' ')   // punctuation → space
+    .replace(/\b(the|a|an|by|and|inn|suites?|hotel|bar|grill|club|lounge|cafe|restaurant|shop|store)\b/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+
+// ── TIER DATA LOOKUP — returns { tier, amount } ────────────────────────
+// Priority: 1. directTier from install sheet  2. IMEI match  3. exact venue  4. fuzzy venue
+function getTierData(install){
+  const NONE = { tier:'', amount:null };
+  if(!install) return NONE;
+
+  // 1. Tier read directly from the install sheet row
+  if(install.directTier) return { tier: install.directTier, amount: null };
+
+  // 2. IMEI match (normalized — handles spaces/dashes)
   if(install.imei){
-    const t = tierMap[normImei(install.imei)] || tierMap[install.imei];
-    if(t) return t;
+    const d = tierDataMap[normImei(install.imei)] || tierDataMap[install.imei];
+    if(d) return d;
   }
+
+  // 3. Exact venue name match
   if(install.venue){
-    const t = venueMap[install.venue.toLowerCase().trim()];
-    if(t) return t;
+    const vn = install.venue.toLowerCase().trim();
+    if(venueDataMap[vn]) return venueDataMap[vn];
+
+    // 4. Fuzzy venue key match
+    const vk = venueKey(install.venue);
+    for(const [k,d] of Object.entries(venueDataMap)){
+      const dk = venueKey(k);
+      if(dk && vk && (dk===vk || dk.startsWith(vk) || vk.startsWith(dk))) return d;
+    }
   }
-  return '';
+  return NONE;
+}
+
+// Convenience wrappers
+function getTier(install){ return getTierData(install).tier; }
+
+// Commission: use amount from tier sheet first; fall back to settings bar rates
+function getCommissionAmt(install){
+  const { tier, amount } = getTierData(install);
+  if(amount !== null && amount > 0) return amount;
+  return getCommRate(tier); // settings bar fallback
 }
 
 // ── PARSE INSTALL SHEETS (2D array from getDataRange().getValues()) ──
@@ -553,9 +588,13 @@ function normImei(s){
 
 // ── PARSE TIER SHEET (2026.02.06 tab) ─────────────────────────────────
 function parseTierSheet(values){
-  if(!values||!Array.isArray(values)||values.length<2){ dbg('[tiers] empty/missing'); return {}; }
+  // Directly populates global tierDataMap and venueDataMap
+  tierDataMap={};
+  venueDataMap={};
 
-  // Dynamic header row detection (same approach as parseInstallSheet)
+  if(!values||!Array.isArray(values)||values.length<2){ dbg('[tiers] empty/missing'); return; }
+
+  // Dynamic header row detection
   let hi=0;
   for(let i=0;i<Math.min(values.length,6);i++){
     if(values[i].filter(c=>String(c||'').trim()).length>2){ hi=i; break; }
@@ -578,44 +617,65 @@ function parseTierSheet(values){
     'payout tier','tier a','tier b','tier c','site tier','rate','rate tier',
     'commission rate','rate level','pricing tier','service tier');
 
-  // Also try to infer tier from a venue/name column if no explicit tier col
+  const amountIdx=findCol(headers,
+    'amount','payout','commission amount','comm amount','commission $','payout amount',
+    'payment','pay','commission payout','total','total commission','comm','fee',
+    'flat fee','flat rate','contract amount','deal amount','placement fee');
+
   const venueIdx=findCol(headers,
     'venue','venue name','account','account name','business','business name',
     'location','client','company','place','name');
 
-  dbg('  → imei='+imeiIdx+' tier='+tierIdx+' venue='+venueIdx+
-      (imeiIdx<0?' ⚠ IMEI COL NOT FOUND':'')+(tierIdx<0?' ⚠ TIER COL NOT FOUND':''));
+  const repIdx=findCol(headers,
+    'rep','rep name','sales rep','agent','agent name','salesperson','associate',
+    'partner','contractor','employee','first name','full name');
 
-  const map={};   // keyed by normalized IMEI → tier letter
-  const venueMap={}; // keyed by lowercase venue name → tier letter (fallback)
+  dbg('  → imei='+imeiIdx+' tier='+tierIdx+' amount='+amountIdx+' venue='+venueIdx+' rep='+repIdx+
+      (imeiIdx<0?' ⚠ IMEI NOT FOUND':'')+
+      (tierIdx<0?' ⚠ TIER NOT FOUND':'')+
+      (amountIdx<0?' ⚠ AMOUNT NOT FOUND':''));
 
   for(let i=hi+1;i<values.length;i++){
     const row=values[i];
     if(!row||row.every(c=>!String(c||'').trim())) continue;
 
-    const rawTier = imeiIdx>=0&&tierIdx>=0
-      ? String(row[tierIdx]||'').trim().toUpperCase().replace(/^TIER\s*/,'')
-      : '';
-    const tier = (rawTier==='A'||rawTier==='B'||rawTier==='C') ? rawTier : '';
+    const rawTier=tierIdx>=0 ? String(row[tierIdx]||'').trim().toUpperCase().replace(/^TIER\s*/,'') : '';
+    const tier=(rawTier==='A'||rawTier==='B'||rawTier==='C') ? rawTier : '';
     if(!tier) continue;
 
+    // Parse amount — handle $1,234.56 format
+    let amount=null;
+    if(amountIdx>=0){
+      const raw=String(row[amountIdx]||'').replace(/[$,\s]/g,'');
+      const n=parseFloat(raw);
+      if(!isNaN(n)&&n>0) amount=n;
+    }
+
+    const entry={ tier, amount };
+    if(repIdx>=0)   entry.rep  =String(row[repIdx]||'').trim();
+    if(venueIdx>=0) entry.venue=String(row[venueIdx]||'').trim();
+
+    // Key by normalized IMEI
     if(imeiIdx>=0){
       const imei=normImei(String(row[imeiIdx]||''));
-      if(imei) map[imei]=tier;
+      if(imei) tierDataMap[imei]=entry;
     }
+    // Key by venue name (exact lowercase + fuzzy venueKey)
     if(venueIdx>=0){
       const vn=String(row[venueIdx]||'').trim().toLowerCase();
-      if(vn) venueMap[vn]=tier;
+      if(vn){
+        venueDataMap[vn]=entry;
+        const vk=venueKey(vn);
+        if(vk&&vk!==vn) venueDataMap[vk]=entry;
+      }
     }
   }
 
-  dbg('[tiers] IMEI map: '+Object.keys(map).length+' entries, venue map: '+Object.keys(venueMap).length+' entries');
-  if(Object.keys(map).length>0)
-    dbg('  sample IMEIs: '+Object.keys(map).slice(0,5).join(', '));
-
-  // Attach venue fallback map so processData can use it
-  map['__venueMap__']=venueMap;
-  return map;
+  dbg('[tiers] tierDataMap: '+Object.keys(tierDataMap).length+' IMEI entries, venueDataMap: '+Object.keys(venueDataMap).length+' venue entries');
+  if(Object.keys(tierDataMap).length>0)
+    dbg('  sample IMEIs: '+Object.keys(tierDataMap).slice(0,3).map(k=>k+' → '+tierDataMap[k].tier+(tierDataMap[k].amount?'/$'+tierDataMap[k].amount:'')).join(', '));
+  if(Object.keys(venueDataMap).length>0)
+    dbg('  sample venues: '+Object.keys(venueDataMap).slice(0,3).join(', '));
 }
 
 // ── PARSE SUPERSET ───────────────────────────────────────────────────
@@ -670,8 +730,10 @@ function parseSuperset(raw){
 function processData(resp){
   debugLines=[];
   allInstalls=[];
-  tierMap={};
-  venueMap={};
+  tierDataMap={};
+  venueDataMap={};
+  tierMap=tierDataMap;   // legacy aliases
+  venueMap=venueDataMap;
 
   SHEET_NAMES.forEach(name=>{
     const raw=resp[name];
@@ -685,9 +747,9 @@ function processData(resp){
 
   const tierRaw=resp['__tiers__'];
   if(tierRaw&&Array.isArray(tierRaw)){
-    tierMap=parseTierSheet(tierRaw);
-    venueMap=tierMap['__venueMap__']||{};
-    delete tierMap['__venueMap__'];
+    parseTierSheet(tierRaw); // populates tierDataMap + venueDataMap directly
+    tierMap=tierDataMap;     // keep aliases in sync
+    venueMap=venueDataMap;
   }
 
   const spRaw  =resp['__superset__'];
@@ -797,10 +859,8 @@ function renderPlacements(){
     return '<span style="color:var(--muted);font-size:12px">—</span>';
   };
   const commVal=install=>{
-    const t=getTier(install);
-    if(t==='A') return '$'+(+document.getElementById('commA').value||500).toLocaleString();
-    if(t==='B') return '$'+(+document.getElementById('commB').value||350).toLocaleString();
-    if(t==='C') return '$'+(+document.getElementById('commC').value||200).toLocaleString();
+    const amt=getCommissionAmt(install);
+    if(amt>0) return '$'+amt.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0});
     return '—';
   };
   const dot=done=>`<div class="milestone-dot${done?' done':''}"></div>`;
@@ -835,12 +895,22 @@ function buildROIRows(){
       const install =getInstallInfo(sp.imei,sp.venue);
       const station =sp.station||(install?install.station:'F10');
       const imei    =sp.imei||(install?install.imei:'');
-      // Use 3-level getTier: directTier → IMEI → venue name
-      const tier    =install?getTier(install):(venueMap[(sp.venue||'').toLowerCase().trim()]||'');
+      // Resolve tier + commission: prefer install record, then venueDataMap fuzzy lookup
+      let tierObj=null;
+      if(install){
+        tierObj=getTierData(install);
+      } else {
+        // No matching install — try venueDataMap directly for this Superset venue
+        const vn=(sp.venue||'').toLowerCase().trim();
+        tierObj=venueDataMap[vn]||venueDataMap[venueKey(sp.venue)]||{tier:'',amount:null};
+      }
+      const tier    =tierObj.tier||'';
       const is1099  =install?install.is1099:false;
       const mkt     =sp.market||(install?install.market:'—')||'—';
       const hw      =getHWCost(station);
-      const comm    =(!is1099&&tier)?getCommRate(tier):0;
+      // Use amount from tier sheet if available; otherwise settings-bar fallback
+      const commAmt = tierObj.amount!==null&&tierObj.amount>0 ? tierObj.amount : (tier?getCommRate(tier):0);
+      const comm    =(!is1099)? commAmt : 0;
       const inv     =hw+comm;
       const rev     =sp.revenue||0;
       const net     =rev-inv;
@@ -860,9 +930,11 @@ function buildROIRows(){
     });
   } else {
     return allInstalls.map(i=>{
-      const tier=getTier(i);
+      const tierObj=getTierData(i);
+      const tier=tierObj.tier||'';
       const hw=getHWCost(i.station);
-      const comm=(!i.is1099&&tier)?getCommRate(tier):0;
+      const commAmt=tierObj.amount!==null&&tierObj.amount>0 ? tierObj.amount : (tier?getCommRate(tier):0);
+      const comm=(!i.is1099)? commAmt : 0;
       const inv=hw+comm;
       return {venue:i.venue,market:i.market||'—',station:i.station,imei:i.imei,hw,comm,inv,rev:0,net:-inv,beMonths:null,bePct:0,roiState:'norev',tier};
     });
