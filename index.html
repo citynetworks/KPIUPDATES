@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>chargeFUZE · City Network Placement Tracker</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B1120;--cf-dark:#0B1120;--cf-mid:#10192E;
+  --card:#fff;--border:#DDE3EF;--text:#1A2340;--muted:#7A87A0;
+  --green:#22C55E;--orange:#F59E0B;--red:#EF4444;--blue:#1A6EFF;--purple:#8B5CF6;
+  --teal:#0D9488;--cf-blue:#1A6EFF;--row-hover:#F8FAFF;--badge-bg:#F0F4FF;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* HEADER */
+header{background:linear-gradient(135deg,var(--cf-dark) 0%,var(--cf-mid) 100%);border-bottom:2px solid var(--cf-blue);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--cf-blue),#0050CC);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
+.brand-name{font-size:19px;font-weight:700;color:#fff}.brand-name span{color:var(--cf-blue)}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:8px}
+.hbtn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.hbtn:hover{background:rgba(255,255,255,.14);border-color:var(--cf-blue)}
+.sync-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(255,255,255,.85);white-space:nowrap}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.sync-dot.loading{background:var(--orange);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* NAV */
+.main-nav{background:var(--cf-dark);border-bottom:1px solid rgba(255,255,255,.08);display:flex;gap:4px;padding:0 24px;position:sticky;top:60px;z-index:99}
+.nav-btn{padding:10px 18px;font-size:13px;font-weight:600;color:rgba(255,255,255,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.nav-btn:hover{color:rgba(255,255,255,.85)}
+.nav-btn.active{color:#fff;border-bottom-color:var(--cf-blue)}
+
+/* SETTINGS BAR */
+.settings-bar{background:var(--cf-dark);border-bottom:1px solid rgba(255,255,255,.07);padding:10px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:sticky;top:100px;z-index:98}
+.settings-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.2px;text-transform:uppercase;white-space:nowrap}
+.cost-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cost-chip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 11px;transition:border-color .2s}
+.cost-chip:focus-within{border-color:var(--cf-blue)}
+.cost-chip label{font-size:11px;font-weight:700;color:var(--cf-blue);min-width:24px}
+.cost-chip input{background:transparent;border:none;outline:none;color:#fff;font-size:14px;font-weight:700;width:52px;text-align:right}
+.divider{width:1px;height:24px;background:rgba(255,255,255,.1)}
+.superset-pill{margin-left:auto;display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;white-space:nowrap}
+.superset-pill.ok{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.1);color:#4ADE80}
+.superset-pill.err{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#F87171}
+.superset-pill.warn{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.1);color:#FCD34D}
+.sp-dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 5px currentColor}
+
+/* VIEWS */
+.view{display:none;padding:20px 24px}
+.view.active{display:block}
+
+/* KPI CARDS */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.kpi-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px}
+.kpi-value{font-size:28px;font-weight:800;line-height:1.1}
+.kpi-value.blue{color:var(--blue)}
+.kpi-value.orange{color:var(--orange)}
+.kpi-value.yellow{color:#CA8A04}
+.kpi-value.purple{color:var(--purple)}
+.kpi-value.green{color:var(--green)}
+.kpi-sub{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* SECTION HEADER */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.sec-title{font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.sec-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.search-wrap{position:relative}
+.search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;pointer-events:none}
+.search-input{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 12px 7px 30px;font-size:13px;color:var(--text);outline:none;width:190px}
+.search-input:focus{border-color:var(--cf-blue)}
+select.fsel{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--text);outline:none;cursor:pointer;min-width:140px}
+
+/* TABLE */
+.tcard{background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.tcard table{width:100%;border-collapse:collapse;font-size:13px}
+.tcard thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;background:#F8FAFF}
+.tcard tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+.tcard tbody tr:hover{background:var(--row-hover)}
+.tcard tbody tr:last-child{border-bottom:none}
+.tcard tbody td{padding:11px 14px;vertical-align:middle}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.b-f15{background:#EDE9FF;color:#6D28D9}
+.b-f10{background:#EFF6FF;color:#1D4ED8}
+.b-f5{background:#F0FDF4;color:#166534}
+.b-ok{background:#F0FDF4;color:#15803D}
+.b-red{background:#FEF2F2;color:#B91C1C}
+.b-orange{background:#FFFBEB;color:#B45309}
+.b-blue{background:#EFF6FF;color:#1D4ED8}
+.b-gray{background:#F1F5F9;color:#475569}
+.b-ta{background:#F0FDF4;color:#15803D}
+.b-tb{background:#EFF6FF;color:#1D4ED8}
+.b-tc{background:#FEF2F2;color:#B91C1C}
+
+/* BREAK-EVEN BAR */
+.be-wrap{display:flex;flex-direction:column;gap:4px;min-width:120px}
+.be-bar-bg{height:6px;border-radius:4px;background:#E9EFF6;overflow:hidden;position:relative}
+.be-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.be-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+.be-pct{font-size:12px;font-weight:700}
+
+/* ROI VALUES */
+.roi-pos{color:var(--green);font-weight:700}
+.roi-neg{color:var(--red);font-weight:700}
+.rev-val{font-weight:600}
+
+/* LEADERBOARD */
+.lb-wrap{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.lb-card{background:var(--card);border-radius:10px;padding:12px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);min-width:160px}
+.lb-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.lb-rank.g{background:#FEF9C3;color:#A16207}
+.lb-rank.s{background:#F1F5F9;color:#475569}
+.lb-rank.b{background:#FFF7ED;color:#C2410C}
+.lb-rank.n{background:var(--badge-bg);color:var(--muted)}
+.lb-name{font-weight:700;font-size:13px;color:var(--text)}
+.lb-count{background:var(--cf-blue);color:#fff;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700;margin-left:auto}
+
+/* MILESTONE */
+.ms{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:#fff;display:inline-block}
+.ms.done{background:var(--green);border-color:var(--green)}
+
+/* EMPTY */
+.empty td{text-align:center;color:var(--muted);padding:32px!important;font-size:13px}
+
+/* LOADING */
+.overlay{position:fixed;inset:0;background:rgba(11,17,32,.93);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:14px}
+.spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--cf-blue);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err-box{background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:12px 16px;color:#B91C1C;font-size:13px;margin-bottom:16px;display:none}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:24px;width:420px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text)}
+.modal p{font-size:12px;color:var(--muted);margin-bottom:8px}
+.modal label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px;margin-top:12px;font-weight:600}
+.modal input{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;outline:none;color:var(--text)}
+.modal input:focus{border-color:var(--cf-blue)}
+.modal-btns{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-p{background:var(--cf-blue);color:#fff}.btn-p:hover{background:#0050CC}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--muted)}.btn-o:hover{border-color:var(--cf-blue);color:var(--cf-blue)}
+.mst{margin-top:10px;font-size:12px;padding:8px 12px;border-radius:8px;display:none}
+
+/* CHART AREA */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+@media(max-width:700px){.chart-row{grid-template-columns:1fr}}
+.chart-card{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.chart-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:14px}
+.bar-chart{display:flex;flex-direction:column;gap:8px}
+.bc-row{display:flex;align-items:center;gap:10px}
+.bc-label{font-size:12px;color:var(--text);width:140px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bc-bar-bg{flex:1;height:8px;border-radius:4px;background:#E9EFF6;overflow:hidden}
+.bc-bar{height:100%;border-radius:4px;background:var(--green);transition:width .5s ease}
+.bc-val{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;min-width:50px;text-align:right}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <div style="color:rgba(255,255,255,.55);font-size:13px">Loading City Network data…</div>
+</div>
+
+<!-- Superset Modal -->
+<div class="modal-bg" id="spModal">
+  <div class="modal">
+    <h3>⚡ Connect to Superset</h3>
+    <p>Connect directly for live rental revenue. Requires Gamma or Admin role.</p>
+    <label>Superset URL</label><input id="spUrl" value="https://superset.getchargefuze.com"/>
+    <label>Username</label><input id="spUser" value="Chris Okoye"/>
+    <label>Password</label><input type="password" id="spPass" placeholder="Password"/>
+    <div class="mst" id="spSt"></div>
+    <div class="modal-btns">
+      <button class="btn btn-o" onclick="closeModal('spModal')">Cancel</button>
+      <button class="btn btn-p" onclick="doConnect()">Connect</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <h3>⚙ Settings</h3>
+    <label>Apps Script URL</label>
+    <input id="settingsUrl" placeholder="Paste Apps Script URL…"/>
+    <div class="modal-btns">
+      <button class="btn btn-o" onclick="closeModal('settingsModal')">Cancel</button>
+      <button class="btn btn-p" onclick="saveSettings()">Save & Reload</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">CF</div>
+    <div>
+      <div class="brand-name">charge<span>FUZE</span></div>
+      <div class="brand-sub">City Network · Placement Tracker</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="sync-badge"><div class="sync-dot" id="syncDot"></div><span id="syncLbl">—</span></div>
+    <button class="hbtn" onclick="loadData()">↺ Refresh</button>
+    <button class="hbtn" onclick="openModal('settingsModal')">⚙ Settings</button>
+    <button class="hbtn" onclick="triggerFile()">📄 File fallback</button>
+  </div>
+</header>
+
+<div class="main-nav">
+  <div class="nav-btn active" id="nav-p" onclick="switchTab('p')">□ Placement Tracker</div>
+  <div class="nav-btn" id="nav-r" onclick="switchTab('r')">☑ ROI Tracker</div>
+</div>
+
+<!-- ROI Settings Bar -->
+<div class="settings-bar" id="roiBar" style="display:none">
+  <div class="settings-label">⚙ Hardware Costs</div>
+  <div class="cost-group">
+    <div class="cost-chip"><label>F10</label><input type="number" id="hwF10" value="400" min="0" onchange="renderROI()"/></div>
+    <div class="cost-chip"><label>F15</label><input type="number" id="hwF15" value="750" min="0" onchange="renderROI()"/></div>
+    <div class="cost-chip"><label>F5</label><input type="number" id="hwF5" value="350" min="0" onchange="renderROI()"/></div>
+  </div>
+  <div class="divider"></div>
+  <div class="settings-label">Commission Range</div>
+  <div class="cost-group">
+    <div class="cost-chip"><label>A</label><input type="number" id="commA" value="500" min="0" max="500" onchange="renderROI()"/></div>
+    <div class="cost-chip"><label>B</label><input type="number" id="commB" value="350" min="0" max="500" onchange="renderROI()"/></div>
+    <div class="cost-chip"><label>C</label><input type="number" id="commC" value="200" min="0" max="500" onchange="renderROI()"/></div>
+  </div>
+  <div class="superset-pill warn" id="spPill" onclick="openModal('spModal')">
+    <div class="sp-dot"></div><span id="spLbl">Superset: Not connected</span>
+  </div>
+</div>
+
+<!-- ═══ PLACEMENTS VIEW ═══ -->
+<div class="view active" id="view-p">
+  <div id="pErr" class="err-box"></div>
+  <div class="sec-title" style="margin-bottom:14px;color:#fff">🏆 Rep Leaderboard</div>
+  <div class="lb-wrap" id="leaderboard"></div>
+
+  <div class="sec-header">
+    <div class="sec-title" style="color:#fff">📋 Contracts <span style="font-size:12px;font-weight:400;color:rgba(255,255,255,.4)" id="cCount"></span></div>
+    <div class="sec-right">
+      <div class="search-wrap"><input class="search-input" id="cSearch" placeholder="Search venue or rep…" oninput="renderContracts()"/></div>
+      <select class="fsel" id="cRep" onchange="renderContracts()"><option value="">All Reps</option></select>
+      <select class="fsel" id="cStatus" onchange="renderContracts()"><option value="">All Statuses</option></select>
+      <select class="fsel" id="cStation" onchange="renderContracts()"><option value="">All Stations</option></select>
+    </div>
+  </div>
+  <div class="tcard">
+    <table><thead><tr>
+      <th>Venue</th><th>Rep</th><th>Status</th><th>Station</th>
+      <th>Signed</th><th>Scheduled</th><th>S</th><th>F</th><th>S2</th>
+      <th>Tier</th><th>Commission</th><th>Contract</th>
+    </tr></thead><tbody id="cBody"></tbody></table>
+  </div>
+</div>
+
+<!-- ═══ ROI VIEW ═══ -->
+<div class="view" id="view-r">
+  <div id="rErr" class="err-box"></div>
+
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Total Stations</div><div class="kpi-value blue" id="k-stations">—</div><div class="kpi-sub" id="k-stations-sub"></div></div>
+    <div class="kpi"><div class="kpi-label">Hardware Investment</div><div class="kpi-value orange" id="k-hw">—</div><div class="kpi-sub">F10 / F15 / F5 units</div></div>
+    <div class="kpi"><div class="kpi-label">Commissions Paid</div><div class="kpi-value yellow" id="k-comm">—</div><div class="kpi-sub">Rep payouts</div></div>
+    <div class="kpi"><div class="kpi-label">Total Investment</div><div class="kpi-value purple" id="k-invest">—</div><div class="kpi-sub">Hardware + Commission</div></div>
+    <div class="kpi"><div class="kpi-label">Net ROI</div><div class="kpi-value green" id="k-roi">—</div><div class="kpi-sub" id="k-roi-sub"></div></div>
+  </div>
+
+  <!-- Charts -->
+  <div class="chart-row" id="chartRow" style="display:none">
+    <div class="chart-card">
+      <div class="chart-title">Top Revenue by Venue</div>
+      <div class="bar-chart" id="topRevenueChart"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Revenue by Market (DMA)</div>
+      <div class="bar-chart" id="marketChart"></div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="sec-header">
+    <div class="sec-title" style="color:#fff">📊 Station ROI Tracker</div>
+    <div class="sec-right">
+      <div class="search-wrap"><input class="search-input" id="rSearch" placeholder="Search venue…" oninput="renderROI()"/></div>
+      <select class="fsel" id="rStation" onchange="renderROI()">
+        <option value="">All Station Types</option>
+        <option>F15</option><option>F10</option><option>F5</option>
+      </select>
+      <select class="fsel" id="rStatus" onchange="renderROI()">
+        <option value="">All</option>
+        <option value="profitable">Profitable</option>
+        <option value="breakeven">Near Breakeven</option>
+        <option value="negative">Negative ROI</option>
+        <option value="norev">No Revenue Yet</option>
+      </select>
+      <select class="fsel" id="rSort" onchange="renderROI()">
+        <option value="rev_desc">Revenue ↓</option>
+        <option value="rev_asc">Revenue ↑</option>
+        <option value="roi_desc">Net ROI ↓</option>
+        <option value="be_asc">Break-Even ↑</option>
+        <option value="venue_asc">Venue A-Z</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tcard">
+    <table><thead><tr>
+      <th>Venue</th><th>Market (DMA)</th><th>Station</th><th>IMEI</th>
+      <th>HW Cost</th><th>Commission</th><th>Total Investment</th>
+      <th>Total Revenue</th><th>Net ROI</th>
+      <th style="min-width:160px">Break-Even Progress</th>
+      <th>Status</th>
+    </tr></thead><tbody id="rBody"></tbody></table>
+  </div>
+</div>
+
+<input type="file" id="fileIn" accept=".json" style="display:none" onchange="handleFile(event)"/>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbwBFt_n1Lm5N5lWpzmB4OwnTyuL0q59-binDi2n6mTrIL4MZK_c0eAol6CygH1w5iFT/exec';
+const SHEET_NAMES = ['Full Time Rep - Install','1099 B - Rep Install','CN Installs - Onboarding'];
+const IS_1099 = '1099 B - Rep Install';
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let allInstalls  = [];
+let contractRows = [];
+let tierMap      = {};  // imei → tier
+let spData       = [];  // superset rows
+let spSource     = null;
+let scriptUrl    = DEFAULT_URL;
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function switchTab(t) {
+  ['p','r'].forEach(n => {
+    document.getElementById('nav-'+n).classList.toggle('active', n===t);
+    document.getElementById('view-'+n).classList.toggle('active', n===t);
+  });
+  document.getElementById('roiBar').style.display = t==='r' ? 'flex' : 'none';
+}
+
+// ══════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ══════════════════════════════════════════
+// JSONP
+// ══════════════════════════════════════════
+function fetchJsonp(url) {
+  return new Promise((res, rej) => {
+    const cb = 'cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const el = document.createElement('script');
+    const t = setTimeout(() => { cleanup(); rej(new Error('Timeout — check Apps Script URL')); }, 30000);
+    function cleanup() { clearTimeout(t); delete window[cb]; el.remove(); }
+    window[cb] = d => { cleanup(); res(d); };
+    el.onerror = () => { cleanup(); rej(new Error('Failed to load — check the URL')); };
+    el.src = url + (url.includes('?')?'&':'?') + 'callback=' + cb;
+    document.head.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════════════
+// LOAD
+// ══════════════════════════════════════════
+async function loadData() {
+  setSyncState('loading');
+  document.getElementById('overlay').style.display = 'flex';
+  hideErrors();
+  try {
+    const resp = await fetchJsonp(scriptUrl);
+    if (!resp.ok) throw new Error(resp.error||'Apps Script error');
+    processData(resp);
+    setSyncState('ok');
+  } catch(e) {
+    setSyncState('err');
+    showErr('rErr', e.message);
+    showErr('pErr', e.message);
+  } finally {
+    document.getElementById('overlay').style.display = 'none';
+  }
+}
+
+function setSyncState(s) {
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLbl');
+  if (s==='loading') { dot.className='sync-dot loading'; lbl.textContent='Syncing…'; }
+  else if (s==='ok')  { dot.className='sync-dot'; lbl.innerHTML='Synced '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+  else                { dot.className='sync-dot'; dot.style.background='var(--red)'; lbl.textContent='Error'; }
+}
+function showErr(id, msg) { const e=document.getElementById(id); e.textContent='⚠ '+msg; e.style.display='block'; }
+function hideErrors() { ['rErr','pErr'].forEach(id=>document.getElementById(id).style.display='none'); }
+
+// ══════════════════════════════════════════
+// PROCESS
+// ══════════════════════════════════════════
+function processData(resp) {
+  // Tier sheet → tierMap + contractRows
+  tierMap = {}; contractRows = [];
+  const tiers = resp['__tiers__'] || [];
+  if (tiers.length > 1) {
+    const hdr = tiers[0].map(h=>String(h||'').toLowerCase().trim());
+    const c = k => hdr.findIndex(h=>h.includes(k));
+    const iC=c('imei'), tC=c('tier'), vC=c('venue')!==-1?c('venue'):c('location'),
+          rC=c('rep'), stC=c('station'), stsC=c('status'),
+          sgC=c('sign'), schC=c('sched')!==-1?c('sched'):c('install'),
+          sC=hdr.findIndex(h=>h==='s'), fC=hdr.findIndex(h=>h==='f'),
+          s2C=hdr.findIndex(h=>h==='s2'), ctC=c('contract')!==-1?c('contract'):c('url')!==-1?c('url'):c('link');
+
+    for (let r=1;r<tiers.length;r++) {
+      const row=tiers[r];
+      if (row.every(x=>!String(x||'').trim())) continue;
+      const imei=String(row[iC]||'').trim();
+      const tier=String(row[tC]||'').trim().toUpperCase();
+      if (imei && tier) tierMap[imei]=tier;
+      contractRows.push({
+        venue:String(row[vC]??'').trim(), rep:String(row[rC]??'').trim(),
+        status:normalizeStatus(String(row[stsC]??'').trim()),
+        station:normStn(row[stC]), imei,
+        signed:fmtDate(row[sgC]), scheduled:fmtDate(row[schC]),
+        s:row[sC]?String(row[sC]).trim():'', f:row[fC]?String(row[fC]).trim():'',
+        s2:row[s2C]?String(row[s2C]).trim():'', tier,
+        commission: tier ? getCommRate(tier) : 0,
+        contractUrl: ctC>=0?String(row[ctC]||'').trim():''
+      });
+    }
+  }
+
+  // Install sheets
+  allInstalls = [];
+  SHEET_NAMES.forEach(name => { if (resp[name]) allInstalls.push(...parseSheet(resp[name],name)); });
+
+  // Superset
+  if (resp['__superset__']!==undefined) {
+    if (resp['__superset__']) {
+      spData = parseSuperset(resp['__superset__']);
+      spSource = resp['__superset_source__']||'api';
+      setSupersetPill('ok', spSource==='csv_tab'
+        ? `Superset: CSV Tab · ${spData.length} stations`
+        : `Superset: Live · ${spData.length} stations`);
+    } else {
+      spData = [];
+      setSupersetPill('err','Superset: '+(resp['__superset_error__']||'Error').substring(0,40));
+    }
+  } else {
+    setSupersetPill('warn','Superset: Deploy script first');
+  }
+
+  populateContractFilters();
+  renderLeaderboard();
+  renderContracts();
+  renderROI();
+}
+
+// ══════════════════════════════════════════
+// PARSE HELPERS
+// ══════════════════════════════════════════
+function parseSheet(rows, sheet) {
+  if (!rows||rows.length<2) return [];
+  const hdr=rows[0].map(h=>String(h||'').toLowerCase().trim());
+  const c=k=>hdr.findIndex(h=>h.includes(k));
+  const rC=c('rep'), vC=c('venue')!==-1?c('venue'):c('location'),
+        adrC=c('address'), stC=c('station'), iC=c('imei'),
+        dC=c('date')!==-1?c('date'):c('install'), stsC=c('status'),
+        mktC=c('market')!==-1?c('market'):c('dma')!==-1?c('dma'):c('city')!==-1?c('city'):c('region');
+  return rows.slice(1).filter(row=>!row.every(x=>!String(x||'').trim())).map(row=>({
+    rep:    String(row[rC]??'').trim(),
+    venue:  String(row[vC]??'').trim(),
+    address:String(row[adrC]??'').trim(),
+    station:normStn(row[stC]),
+    imei:   String(row[iC]??'').trim(),
+    installDate: row[dC]||null,
+    status: normalizeStatus(String(row[stsC]??'').trim()),
+    market: mktC>=0?String(row[mktC]??'').trim().toUpperCase():'',
+    sheet, is1099: sheet===IS_1099
+  }));
+}
+
+function parseSuperset(raw) {
+  try {
+    const rows = raw.result?.[0]?.data || [];
+    return rows.map(r=>{
+      const keys=Object.keys(r);
+      const g=(...terms)=>{const k=keys.find(k=>terms.some(t=>k.toLowerCase().includes(t)));return k?r[k]:undefined;};
+      return {
+        imei:    String(g('imei','serial')||'').trim(),
+        venue:   String(g('venue','location','site','place','name')||'').trim(),
+        market:  String(g('market','dma','city','region')||'').trim().toUpperCase(),
+        revenue: parseFloat(g('revenue','rental','amount','total','earning')||0)||0,
+        station: normStn(g('station','type','model','unit','device'))
+      };
+    }).filter(r=>r.venue||r.imei);
+  } catch(e) { console.warn('parseSuperset:',e); return []; }
+}
+
+function normStn(s) {
+  if (s==null) return '';
+  const str=String(s).replace(/[\[\]"']/g,'').trim();
+  if (/f15/i.test(str)) return 'F15';
+  if (/f10/i.test(str)) return 'F10';
+  if (/f5/i.test(str))  return 'F5';
+  return str?str.toUpperCase():'';
+}
+function normalizeStatus(s) {
+  if (!s) return 'Unknown';
+  const l=s.toLowerCase();
+  if (l.includes('installed')||l==='active'||l==='live') return 'Installed';
+  if (l.includes('declined')||l.includes('rejected'))    return 'Declined';
+  if (l.includes('pending'))                             return 'Pending Install';
+  if (l.includes('inactive')||l.includes('removed')||l.includes('churn')) return 'Inactive';
+  if (l.includes('onboard'))                             return 'Onboarding';
+  return s;
+}
+function fmtDate(v) {
+  if (!v) return '—';
+  if (v instanceof Date) return v.toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'numeric'});
+  const d=new Date(v);
+  if (!isNaN(d)&&String(v).length>4) return d.toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'numeric'});
+  return String(v).trim()||'—';
+}
+
+// ══════════════════════════════════════════
+// COST HELPERS
+// ══════════════════════════════════════════
+function getHWCost(stn) {
+  return {
+    F15: parseFloat(document.getElementById('hwF15').value)||750,
+    F10: parseFloat(document.getElementById('hwF10').value)||400,
+    F5:  parseFloat(document.getElementById('hwF5').value)||350
+  }[stn] || (parseFloat(document.getElementById('hwF10').value)||400);
+}
+function getCommRate(tier) {
+  const map={A:parseFloat(document.getElementById('commA')?.value||500),B:parseFloat(document.getElementById('commB')?.value||350),C:parseFloat(document.getElementById('commC')?.value||200)};
+  return map[tier]||0;
+}
+function getInstallInfo(imei, venue) {
+  // Look up install record by IMEI first, then fuzzy venue
+  if (imei) {
+    const m=allInstalls.find(i=>i.imei&&i.imei===imei);
+    if (m) return m;
+  }
+  if (venue) {
+    const vl=venue.toLowerCase();
+    const m=allInstalls.find(i=>i.venue&&(i.venue.toLowerCase()===vl||i.venue.toLowerCase().includes(vl.substring(0,10))||vl.includes(i.venue.toLowerCase().substring(0,10))));
+    if (m) return m;
+  }
+  return null;
+}
+function setSupersetPill(state, label) {
+  const el=document.getElementById('spPill');
+  el.className='superset-pill '+({ok:'ok',err:'err',warn:'warn'}[state]||'warn');
+  document.getElementById('spLbl').textContent=label;
+}
+
+// ══════════════════════════════════════════
+// LEADERBOARD
+// ══════════════════════════════════════════
+function renderLeaderboard() {
+  const counts={};
+  [...allInstalls, ...contractRows].forEach(r=>{
+    if ((r.status==='Installed'||r.status==='Active') && r.rep)
+      counts[r.rep]=(counts[r.rep]||0)+1;
+  });
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const rc=i=>i===0?'g':i===1?'s':i===2?'b':'n';
+  document.getElementById('leaderboard').innerHTML = sorted.length
+    ? sorted.map(([name,cnt],i)=>`
+      <div class="lb-card">
+        <div class="lb-rank ${rc(i)}">${i+1}</div>
+        <div><div class="lb-name">${name}</div></div>
+        <div class="lb-count">${cnt}</div>
+      </div>`).join('')
+    : '<div style="color:rgba(255,255,255,.4);font-size:13px">No install data yet</div>';
+}
+
+// ══════════════════════════════════════════
+// CONTRACTS
+// ══════════════════════════════════════════
+function populateContractFilters() {
+  const reps=    [...new Set(contractRows.map(r=>r.rep).filter(Boolean))].sort();
+  const statuses=[...new Set(contractRows.map(r=>r.status).filter(Boolean))].sort();
+  const stations=[...new Set(contractRows.map(r=>r.station).filter(Boolean))].sort();
+  const fill=(id,arr)=>{const el=document.getElementById(id);const cur=el.value;el.innerHTML='<option value="">All</option>'+arr.map(v=>`<option value="${v}">${v}</option>`).join('');if(arr.includes(cur))el.value=cur;};
+  fill('cRep',reps); fill('cStatus',statuses); fill('cStation',stations);
+}
+function renderContracts() {
+  const q=document.getElementById('cSearch').value.toLowerCase();
+  const rep=document.getElementById('cRep').value;
+  const stat=document.getElementById('cStatus').value;
+  const stn=document.getElementById('cStation').value;
+  const rows=contractRows.filter(r=>{
+    if(rep&&r.rep!==rep) return false;
+    if(stat&&r.status!==stat) return false;
+    if(stn&&r.station!==stn) return false;
+    if(q&&![r.venue,r.rep].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('cCount').textContent=rows.length+' records';
+  const sb=s=>{const m={'Installed':'b-ok','Declined':'b-red','Pending Install':'b-orange','Inactive':'b-gray','Onboarding':'b-blue'};return`<span class="badge ${m[s]||'b-gray'}">${s}</span>`;};
+  const stb=s=>{const m={F15:'b-f15',F10:'b-f10',F5:'b-f5'};return s?`<span class="badge ${m[s]||'b-gray'}">${s}</span>`:'—';};
+  const tb=t=>{if(!t)return'—';const m={A:'b-ta',B:'b-tb',C:'b-tc'};return`<span class="badge ${m[t]||'b-gray'}">Tier ${t}${t==='C'?' △':''}</span>`;};
+  const ms=v=>`<span class="ms${v?' done':''}"></span>`;
+  const cl=url=>url?`<a href="${url}" target="_blank" style="color:var(--blue);font-size:12px;text-decoration:none">📄 View</a>`:'<span style="color:var(--muted)">—</span>';
+  document.getElementById('cBody').innerHTML=rows.length
+    ?rows.map(r=>`<tr>
+      <td style="font-weight:600">${r.venue||'—'}</td><td>${r.rep||'—'}</td>
+      <td>${sb(r.status)}</td><td>${stb(r.station)}</td>
+      <td style="font-size:12px;white-space:nowrap">${r.signed}</td>
+      <td style="font-size:12px;white-space:nowrap">${r.scheduled}</td>
+      <td style="text-align:center">${ms(r.s)}</td>
+      <td style="text-align:center">${ms(r.f)}</td>
+      <td style="text-align:center">${ms(r.s2)}</td>
+      <td>${tb(r.tier)}</td>
+      <td style="font-weight:600">${r.commission?'$'+r.commission.toLocaleString():'—'}</td>
+      <td>${cl(r.contractUrl)}</td>
+    </tr>`).join('')
+    :'<tr class="empty"><td colspan="12">No contracts found</td></tr>';
+}
+
+// ══════════════════════════════════════════
+// ROI TRACKER — Superset-data-first
+// ══════════════════════════════════════════
+function buildROIRows() {
+  if (spData.length > 0) {
+    // PRIMARY: iterate all Superset rows
+    return spData.map(sp => {
+      const install = getInstallInfo(sp.imei, sp.venue);
+      const station = sp.station || (install?install.station:'F10');
+      const imei    = sp.imei || (install?install.imei:'');
+      const tier    = tierMap[imei] || (install?tierMap[install.imei]:null);
+      const is1099  = install?install.is1099:false;
+      const hw      = getHWCost(station);
+      const comm    = (!is1099 && tier) ? getCommRate(tier) : 0;
+      const inv     = hw + comm;
+      const rev     = sp.revenue || 0;
+      const net     = rev - inv;
+      const mkt     = sp.market || (install?install.market:'');
+      const installDate = install?install.installDate:null;
+      const rep     = install?install.rep:'';
+
+      // Break-even months
+      let beMonths=null;
+      if (installDate) {
+        const ms=new Date(installDate).getTime();
+        if (!isNaN(ms)) {
+          const moActive=(Date.now()-ms)/(1000*60*60*24*30.44);
+          const moRev=moActive>0?rev/moActive:0;
+          beMonths=moRev>0?inv/moRev:null;
+        }
+      }
+      // Break-even % (how much of investment recovered)
+      const bePct = inv>0 ? Math.min(150, (rev/inv)*100) : 0;
+      const roiState = rev===0?'norev':net>=0?'profitable':net>=-200?'breakeven':'negative';
+      return { venue:sp.venue, market:mkt, station, imei, hw, comm, inv, rev, net, beMonths, bePct, roiState, rep, tier };
+    });
+  } else {
+    // FALLBACK: install data with $0 revenue
+    return allInstalls.map(i=>{
+      const hw=getHWCost(i.station), tier=tierMap[i.imei];
+      const comm=!i.is1099&&tier?getCommRate(tier):0;
+      const inv=hw+comm;
+      return {...i,market:i.market,hw,comm,inv,rev:0,net:-inv,beMonths:null,bePct:0,roiState:'norev',tier};
+    });
+  }
+}
+
+function renderROI() {
+  const q   = document.getElementById('rSearch').value.toLowerCase();
+  const stF = document.getElementById('rStation').value;
+  const stateF = document.getElementById('rStatus').value;
+  const sort = document.getElementById('rSort').value;
+
+  let rows = buildROIRows().filter(r=>{
+    if (stF && r.station!==stF) return false;
+    if (stateF && r.roiState!==stateF) return false;
+    if (q && ![r.venue,r.market,r.imei].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  // Sort
+  const sortFns = {
+    rev_desc: (a,b)=>b.rev-a.rev, rev_asc: (a,b)=>a.rev-b.rev,
+    roi_desc: (a,b)=>b.net-a.net,
+    be_asc:   (a,b)=>(a.beMonths??999)-(b.beMonths??999),
+    venue_asc:(a,b)=>a.venue.localeCompare(b.venue)
+  };
+  rows.sort(sortFns[sort]||sortFns.rev_desc);
+
+  // KPIs
+  const totalHW   = rows.reduce((s,r)=>s+r.hw,0);
+  const totalComm = rows.reduce((s,r)=>s+r.comm,0);
+  const totalInv  = rows.reduce((s,r)=>s+r.inv,0);
+  const totalRev  = rows.reduce((s,r)=>s+r.rev,0);
+  const profRows  = rows.filter(r=>r.net>=0);
+  const netROI    = totalRev - totalInv;
+  const active    = rows.filter(r=>r.rev>0).length;
+
+  document.getElementById('k-stations').textContent = rows.length;
+  document.getElementById('k-stations-sub').textContent = active+' with revenue';
+  document.getElementById('k-hw').textContent = '$'+totalHW.toLocaleString();
+  document.getElementById('k-comm').textContent = '$'+totalComm.toLocaleString();
+  document.getElementById('k-invest').textContent = '$'+totalInv.toLocaleString();
+  document.getElementById('k-roi').textContent = (netROI>=0?'+$':'-$')+Math.abs(netROI).toLocaleString();
+  document.getElementById('k-roi-sub').textContent = profRows.length+' profitable stations';
+
+  // Charts (show if superset data)
+  if (spData.length > 0) {
+    renderCharts(rows);
+    document.getElementById('chartRow').style.display = 'grid';
+  }
+
+  // Table
+  const fmt  = v => '$'+Math.abs(v).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0});
+  const stb  = s => { const m={F15:'b-f15',F10:'b-f10',F5:'b-f5'}; return s?`<span class="badge ${m[s]||'b-gray'}">${s}</span>`:'—'; };
+  const statusCell = r => {
+    if (r.roiState==='norev')      return '<span class="badge b-gray">No Revenue Yet</span>';
+    if (r.roiState==='profitable') return '<span class="badge b-ok">✓ Profitable</span>';
+    if (r.roiState==='breakeven')  return '<span class="badge b-orange">Near Breakeven</span>';
+    return '<span class="badge b-red">Negative ROI</span>';
+  };
+  const beBar = r => {
+    const pct = r.bePct;
+    const col = pct>=100?'var(--green)':pct>=50?'var(--orange)':'var(--red)';
+    const months = r.beMonths!==null ? r.beMonths.toFixed(1)+' mo' : '—';
+    return `<div class="be-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+        <span class="be-pct" style="color:${col}">${Math.round(pct)}%</span>
+        <span class="breakeven" style="color:var(--teal)">${months}</span>
+      </div>
+      <div class="be-bar-bg"><div class="be-bar-fill" style="width:${Math.min(100,pct)}%;background:${col}"></div></div>
+    </div>`;
+  };
+
+  document.getElementById('rBody').innerHTML = rows.length
+    ? rows.map(r=>`<tr>
+        <td style="font-weight:600">${r.venue||'—'}</td>
+        <td style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase">${r.market||'—'}</td>
+        <td>${stb(r.station)}</td>
+        <td style="font-family:monospace;font-size:12px;color:var(--muted)">${r.imei?r.imei.slice(-6):'—'}</td>
+        <td>${fmt(r.hw)}</td>
+        <td>${r.comm?fmt(r.comm):'<span style="color:var(--muted)">—</span>'}</td>
+        <td style="font-weight:600">${fmt(r.inv)}</td>
+        <td class="rev-val" style="color:${r.rev>0?'var(--text)':'var(--muted)'}">${r.rev>0?'$'+r.rev.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}):'$0'}</td>
+        <td class="${r.net>=0?'roi-pos':'roi-neg'}">${(r.net>=0?'+':'-')+fmt(r.net)}</td>
+        <td>${beBar(r)}</td>
+        <td>${statusCell(r)}</td>
+      </tr>`).join('')
+    : '<tr class="empty"><td colspan="11">No data. Ensure Superset_Revenue tab is populated and Apps Script is deployed.</td></tr>';
+}
+
+// ══════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════
+function renderCharts(rows) {
+  // Top 8 by revenue
+  const top8 = [...rows].sort((a,b)=>b.rev-a.rev).slice(0,8);
+  const maxRev = top8[0]?.rev||1;
+  document.getElementById('topRevenueChart').innerHTML = top8.map(r=>`
+    <div class="bc-row">
+      <div class="bc-label" title="${r.venue}">${r.venue||'—'}</div>
+      <div class="bc-bar-bg"><div class="bc-bar" style="width:${(r.rev/maxRev*100).toFixed(1)}%"></div></div>
+      <div class="bc-val">$${r.rev.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+    </div>`).join('');
+
+  // By market
+  const mktMap={};
+  rows.forEach(r=>{ if(r.market){mktMap[r.market]=(mktMap[r.market]||0)+r.rev; }});
+  const markets=Object.entries(mktMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxMkt=markets[0]?.[1]||1;
+  document.getElementById('marketChart').innerHTML = markets.map(([mkt,rev])=>`
+    <div class="bc-row">
+      <div class="bc-label">${mkt}</div>
+      <div class="bc-bar-bg"><div class="bc-bar" style="width:${(rev/maxMkt*100).toFixed(1)}%;background:var(--blue)"></div></div>
+      <div class="bc-val">$${rev.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:12px">No market data available</div>';
+}
+
+// ══════════════════════════════════════════
+// SETTINGS + FILE FALLBACK
+// ══════════════════════════════════════════
+function saveSettings() {
+  const url=document.getElementById('settingsUrl').value.trim();
+  if (url) scriptUrl=url;
+  closeModal('settingsModal');
+  loadData();
+}
+function triggerFile() { document.getElementById('fileIn').click(); }
+function handleFile(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try {
+      const resp=JSON.parse(ev.target.result);
+      resp.ok=true;
+      processData(resp);
+      setSyncState('ok');
+    } catch(err) { alert('Could not parse file: '+err.message); }
+  };
+  reader.readAsText(file);
+}
+
+async function doConnect() {
+  const url=document.getElementById('spUrl').value.trim();
+  const user=document.getElementById('spUser').value.trim();
+  const pass=document.getElementById('spPass').value.trim();
+  const st=document.getElementById('spSt');
+  st.style.cssText='display:block;background:#EFF6FF;color:#1D4ED8;border-radius:8px;padding:8px 12px';
+  st.textContent='Connecting…';
+  try {
+    const r=await fetch(url+'/api/v1/security/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:user,password:pass,provider:'db',refresh:true})});
+    if(!r.ok) throw new Error('Login failed: '+r.status);
+    st.style.background='#F0FDF4'; st.style.color='#15803D';
+    st.textContent='✓ Connected! Reload to pull live data.';
+    setSupersetPill('ok','Superset: Connected');
+    setTimeout(()=>closeModal('spModal'),1500);
+  } catch(e) {
+    st.style.background='#FEF2F2'; st.style.color='#B91C1C';
+    st.textContent='✗ '+e.message;
+  }
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('settingsUrl').value=DEFAULT_URL;
+  loadData();
+});
+</script>
+</body>
+</html>
