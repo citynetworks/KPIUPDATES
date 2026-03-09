@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>chargeFUZE · City Network Placement Tracker</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B1120;--cf-dark:#0B1120;--cf-mid:#10192E;
+  --card:#fff;--border:#DDE3EF;--text:#1A2340;--muted:#7A87A0;
+  --green:#22C55E;--orange:#F59E0B;--red:#EF4444;--blue:#1A6EFF;--purple:#8B5CF6;
+  --teal:#0D9488;--cf-blue:#1A6EFF;--row-hover:#F8FAFF;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:linear-gradient(135deg,var(--cf-dark) 0%,var(--cf-mid) 100%);border-bottom:2px solid var(--cf-blue);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--cf-blue),#0050CC);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
+.brand-name{font-size:19px;font-weight:700;color:#fff}.brand-name span{color:var(--cf-blue)}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:8px}
+.hbtn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.hbtn:hover{background:rgba(255,255,255,.14);border-color:var(--cf-blue)}
+.sync-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(255,255,255,.85);white-space:nowrap}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.sync-dot.loading{background:var(--orange);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.main-nav{background:var(--cf-dark);border-bottom:1px solid rgba(255,255,255,.08);display:flex;gap:4px;padding:0 24px;position:sticky;top:60px;z-index:99}
+.nav-btn{padding:10px 18px;font-size:13px;font-weight:600;color:rgba(255,255,255,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.nav-btn:hover{color:rgba(255,255,255,.85)}
+.nav-btn.active{color:#fff;border-bottom-color:var(--cf-blue)}
+.settings-bar{background:var(--cf-dark);border-bottom:1px solid rgba(255,255,255,.07);padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:100px;z-index:98}
+.settings-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.2px;text-transform:uppercase;white-space:nowrap}
+.cost-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cost-chip{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 10px;transition:border-color .2s}
+.cost-chip:focus-within{border-color:var(--cf-blue)}
+.cost-chip label{font-size:11px;font-weight:700;color:var(--cf-blue);min-width:26px}
+.cost-chip input{background:transparent;border:none;outline:none;color:#fff;font-size:13px;font-weight:700;width:48px;text-align:right}
+.divider{width:1px;height:24px;background:rgba(255,255,255,.1);flex-shrink:0}
+.superset-pill{margin-left:auto;display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;white-space:nowrap}
+.superset-pill.ok{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.1);color:#4ADE80}
+.superset-pill.err{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#F87171}
+.superset-pill.warn{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.1);color:#FCD34D}
+.sp-dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 5px currentColor}
+.view{display:none;padding:20px 24px}.view.active{display:block}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.kpi-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px}
+.kpi-value{font-size:28px;font-weight:800;line-height:1.1}
+.kpi-value.blue{color:var(--blue)}.kpi-value.orange{color:var(--orange)}.kpi-value.yellow{color:#CA8A04}
+.kpi-value.purple{color:var(--purple)}.kpi-value.green{color:var(--green)}
+.kpi-sub{font-size:12px;color:var(--muted);margin-top:5px}
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.sec-title{font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.sec-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.search-wrap{position:relative}
+.search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;pointer-events:none}
+.search-input{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 12px 7px 30px;font-size:13px;color:var(--text);outline:none;width:190px}
+.search-input:focus{border-color:var(--cf-blue)}
+select.fsel{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--text);outline:none;cursor:pointer;min-width:140px}
+.tcard{background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.tcard table{width:100%;border-collapse:collapse;font-size:13px}
+.tcard thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;background:#F8FAFF}
+.tcard tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+.tcard tbody tr:hover{background:var(--row-hover)}
+.tcard tbody tr:last-child{border-bottom:none}
+.tcard tbody td{padding:11px 14px;vertical-align:middle}
+
+/* BADGES — all station types */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+/* F5  – green */
+.b-f5 {background:#F0FDF4;color:#166534}
+/* F10 – blue */
+.b-f10{background:#EFF6FF;color:#1D4ED8}
+/* F15 – purple */
+.b-f15{background:#EDE9FF;color:#6D28D9}
+/* F25 – teal */
+.b-f25{background:#F0FDFA;color:#0F766E}
+/* F45 – amber */
+.b-f45{background:#FFFBEB;color:#92400E}
+/* Status/tier */
+.b-ok{background:#F0FDF4;color:#15803D}.b-red{background:#FEF2F2;color:#B91C1C}
+.b-orange{background:#FFFBEB;color:#B45309}.b-blue{background:#EFF6FF;color:#1D4ED8}
+.b-gray{background:#F1F5F9;color:#475569}
+.b-ta{background:#F0FDF4;color:#15803D}.b-tb{background:#EFF6FF;color:#1D4ED8}.b-tc{background:#FEF2F2;color:#B91C1C}
+
+.breakeven{font-size:12px;font-weight:600}
+.be-wrap{min-width:130px}
+.be-bar-bg{height:6px;border-radius:4px;background:#E9EFF6;overflow:hidden;margin-top:4px}
+.be-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.be-pct{font-size:12px;font-weight:700}
+.milestone-dot{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:2px solid #CBD5E1;font-size:10px;font-weight:700;color:#94A3B8}
+.milestone-dot.done{background:var(--green);border-color:var(--green);color:#fff}
+.lb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:24px}
+.lb-card{background:var(--card);border-radius:12px;padding:16px 18px;box-shadow:0 1px 6px rgba(0,0,0,.07);display:flex;align-items:center;gap:14px}
+.lb-rank{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
+.lb-rank.r1{background:linear-gradient(135deg,#F59E0B,#D97706)}
+.lb-rank.r2{background:linear-gradient(135deg,#94A3B8,#64748B)}
+.lb-rank.r3{background:linear-gradient(135deg,#CD7F32,#92400E)}
+.lb-rank.rn{background:linear-gradient(135deg,var(--cf-blue),#0050CC)}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-stat{font-size:12px;color:var(--muted);margin-top:3px}
+.lb-count{font-size:22px;font-weight:800;color:var(--cf-blue);flex-shrink:0}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+@media(max-width:900px){.chart-row{grid-template-columns:1fr}}
+.chart-card{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.chart-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-label{font-size:12px;color:var(--text);width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.bar-track{flex:1;height:10px;background:#E9EFF6;border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;transition:width .4s ease}
+.bar-val{font-size:11px;font-weight:700;color:var(--muted);width:52px;text-align:right;flex-shrink:0}
+.st-active{background:#F0FDF4;color:#15803D}.st-signed{background:#EFF6FF;color:#1D4ED8}
+.st-scheduled{background:#FFFBEB;color:#B45309}.st-inactive{background:#F1F5F9;color:#475569}
+.st-unknown{background:#F1F5F9;color:#6B7280}
+.empty-state{padding:40px;text-align:center;color:var(--muted);font-size:14px}
+.empty-icon{font-size:32px;margin-bottom:10px}
+.debug-bar{background:#0A0F1C;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px 16px;font-size:11.5px;color:#94A3B8;margin-bottom:14px;font-family:'Courier New',monospace;display:none;white-space:pre-wrap;line-height:1.9;max-height:500px;overflow-y:auto}
+.debug-bar b{color:#60A5FA}
+.debug-bar .ok{color:#4ADE80}
+.debug-bar .err{color:#F87171}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">CF</div>
+    <div>
+      <div class="brand-name">charge<span>FUZE</span></div>
+      <div class="brand-sub">City Network · Placement Tracker</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="sync-badge"><div class="sync-dot loading" id="syncDot"></div><span id="syncLabel">Loading…</span></div>
+    <button class="hbtn" onclick="loadData()">↻ Refresh</button>
+    <button class="hbtn" onclick="toggleDebug()">⚙ Debug</button>
+    <button class="hbtn" onclick="showFileFallback()">📄 File fallback</button>
+  </div>
+</header>
+
+<nav class="main-nav">
+  <div class="nav-btn active" id="tab-placement" onclick="switchTab('placement')">📋 Placement Tracker</div>
+  <div class="nav-btn" id="tab-roi" onclick="switchTab('roi')">📊 ROI Tracker</div>
+</nav>
+
+<!-- Settings bar: all 5 station types + 3 commission tiers -->
+<div class="settings-bar">
+  <span class="settings-label">HW Cost</span>
+  <div class="cost-group">
+    <div class="cost-chip"><label>F5</label> <span style="color:rgba(255,255,255,.35);font-size:12px">$</span><input id="hwF5"  type="number" value="350"  min="0" onchange="renderROI()"/></div>
+    <div class="cost-chip"><label>F10</label><span style="color:rgba(255,255,255,.35);font-size:12px">$</span><input id="hwF10" type="number" value="400"  min="0" onchange="renderROI()"/></div>
+    <div class="cost-chip"><label>F15</label><span style="color:rgba(255,255,255,.35);font-size:12px">$</span><input id="hwF15" type="number" value="750"  min="0" onchange="renderROI()"/></div>
+    <div class="cost-chip"><label>F25</label><span style="color:rgba(255,255,255,.35);font-size:12px">$</span><input id="hwF25" type="number" value="900"  min="0" onchange="renderROI()"/></div>
+    <div class="cost-chip"><label>F45</label><span style="color:rgba(255,255,255,.35);font-size:12px">$</span><input id="hwF45" type="number" value="1200" min="0" onchange="renderROI()"/></div>
+  </div>
+  <div class="divider"></div>
+  <span class="settings-label">Commission</span>
+  <div class="cost-group">
+    <div class="cost-chip"><label>A</label><span style="color:rgba(255,255,255,.35);font-size:12px">$</span><input id="commA" type="number" value="500" min="0" max="500" onchange="renderROI()"/></div>
+    <div class="cost-chip"><label>B</label><span style="color:rgba(255,255,255,.35);font-size:12px">$</span><input id="commB" type="number" value="350" min="0" max="500" onchange="renderROI()"/></div>
+    <div class="cost-chip"><label>C</label><span style="color:rgba(255,255,255,.35);font-size:12px">$</span><input id="commC" type="number" value="200" min="0" max="500" onchange="renderROI()"/></div>
+  </div>
+  <div id="spPill" class="superset-pill warn" onclick="loadData()"><div class="sp-dot"></div><span id="spPillTxt">Superset: —</span></div>
+</div>
+
+<!-- ═══ PLACEMENT TRACKER ═══ -->
+<div id="view-placement" class="view active">
+  <div id="debugBar" class="debug-bar"></div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Total Contracts</div><div class="kpi-value blue" id="kpi-total">—</div><div class="kpi-sub">across all reps</div></div>
+    <div class="kpi"><div class="kpi-label">Active Stations</div><div class="kpi-value green" id="kpi-active">—</div><div class="kpi-sub">live &amp; earning</div></div>
+    <div class="kpi"><div class="kpi-label">Scheduled</div><div class="kpi-value orange" id="kpi-sched">—</div><div class="kpi-sub">installs pending</div></div>
+    <div class="kpi"><div class="kpi-label">Signed / Pending</div><div class="kpi-value yellow" id="kpi-signed">—</div><div class="kpi-sub">contracts signed</div></div>
+    <div class="kpi"><div class="kpi-label">Reps</div><div class="kpi-value purple" id="kpi-reps">—</div><div class="kpi-sub">unique reps</div></div>
+  </div>
+  <div class="sec-header"><div class="sec-title">🏆 Rep Leaderboard</div></div>
+  <div id="leaderboard" class="lb-grid"></div>
+  <div class="sec-header">
+    <div class="sec-title">📄 Contracts <span id="contractCount" style="font-size:12px;font-weight:500;color:var(--muted);margin-left:6px"></span></div>
+    <div class="sec-right">
+      <div class="search-wrap"><input class="search-input" id="searchInput" placeholder="Search venue or rep…" oninput="renderPlacements()"/></div>
+      <select class="fsel" id="filterStatus" onchange="renderPlacements()">
+        <option value="">All Status</option>
+        <option value="active">Active</option>
+        <option value="scheduled">Scheduled</option>
+        <option value="signed">Signed</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <select class="fsel" id="filterRep" onchange="renderPlacements()"><option value="">All Reps</option></select>
+      <select class="fsel" id="filterSheet" onchange="renderPlacements()">
+        <option value="">All Sheets</option>
+        <option value="Full Time Rep - Install">Full Time</option>
+        <option value="1099 B - Rep Install">1099</option>
+        <option value="CN Installs - Onboarding">Onboarding</option>
+      </select>
+    </div>
+  </div>
+  <div class="tcard">
+    <table>
+      <thead>
+        <tr>
+          <th>VENUE</th><th>REP</th><th>STATUS</th><th>STATION</th>
+          <th>SIGNED</th><th>SCHEDULED</th>
+          <th style="text-align:center">S</th><th style="text-align:center">F</th><th style="text-align:center">S2</th>
+          <th>TIER</th><th>COMMISSION</th><th>SHEET</th>
+        </tr>
+      </thead>
+      <tbody id="placementBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ ROI TRACKER ═══ -->
+<div id="view-roi" class="view">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Superset Venues</div><div class="kpi-value blue" id="roi-kpi-total">—</div><div class="kpi-sub">from Superset_Revenue tab</div></div>
+    <div class="kpi"><div class="kpi-label">Net Rental Revenue</div><div class="kpi-value green" id="roi-kpi-rev">—</div><div class="kpi-sub">net (excl. fees)</div></div>
+    <div class="kpi"><div class="kpi-label">Profitable</div><div class="kpi-value green" id="roi-kpi-prof">—</div><div class="kpi-sub">at or above breakeven</div></div>
+    <div class="kpi"><div class="kpi-label">Near Breakeven</div><div class="kpi-value orange" id="roi-kpi-be">—</div><div class="kpi-sub">50–99% recovered</div></div>
+    <div class="kpi"><div class="kpi-label">Avg Net Revenue</div><div class="kpi-value blue" id="roi-kpi-avg">—</div><div class="kpi-sub">per venue</div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card"><div class="chart-title">📍 Top Net Revenue by Venue</div><div id="venueChart"></div></div>
+    <div class="chart-card"><div class="chart-title">🗺 Net Revenue by Market (DMA)</div><div id="marketChart"></div></div>
+  </div>
+  <div class="sec-header">
+    <div class="sec-title">💰 ROI by Venue</div>
+    <div class="sec-right">
+      <div class="search-wrap"><input class="search-input" id="roiSearch" placeholder="Search venue or market…" oninput="renderROI()"/></div>
+      <select class="fsel" id="roiFilter" onchange="renderROI()">
+        <option value="">All Venues</option>
+        <option value="profitable">Profitable</option>
+        <option value="breakeven">Near Breakeven</option>
+        <option value="negative">Negative ROI</option>
+        <option value="norev">No Revenue Yet</option>
+      </select>
+      <select class="fsel" id="roiSort" onchange="renderROI()">
+        <option value="rev_desc">Revenue ↓</option>
+        <option value="net_desc">Net ROI ↓</option>
+        <option value="be_asc">Break-Even ↑</option>
+        <option value="venue_az">Venue A-Z</option>
+      </select>
+    </div>
+  </div>
+  <div class="tcard">
+    <table>
+      <thead>
+        <tr>
+          <th>VENUE</th><th>MARKET</th><th>STATION</th>
+          <th>HW COST</th><th>COMMISSION</th><th>TOTAL INVEST</th>
+          <th>NET RENTAL REV</th><th>NET ROI</th>
+          <th>BREAK-EVEN</th><th>STATUS</th>
+        </tr>
+      </thead>
+      <tbody id="roiBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Fallback modal -->
+<div id="fallbackModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:28px;width:500px;max-width:95vw">
+    <h3 style="margin-bottom:12px;font-size:16px">📄 File Fallback</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Paste your Apps Script Web App URL:</p>
+    <input id="urlInput" type="text" placeholder="https://script.google.com/macros/s/…/exec" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;margin-bottom:10px"/>
+    <div style="display:flex;gap:8px">
+      <button onclick="loadFromUrl()" style="flex:1;padding:9px;background:var(--cf-blue);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px">Load</button>
+      <button onclick="document.getElementById('fallbackModal').style.display='none'" style="padding:9px 16px;background:#F1F5F9;border:none;border-radius:8px;cursor:pointer;font-size:13px">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ────────────────────────────────────────────────────────
+const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbwBFt_n1Lm5N5lWpzmB4OwnTyuL0q59-binDi2n6mTrIL4MZK_c0eAol6CygH1w5iFT/exec';
+const SHEET_NAMES = ['Full Time Rep - Install','1099 B - Rep Install','CN Installs - Onboarding'];
+const IS_1099     = '1099 B - Rep Install';
+
+// ── STATE ────────────────────────────────────────────────────────────
+let allInstalls = [];
+let spData      = [];
+// tierDataMap: normImei → { tier:'A'|'B'|'C', amount:number|null, rep, venue }
+let tierDataMap = {};
+// venueDataMap: venue name lowercase → same object (fuzzy fallback)
+let venueDataMap= {};
+// Legacy aliases kept so nothing breaks
+let tierMap     = tierDataMap;
+let venueMap    = venueDataMap;
+let debugLines  = [];
+
+// ── HELPERS ──────────────────────────────────────────────────────────
+function dbg(msg){ console.log(msg); debugLines.push(msg); }
+
+function findCol(headers, ...candidates){
+  // Pass 1: exact match
+  for(const c of candidates){
+    const idx = headers.indexOf(c.toLowerCase().trim());
+    if(idx >= 0) return idx;
+  }
+  // Pass 2: header includes candidate substring
+  for(const c of candidates){
+    const lc = c.toLowerCase().trim();
+    const idx = headers.findIndex(h => h.length > 1 && h.includes(lc));
+    if(idx >= 0) return idx;
+  }
+  // Pass 3: candidate includes header substring (e.g. 'station type' includes 'station')
+  for(const c of candidates){
+    const lc = c.toLowerCase().trim();
+    const idx = headers.findIndex(h => h.length > 1 && lc.includes(h));
+    if(idx >= 0) return idx;
+  }
+  return -1;
+}
+
+// Normalize station to one of: F5, F10, F15, F25, F45 (or raw string)
+function normalizeStation(s){
+  if(!s) return '';
+  // Strip JSON-array wrapper e.g. ["F15-White"] → F15-White
+  const str = String(s).replace(/[\[\]"']/g,'').trim();
+  // Extract F-number — match F followed by digits
+  const m = str.match(/F\s*(\d+)/i);
+  if(!m) return str;
+  const num = parseInt(m[1], 10);
+  // Map to canonical names
+  if(num <= 5)              return 'F5';
+  if(num >= 6  && num <= 12) return 'F10';
+  if(num >= 13 && num <= 20) return 'F15';
+  if(num >= 21 && num <= 30) return 'F25';
+  if(num >= 31)              return 'F45';
+  return 'F' + num;
+}
+
+// Station badge — exact match on normalized value
+function stationBadge(raw){
+  const norm = normalizeStation(raw);
+  const map = {
+    'F5' : '<span class="badge b-f5">F5</span>',
+    'F10': '<span class="badge b-f10">F10</span>',
+    'F15': '<span class="badge b-f15">F15</span>',
+    'F25': '<span class="badge b-f25">F25</span>',
+    'F45': '<span class="badge b-f45">F45</span>',
+  };
+  return map[norm] || (norm ? `<span class="badge b-gray">${norm}</span>` : '—');
+}
+
+function fmtDate(d){
+  if(!d) return '—';
+  let dt = d instanceof Date ? d : new Date(d);
+  if(isNaN(dt)) return String(d)||'—';
+  return (dt.getMonth()+1)+'/'+dt.getDate()+'/'+String(dt.getFullYear()).slice(2);
+}
+function fmtUSD(n){ return '$'+Number(n||0).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}); }
+function fmtK(n){ return n>=1000?'$'+(n/1000).toFixed(1)+'k':fmtUSD(n); }
+
+// ── HW COST — keyed by exact normalized station name ─────────────────
+function getHWCost(station){
+  const norm = normalizeStation(station);
+  switch(norm){
+    case 'F5':  return +(document.getElementById('hwF5')?.value  || 350);
+    case 'F10': return +(document.getElementById('hwF10')?.value || 400);
+    case 'F15': return +(document.getElementById('hwF15')?.value || 750);
+    case 'F25': return +(document.getElementById('hwF25')?.value || 900);
+    case 'F45': return +(document.getElementById('hwF45')?.value || 1200);
+    default:    return +(document.getElementById('hwF10')?.value || 400); // fallback
+  }
+}
+
+function getCommRate(tier){
+  const t = String(tier||'').toUpperCase().replace(/TIER\s*/,'');
+  if(t==='A') return +(document.getElementById('commA')?.value || 500);
+  if(t==='B') return +(document.getElementById('commB')?.value || 350);
+  if(t==='C') return +(document.getElementById('commC')?.value || 200);
+  return 0;
+}
+
+// ── FUZZY VENUE KEY — strips punctuation + extra words for loose matching ─
+function venueKey(s){
+  return String(s||'').toLowerCase()
+    .replace(/[^\w\s]/g,' ')   // punctuation → space
+    .replace(/\b(the|a|an|by|and|inn|suites?|hotel|bar|grill|club|lounge|cafe|restaurant|shop|store)\b/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+
+// ── TIER DATA LOOKUP — returns { tier, amount } ────────────────────────
+// Priority: 1. directTier from install sheet  2. IMEI match  3. exact venue  4. fuzzy venue
+function getTierData(install){
+  const NONE = { tier:'', amount:null };
+  if(!install) return NONE;
+
+  // 1. Tier read directly from the install sheet row
+  if(install.directTier) return { tier: install.directTier, amount: null };
+
+  // 2. IMEI match (normalized — handles spaces/dashes)
+  if(install.imei){
+    const d = tierDataMap[normImei(install.imei)] || tierDataMap[install.imei];
+    if(d) return d;
+  }
+
+  // 3. Exact venue name match
+  if(install.venue){
+    const vn = install.venue.toLowerCase().trim();
+    if(venueDataMap[vn]) return venueDataMap[vn];
+
+    // 4. Fuzzy venue key match
+    const vk = venueKey(install.venue);
+    for(const [k,d] of Object.entries(venueDataMap)){
+      const dk = venueKey(k);
+      if(dk && vk && (dk===vk || dk.startsWith(vk) || vk.startsWith(dk))) return d;
+    }
+  }
+  return NONE;
+}
+
+// Convenience wrappers
+function getTier(install){ return getTierData(install).tier; }
+
+// Commission: use amount from tier sheet first; fall back to settings bar rates
+function getCommissionAmt(install){
+  const { tier, amount } = getTierData(install);
+  if(amount !== null && amount > 0) return amount;
+  return getCommRate(tier); // settings bar fallback
+}
+
+// ── PARSE INSTALL SHEETS (2D array from getDataRange().getValues()) ──
+function parseInstallSheet(values, sheetName){
+  if(!values||!Array.isArray(values)||values.length<2){ dbg('['+sheetName+'] empty/missing'); return []; }
+
+  // Find header row — first row with >2 non-empty cells within first 6 rows
+  let hi=0;
+  for(let i=0;i<Math.min(values.length,6);i++){
+    if(values[i].filter(c=>String(c||'').trim()).length>2){ hi=i; break; }
+  }
+  const rawHeaders = values[hi];
+  const headers = rawHeaders.map(h=>String(h||'').trim().toLowerCase());
+
+  // ── DEBUG: show ALL headers with column index ──────────────────────
+  dbg('━━━ ['+sheetName+'] '+values.length+' rows, header row='+hi+' ('+headers.filter(Boolean).length+' cols) ━━━');
+  headers.forEach((h,i)=>{ if(h) dbg('  col['+i+'] = "'+rawHeaders[i]+'"'); });
+
+  // ── COLUMN DETECTION — very wide net of name candidates ───────────
+  const vIdx  = findCol(headers,
+    'venue','venue name','venue/business','account','account name','business',
+    'business name','client','company','company name','location','location name',
+    'establishment','place','site','facility','partner','customer','name',
+    'property','bar','restaurant','shop','hotel','property name','place name');
+
+  const rIdx  = findCol(headers,
+    'rep','sales rep','rep name','agent','employee','salesperson','assigned rep',
+    'representative','account rep','field rep','installer','team member',
+    'sales person','assigned to','assigned','closer','contact rep','rep #',
+    'sales agent','rep/agent','field sales','salesperson name','account manager');
+
+  const stIdx = findCol(headers,
+    'status','install status','stage','phase','contract status','deal status',
+    'pipeline stage','current status','placement status','active status',
+    'deal stage','account status','outcome','disposition','progress','workflow',
+    'state','placement stage','contract stage','current stage','pipeline',
+    'contract phase','active?','installed?','install stage','lead status',
+    'opportunity stage','sales stage','process stage','lifecycle stage');
+
+  const hwIdx = findCol(headers,
+    'station','station type','hardware','model','device','charger type','unit type',
+    'equipment','product','f-series','fseries','charger','unit','charger model',
+    'hardware model','hardware type','device model','device type','equipment type',
+    'product type','asset type','asset','item','sku','type','unit model',
+    'f type','f series','ftype','fseries type','charger unit','charger hardware',
+    'hw','hw type','hw model','station model','device hardware');
+
+  const imIdx = findCol(headers,
+    'imei','device imei','serial','serial number','unit serial','device serial',
+    'imei #','serial #','device id','unit id','asset id','hardware id',
+    'device number','unit number','identifier','imei/serial','device imei #',
+    'imei number','esn','device esn','unit esn');
+
+  const mIdx  = findCol(headers,
+    'market','dma','region','city','territory','market/dma','dma region',
+    'market region','city/dma','sales territory','market area','geographic area',
+    'zone','area','metro','metro area');
+
+  const sigIdx= findCol(headers,
+    'signed date','date signed','contract date','contract signed','sign date',
+    'signature date','agreement date','signed on','contract executed',
+    'executed date','close date','closed date','signed/executed',
+    'date of signature','contract sign date','signed','contract sign');
+
+  const schIdx= findCol(headers,
+    'scheduled date','install date','scheduled install','schedule date',
+    'installation date','install scheduled','go live','go-live',
+    'activation date','launch date','deploy date','go live date',
+    'scheduled on','install on','deployment date','active date',
+    'live date','go live date','scheduled','installation');
+
+  const conIdx= findCol(headers,
+    'contract','contract link','contract url','doc link','drive link',
+    'agreement link','contract file','document link','docusign',
+    'contract doc','signed doc','agreement url');
+
+  // Milestone columns — try exact single-char first, then many name variants
+  let s1Idx = headers.indexOf('s');
+  if(s1Idx<0) s1Idx = findCol(headers,
+    's1','milestone s','ms','survey','site survey','sign check',
+    'survey done','s milestone','phase 1','m1','step 1','step1',
+    'checkpoint 1','ch1','signed check','s complete','s done',
+    's status','survey complete','first milestone','milestone 1');
+
+  let fIdx  = headers.indexOf('f');
+  if(fIdx<0) fIdx  = findCol(headers,
+    'f1','milestone f','mf','first','funded','first revenue','finalized',
+    'first pay','f check','f milestone','phase 2','m2','step 2','step2',
+    'checkpoint 2','ch2','f complete','f done','f status',
+    'first revenue check','second milestone','milestone 2');
+
+  let s2Idx = headers.indexOf('s2');
+  if(s2Idx<0) s2Idx = findCol(headers,
+    's2 milestone','milestone s2','ms2','second','second revenue',
+    'second pay','second payment','s2 check','phase 3','m3',
+    'step 3','step3','checkpoint 3','ch3','s2 complete','s2 done',
+    's2 status','second revenue check','third milestone','milestone 3');
+
+  // Direct tier column in this install sheet (primary lookup — no IMEI matching needed)
+  const dirTierIdx = findCol(headers,
+    'tier','commission tier','rep tier','tier level','commission level',
+    'tier a','tier b','tier c','category','class','level','placement tier',
+    'contract tier','deal tier','account tier','venue tier','site tier',
+    'comp tier','comp level','compensation tier','payout tier');
+
+  // ── DEBUG: show column map result ─────────────────────────────────
+  const colName=(idx)=> idx>=0 ? '"'+rawHeaders[idx]+'" ['+idx+']' : '❌ NOT FOUND';
+  dbg('  → venue='+colName(vIdx)+' rep='+colName(rIdx)+' status='+colName(stIdx));
+  dbg('  → station='+colName(hwIdx)+' imei='+colName(imIdx)+' market='+colName(mIdx));
+  dbg('  → signed='+colName(sigIdx)+' scheduled='+colName(schIdx));
+  dbg('  → tier(direct)='+colName(dirTierIdx));
+  dbg('  → S='+colName(s1Idx)+' F='+colName(fIdx)+' S2='+colName(s2Idx));
+
+  // ── DEBUG: show first data row values ─────────────────────────────
+  if(values.length > hi+1){
+    const fr=values[hi+1];
+    dbg('  First data row sample:');
+    fr.forEach((v,i)=>{ if(v!==''&&v!==null&&v!==undefined) dbg('    ['+i+']='+(typeof v)+': '+String(v).substring(0,60)); });
+  }
+
+  const getStr =(row,idx)=> idx>=0&&idx<row.length ? String(row[idx]||'').trim() : '';
+  const getBool=(row,idx)=>{
+    if(idx<0) return false;
+    const v=row[idx];
+    if(typeof v==='boolean') return v;
+    const s=String(v||'').trim().toLowerCase();
+    return s==='true'||s==='yes'||s==='1'||s==='✓'||s==='x'||s==='done'||s==='complete'||s==='completed';
+  };
+
+  const results=[];
+  for(let i=hi+1;i<values.length;i++){
+    const row=values[i];
+    if(!row||row.every(c=>!String(c||'').trim())) continue;
+    const venue=getStr(row,vIdx);
+    if(!venue) continue;
+    // Normalize tier: strip "Tier " prefix, uppercase → 'A','B','C'
+    const rawTier = getStr(row,dirTierIdx).toUpperCase().replace(/^TIER\s*/,'').trim();
+    const directTier = (rawTier==='A'||rawTier==='B'||rawTier==='C') ? rawTier : '';
+    results.push({
+      venue,
+      rep:        getStr(row,rIdx),
+      status:     getStr(row,stIdx),
+      station:    normalizeStation(getStr(row,hwIdx)),
+      imei:       getStr(row,imIdx),
+      market:     getStr(row,mIdx),
+      signed:     sigIdx>=0&&sigIdx<row.length ? row[sigIdx] : '',
+      scheduled:  schIdx>=0&&schIdx<row.length ? row[schIdx] : '',
+      contract:   getStr(row,conIdx),
+      s1:         getBool(row,s1Idx),
+      f1:         getBool(row,fIdx),
+      s2:         getBool(row,s2Idx),
+      directTier, // tier read directly from this install sheet (takes priority)
+      is1099:     sheetName===IS_1099,
+      sheetName,
+    });
+  }
+  dbg('['+sheetName+'] → '+results.length+' records parsed');
+  return results;
+}
+
+// ── IMEI NORMALIZATION — strips spaces/dashes for consistent comparison ─
+function normImei(s){
+  return String(s||'').replace(/[\s\-\.]/g,'').trim();
+}
+
+// ── PARSE TIER SHEET (2026.02.06 tab) ─────────────────────────────────
+function parseTierSheet(values){
+  // Directly populates global tierDataMap and venueDataMap
+  tierDataMap={};
+  venueDataMap={};
+
+  if(!values||!Array.isArray(values)||values.length<2){ dbg('[tiers] empty/missing'); return; }
+
+  // Dynamic header row detection
+  let hi=0;
+  for(let i=0;i<Math.min(values.length,6);i++){
+    if(values[i].filter(c=>String(c||'').trim()).length>2){ hi=i; break; }
+  }
+  const rawHeaders=values[hi];
+  const headers=rawHeaders.map(h=>String(h||'').trim().toLowerCase());
+
+  dbg('━━━ [2026.02.06 tier sheet] '+values.length+' rows, header row='+hi+' ━━━');
+  headers.forEach((h,i)=>{ if(h) dbg('  col['+i+'] = "'+rawHeaders[i]+'"'); });
+
+  const imeiIdx=findCol(headers,
+    'imei','device imei','serial','serial number','unit serial','device serial',
+    'imei #','serial #','device id','unit id','hardware id','imei number',
+    'esn','device esn','device number','unit number');
+
+  const tierIdx=findCol(headers,
+    'tier','tier level','commission tier','rep tier','category','class',
+    'level','commission level','placement tier','contract tier','deal tier',
+    'account tier','venue tier','comp tier','comp level','compensation tier',
+    'payout tier','tier a','tier b','tier c','site tier','rate','rate tier',
+    'commission rate','rate level','pricing tier','service tier');
+
+  const amountIdx=findCol(headers,
+    'amount','payout','commission amount','comm amount','commission $','payout amount',
+    'payment','pay','commission payout','total','total commission','comm','fee',
+    'flat fee','flat rate','contract amount','deal amount','placement fee');
+
+  const venueIdx=findCol(headers,
+    'venue','venue name','account','account name','business','business name',
+    'location','client','company','place','name');
+
+  const repIdx=findCol(headers,
+    'rep','rep name','sales rep','agent','agent name','salesperson','associate',
+    'partner','contractor','employee','first name','full name');
+
+  dbg('  → imei='+imeiIdx+' tier='+tierIdx+' amount='+amountIdx+' venue='+venueIdx+' rep='+repIdx+
+      (imeiIdx<0?' ⚠ IMEI NOT FOUND':'')+
+      (tierIdx<0?' ⚠ TIER NOT FOUND':'')+
+      (amountIdx<0?' ⚠ AMOUNT NOT FOUND':''));
+
+  for(let i=hi+1;i<values.length;i++){
+    const row=values[i];
+    if(!row||row.every(c=>!String(c||'').trim())) continue;
+
+    const rawTier=tierIdx>=0 ? String(row[tierIdx]||'').trim().toUpperCase().replace(/^TIER\s*/,'') : '';
+    const tier=(rawTier==='A'||rawTier==='B'||rawTier==='C') ? rawTier : '';
+    if(!tier) continue;
+
+    // Parse amount — handle $1,234.56 format
+    let amount=null;
+    if(amountIdx>=0){
+      const raw=String(row[amountIdx]||'').replace(/[$,\s]/g,'');
+      const n=parseFloat(raw);
+      if(!isNaN(n)&&n>0) amount=n;
+    }
+
+    const entry={ tier, amount };
+    if(repIdx>=0)   entry.rep  =String(row[repIdx]||'').trim();
+    if(venueIdx>=0) entry.venue=String(row[venueIdx]||'').trim();
+
+    // Key by normalized IMEI
+    if(imeiIdx>=0){
+      const imei=normImei(String(row[imeiIdx]||''));
+      if(imei) tierDataMap[imei]=entry;
+    }
+    // Key by venue name (exact lowercase + fuzzy venueKey)
+    if(venueIdx>=0){
+      const vn=String(row[venueIdx]||'').trim().toLowerCase();
+      if(vn){
+        venueDataMap[vn]=entry;
+        const vk=venueKey(vn);
+        if(vk&&vk!==vn) venueDataMap[vk]=entry;
+      }
+    }
+  }
+
+  dbg('[tiers] tierDataMap: '+Object.keys(tierDataMap).length+' IMEI entries, venueDataMap: '+Object.keys(venueDataMap).length+' venue entries');
+  if(Object.keys(tierDataMap).length>0)
+    dbg('  sample IMEIs: '+Object.keys(tierDataMap).slice(0,3).map(k=>k+' → '+tierDataMap[k].tier+(tierDataMap[k].amount?'/$'+tierDataMap[k].amount:'')).join(', '));
+  if(Object.keys(venueDataMap).length>0)
+    dbg('  sample venues: '+Object.keys(venueDataMap).slice(0,3).join(', '));
+}
+
+// ── PARSE SUPERSET ───────────────────────────────────────────────────
+// Revenue: strictly Net Rental Revenue — never the transaction count column
+// Venue:   strictly venue_name column
+function parseSuperset(raw){
+  if(!raw) return [];
+  try{
+    let rows=[];
+    if(Array.isArray(raw)){
+      rows=raw;
+    } else if(raw.result&&Array.isArray(raw.result)){
+      rows=raw.result[0]?.data||raw.result;
+    } else if(raw.data&&Array.isArray(raw.data)){
+      rows=raw.data;
+    }
+
+    return rows.map(r=>{
+      const keys=Object.keys(r);
+      const find=(...cands)=>{
+        for(const c of cands){
+          const lc=c.toLowerCase();
+          const k=keys.find(k=>k.toLowerCase().includes(lc));
+          if(k!==undefined) return r[k];
+        }
+        return '';
+      };
+
+      // VENUE: venue_name only
+      const venue=String(
+        find('venue_name')||find('venue name')||find('venue')||find('account name')||find('account')||''
+      ).trim();
+
+      // REVENUE: Net Rental Revenue — intentionally skip 'total','amount','revenue' bare words
+      // to avoid matching the "Total Rental" transaction-count column
+      const revRaw=find('net rental r','net rental','net revenue','net r');
+      const revenue=parseFloat(String(revRaw||'0').replace(/[$,\s]/g,''))||0;
+
+      return {
+        venue,
+        imei:    String(find('imei','serial','unit','device')||'').trim(),
+        revenue,
+        market:  String(find('dma_descrip','dma','market','region','city','territory')||'').trim(),
+        // station: normalize properly so F25/F45 display correctly
+        station: normalizeStation(String(find('station_type','station','model','type','hardware','product')||'')),
+      };
+    }).filter(r=>r.venue||r.imei);
+  } catch(e){ console.warn('parseSuperset:',e); return []; }
+}
+
+// ── PROCESS RESPONSE ─────────────────────────────────────────────────
+function processData(resp){
+  debugLines=[];
+  allInstalls=[];
+  tierDataMap={};
+  venueDataMap={};
+  tierMap=tierDataMap;   // legacy aliases
+  venueMap=venueDataMap;
+
+  SHEET_NAMES.forEach(name=>{
+    const raw=resp[name];
+    if(raw&&Array.isArray(raw)){
+      allInstalls=allInstalls.concat(parseInstallSheet(raw,name));
+    } else {
+      dbg('['+name+'] missing from response');
+    }
+  });
+  dbg('Total installs: '+allInstalls.length);
+
+  const tierRaw=resp['__tiers__'];
+  if(tierRaw&&Array.isArray(tierRaw)){
+    parseTierSheet(tierRaw); // populates tierDataMap + venueDataMap directly
+    tierMap=tierDataMap;     // keep aliases in sync
+    venueMap=venueDataMap;
+  }
+
+  const spRaw  =resp['__superset__'];
+  const usedCsv=resp['__superset_source__']==='csv_tab';
+  spData=parseSuperset(spRaw);
+  dbg('Superset rows: '+spData.length+(usedCsv?' (CSV tab)':' (live API)'));
+
+  const pill=document.getElementById('spPill');
+  const txt =document.getElementById('spPillTxt');
+  if(spData.length>0){
+    pill.className='superset-pill ok';
+    txt.textContent=usedCsv
+      ?`Superset: CSV Tab · ${spData.length.toLocaleString()} venues`
+      :`Superset: Live · ${spData.length.toLocaleString()} venues`;
+  } else {
+    pill.className='superset-pill err';
+    txt.textContent='Superset: No Data';
+  }
+
+  document.getElementById('debugBar').innerHTML=debugLines
+    .map(l=>{
+      if(l.includes('❌')) return '<span class="err">'+l+'</span>';
+      if(l.includes('━━━')) return '<b>'+l+'</b>';
+      if(l.includes('→ ')) return l.replace(/("[^"]*" \[\d+\])/g,'<span class="ok">$1</span>').replace(/(❌ NOT FOUND)/g,'<span class="err">$1</span>');
+      return l;
+    }).join('\n');
+
+  const reps=[...new Set(allInstalls.map(i=>i.rep).filter(Boolean))].sort();
+  document.getElementById('filterRep').innerHTML='<option value="">All Reps</option>'+
+    reps.map(r=>`<option value="${r}">${r}</option>`).join('');
+
+  renderPlacements();
+  renderROI();
+}
+
+// ── PLACEMENT TRACKER ────────────────────────────────────────────────
+function statusClass(s){
+  const sl=(s||'').toLowerCase();
+  if(sl.includes('active')||sl.includes('live')||sl.includes('installed')) return 'st-active';
+  if(sl.includes('schedul')) return 'st-scheduled';
+  if(sl.includes('sign')||sl.includes('contract')) return 'st-signed';
+  if(sl.includes('inact')||sl.includes('remov')||sl.includes('churn')) return 'st-inactive';
+  return 'st-unknown';
+}
+
+function renderPlacements(){
+  const q      =(document.getElementById('searchInput')?.value||'').toLowerCase();
+  const stFilt =(document.getElementById('filterStatus')?.value||'').toLowerCase();
+  const repFilt= document.getElementById('filterRep')?.value||'';
+  const shFilt = document.getElementById('filterSheet')?.value||'';
+
+  const rows=allInstalls.filter(r=>{
+    if(q&&!(r.venue.toLowerCase().includes(q)||r.rep.toLowerCase().includes(q)||(r.market||'').toLowerCase().includes(q))) return false;
+    if(stFilt&&!statusClass(r.status).includes(stFilt.slice(0,4))) return false;
+    if(repFilt&&r.rep!==repFilt) return false;
+    if(shFilt&&r.sheetName!==shFilt) return false;
+    return true;
+  });
+
+  document.getElementById('kpi-total').textContent  = allInstalls.length.toLocaleString();
+  document.getElementById('kpi-active').textContent = allInstalls.filter(r=>statusClass(r.status)==='st-active').length.toLocaleString();
+  document.getElementById('kpi-sched').textContent  = allInstalls.filter(r=>statusClass(r.status)==='st-scheduled').length.toLocaleString();
+  document.getElementById('kpi-signed').textContent = allInstalls.filter(r=>statusClass(r.status)==='st-signed').length.toLocaleString();
+  document.getElementById('kpi-reps').textContent   = new Set(allInstalls.map(r=>r.rep).filter(Boolean)).size.toLocaleString();
+  document.getElementById('contractCount').textContent=rows.length+' records';
+
+  // Leaderboard
+  const repStats={};
+  allInstalls.forEach(r=>{
+    if(!r.rep) return;
+    if(!repStats[r.rep]) repStats[r.rep]={count:0,active:0,tA:0,tB:0,tC:0};
+    repStats[r.rep].count++;
+    if(statusClass(r.status)==='st-active') repStats[r.rep].active++;
+    const t=getTier(r);
+    if(t==='A') repStats[r.rep].tA++;
+    else if(t==='B') repStats[r.rep].tB++;
+    else if(t==='C') repStats[r.rep].tC++;
+  });
+  const sorted=Object.entries(repStats).sort((a,b)=>b[1].count-a[1].count);
+  const lbEl=document.getElementById('leaderboard');
+  if(!sorted.length){
+    lbEl.innerHTML='<div style="color:rgba(255,255,255,.4);font-size:13px;padding:16px 0">No install data yet — click ⚙ Debug to inspect column detection</div>';
+  } else {
+    lbEl.innerHTML=sorted.map(([rep,s],i)=>{
+      const rc=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+      const ts=[s.tA?`<span class="badge b-ta" style="font-size:10px">A×${s.tA}</span>`:'',
+                s.tB?`<span class="badge b-tb" style="font-size:10px">B×${s.tB}</span>`:'',
+                s.tC?`<span class="badge b-tc" style="font-size:10px">C×${s.tC}</span>`:''].filter(Boolean).join(' ');
+      return `<div class="lb-card"><div class="lb-rank ${rc}">${i+1}</div>
+        <div class="lb-info"><div class="lb-name">${rep}</div>
+        <div class="lb-stat">${s.active} active · ${ts||'no tier data'}</div></div>
+        <div class="lb-count">${s.count}</div></div>`;
+    }).join('');
+  }
+
+  const tbody=document.getElementById('placementBody');
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="12"><div class="empty-state"><div class="empty-icon">📋</div>No contracts match your filters</div></td></tr>`;
+    return;
+  }
+
+  const tierBadge=install=>{
+    const t=getTier(install);
+    if(t==='A') return `<span class="badge b-ta">Tier A</span>`;
+    if(t==='B') return `<span class="badge b-tb">Tier B</span>`;
+    if(t==='C') return `<span class="badge b-tc">Tier C △</span>`;
+    return '<span style="color:var(--muted);font-size:12px">—</span>';
+  };
+  const commVal=install=>{
+    const amt=getCommissionAmt(install);
+    if(amt>0) return '$'+amt.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0});
+    return '—';
+  };
+  const dot=done=>`<div class="milestone-dot${done?' done':''}"></div>`;
+  const shTag=s=>s===IS_1099?'1099':s==='Full Time Rep - Install'?'FT':s==='CN Installs - Onboarding'?'OB':'?';
+
+  tbody.innerHTML=rows.map(r=>`<tr>
+    <td style="font-weight:600;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.venue}">${r.venue}</td>
+    <td>${r.rep||'—'}</td>
+    <td><span class="badge ${statusClass(r.status)}">${r.status||'Unknown'}</span></td>
+    <td>${stationBadge(r.station)}</td>
+    <td style="font-size:12px;color:var(--muted)">${fmtDate(r.signed)}</td>
+    <td style="font-size:12px;color:var(--muted)">${fmtDate(r.scheduled)}</td>
+    <td style="text-align:center">${dot(r.s1)}</td>
+    <td style="text-align:center">${dot(r.f1)}</td>
+    <td style="text-align:center">${dot(r.s2)}</td>
+    <td>${tierBadge(r)}</td>
+    <td style="font-weight:600">${commVal(r)}</td>
+    <td><span class="badge b-gray" style="font-size:10px">${shTag(r.sheetName)}</span></td>
+  </tr>`).join('');
+}
+
+// ── ROI TRACKER ──────────────────────────────────────────────────────
+function getInstallInfo(imei,venue){
+  if(imei){ const m=allInstalls.find(i=>i.imei===imei); if(m) return m; }
+  if(venue){ const vn=venue.toLowerCase().trim(); return allInstalls.find(i=>i.venue&&i.venue.toLowerCase().trim()===vn)||null; }
+  return null;
+}
+
+function buildROIRows(){
+  if(spData.length>0){
+    return spData.map(sp=>{
+      const install =getInstallInfo(sp.imei,sp.venue);
+      const station =sp.station||(install?install.station:'F10');
+      const imei    =sp.imei||(install?install.imei:'');
+      // Resolve tier + commission: prefer install record, then venueDataMap fuzzy lookup
+      let tierObj=null;
+      if(install){
+        tierObj=getTierData(install);
+      } else {
+        // No matching install — try venueDataMap directly for this Superset venue
+        const vn=(sp.venue||'').toLowerCase().trim();
+        tierObj=venueDataMap[vn]||venueDataMap[venueKey(sp.venue)]||{tier:'',amount:null};
+      }
+      const tier    =tierObj.tier||'';
+      const is1099  =install?install.is1099:false;
+      const mkt     =sp.market||(install?install.market:'—')||'—';
+      const hw      =getHWCost(station);
+      // Use amount from tier sheet if available; otherwise settings-bar fallback
+      const commAmt = tierObj.amount!==null&&tierObj.amount>0 ? tierObj.amount : (tier?getCommRate(tier):0);
+      const comm    =(!is1099)? commAmt : 0;
+      const inv     =hw+comm;
+      const rev     =sp.revenue||0;
+      const net     =rev-inv;
+      const bePct   =inv>0?Math.min(150,(rev/inv)*100):0;
+      const roiState=rev===0?'norev':net>=0?'profitable':net>=-200?'breakeven':'negative';
+      let beMonths=null;
+      if(install&&install.signed){
+        try{
+          const d=install.signed instanceof Date?install.signed:new Date(install.signed);
+          if(!isNaN(d)){
+            const months=(Date.now()-d.getTime())/(1000*60*60*24*30.44);
+            if(months>0&&rev>0) beMonths=(inv/(rev/months)).toFixed(1)+' mo';
+          }
+        }catch(e){}
+      }
+      return {venue:sp.venue,market:mkt,station,imei,hw,comm,inv,rev,net,beMonths,bePct,roiState,tier};
+    });
+  } else {
+    return allInstalls.map(i=>{
+      const tierObj=getTierData(i);
+      const tier=tierObj.tier||'';
+      const hw=getHWCost(i.station);
+      const commAmt=tierObj.amount!==null&&tierObj.amount>0 ? tierObj.amount : (tier?getCommRate(tier):0);
+      const comm=(!i.is1099)? commAmt : 0;
+      const inv=hw+comm;
+      return {venue:i.venue,market:i.market||'—',station:i.station,imei:i.imei,hw,comm,inv,rev:0,net:-inv,beMonths:null,bePct:0,roiState:'norev',tier};
+    });
+  }
+}
+
+function renderROI(){
+  const q   =(document.getElementById('roiSearch')?.value||'').toLowerCase();
+  const filt= document.getElementById('roiFilter')?.value||'';
+  const sort= document.getElementById('roiSort')?.value||'rev_desc';
+
+  let rows=buildROIRows().filter(r=>{
+    if(q&&!(r.venue.toLowerCase().includes(q)||(r.market||'').toLowerCase().includes(q))) return false;
+    if(filt&&r.roiState!==filt) return false;
+    return true;
+  });
+  rows.sort((a,b)=>{
+    if(sort==='rev_desc') return b.rev-a.rev;
+    if(sort==='net_desc') return b.net-a.net;
+    if(sort==='be_asc')   return (a.bePct||0)-(b.bePct||0);
+    if(sort==='venue_az') return a.venue.localeCompare(b.venue);
+    return 0;
+  });
+
+  const all=buildROIRows();
+  const totRev=all.reduce((s,r)=>s+r.rev,0);
+  document.getElementById('roi-kpi-total').textContent = all.length.toLocaleString();
+  document.getElementById('roi-kpi-rev').textContent   = fmtK(totRev);
+  document.getElementById('roi-kpi-prof').textContent  = all.filter(r=>r.roiState==='profitable').length.toLocaleString();
+  document.getElementById('roi-kpi-be').textContent    = all.filter(r=>r.roiState==='breakeven').length.toLocaleString();
+  document.getElementById('roi-kpi-avg').textContent   = fmtK(all.length?totRev/all.length:0);
+
+  if(spData.length>0){
+    const topV=[...all].sort((a,b)=>b.rev-a.rev).slice(0,8);
+    const maxV=topV[0]?.rev||1;
+    document.getElementById('venueChart').innerHTML=topV.map(r=>`
+      <div class="bar-row">
+        <div class="bar-label" title="${r.venue}">${r.venue}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(r.rev/maxV)*100}%;background:var(--cf-blue)"></div></div>
+        <div class="bar-val">${fmtK(r.rev)}</div>
+      </div>`).join('')||'<div style="color:var(--muted);font-size:13px">No data</div>';
+
+    const mktMap={};
+    all.forEach(r=>{ const m=r.market||'Unknown'; mktMap[m]=(mktMap[m]||0)+r.rev; });
+    const topM=Object.entries(mktMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const maxM=topM[0]?.[1]||1;
+    document.getElementById('marketChart').innerHTML=topM.map(([m,v])=>`
+      <div class="bar-row">
+        <div class="bar-label" title="${m}">${m}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(v/maxM)*100}%;background:var(--teal)"></div></div>
+        <div class="bar-val">${fmtK(v)}</div>
+      </div>`).join('')||'<div style="color:var(--muted);font-size:13px">No data</div>';
+  }
+
+  const beBar=r=>{
+    const pct=r.bePct;
+    const col=pct>=100?'var(--green)':pct>=50?'var(--orange)':'var(--red)';
+    const mo=r.beMonths?`<span class="breakeven" style="color:var(--teal)">${r.beMonths}</span>`:'';
+    return `<div class="be-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="be-pct" style="color:${col}">${Math.round(pct)}%</span>${mo}
+      </div>
+      <div class="be-bar-bg"><div class="be-bar-fill" style="width:${Math.min(100,pct)}%;background:${col}"></div></div>
+    </div>`;
+  };
+  const roiBadge=r=>{
+    if(r.roiState==='profitable') return '<span class="badge b-ok">Profitable</span>';
+    if(r.roiState==='breakeven')  return '<span class="badge b-orange">Near Breakeven</span>';
+    if(r.roiState==='negative')   return '<span class="badge b-red">Negative ROI</span>';
+    return '<span class="badge b-gray">No Revenue</span>';
+  };
+
+  const tbody=document.getElementById('roiBody');
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">📊</div>No ROI data — check Superset_Revenue tab</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML=rows.map(r=>`<tr>
+    <td style="font-weight:600;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.venue}">${r.venue}</td>
+    <td style="font-size:12px;color:var(--muted)">${r.market||'—'}</td>
+    <td>${stationBadge(r.station)}</td>
+    <td style="color:var(--muted);font-size:12px">${fmtUSD(r.hw)}</td>
+    <td style="color:var(--muted);font-size:12px">${r.comm?fmtUSD(r.comm):'—'}</td>
+    <td style="font-weight:600">${fmtUSD(r.inv)}</td>
+    <td style="font-weight:700;color:${r.rev>0?'var(--green)':'var(--muted)'}">${fmtUSD(r.rev)}</td>
+    <td style="font-weight:700;color:${r.net>=0?'var(--green)':'var(--red)'}">${r.net>=0?'+':''}${fmtUSD(r.net)}</td>
+    <td>${beBar(r)}</td>
+    <td>${roiBadge(r)}</td>
+  </tr>`).join('');
+}
+
+// ── NAV / UTILS ──────────────────────────────────────────────────────
+function switchTab(tab){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+function toggleDebug(){
+  const b=document.getElementById('debugBar');
+  b.style.display=b.style.display==='none'?'block':'none';
+}
+
+// ── DATA LOADING ─────────────────────────────────────────────────────
+let _cbIdx=0;
+function loadData(url){
+  const src=url||DEFAULT_URL;
+  const dot=document.getElementById('syncDot');
+  const lbl=document.getElementById('syncLabel');
+  dot.classList.add('loading'); lbl.textContent='Syncing…';
+  const cb='__cb'+(++_cbIdx);
+  const tag=document.createElement('script');
+  tag.onerror=()=>{ dot.classList.remove('loading'); lbl.textContent='Load failed'; dot.style.background='var(--red)'; };
+  window[cb]=resp=>{
+    delete window[cb]; document.head.removeChild(tag);
+    dot.classList.remove('loading');
+    if(resp&&resp.ok){
+      const n=new Date();
+      lbl.textContent='Synced '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+' '+(n.getHours()>=12?'PM':'AM');
+      dot.style.background='var(--green)';
+      processData(resp);
+    } else {
+      lbl.textContent='Error: '+(resp?.error||'unknown');
+      dot.style.background='var(--red)';
+    }
+  };
+  tag.src=src+'?callback='+cb+'&t='+Date.now();
+  document.head.appendChild(tag);
+}
+function showFileFallback(){ document.getElementById('fallbackModal').style.display='flex'; document.getElementById('urlInput').value=DEFAULT_URL; }
+function loadFromUrl(){ const u=document.getElementById('urlInput').value.trim(); document.getElementById('fallbackModal').style.display='none'; if(u) loadData(u); }
+
+loadData();
+</script>
+</body>
+</html>
