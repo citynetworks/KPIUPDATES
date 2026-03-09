@@ -116,7 +116,10 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
 .st-unknown{background:#F1F5F9;color:#6B7280}
 .empty-state{padding:40px;text-align:center;color:var(--muted);font-size:14px}
 .empty-icon{font-size:32px;margin-bottom:10px}
-.debug-bar{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 14px;font-size:11px;color:rgba(255,255,255,.45);margin-bottom:14px;font-family:monospace;display:none;white-space:pre-wrap;line-height:1.7}
+.debug-bar{background:#0A0F1C;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px 16px;font-size:11.5px;color:#94A3B8;margin-bottom:14px;font-family:'Courier New',monospace;display:none;white-space:pre-wrap;line-height:1.9;max-height:500px;overflow-y:auto}
+.debug-bar b{color:#60A5FA}
+.debug-bar .ok{color:#4ADE80}
+.debug-bar .err{color:#F87171}
 </style>
 </head>
 <body>
@@ -278,20 +281,29 @@ const IS_1099     = '1099 B - Rep Install';
 // ── STATE ────────────────────────────────────────────────────────────
 let allInstalls = [];
 let spData      = [];
-let tierMap     = {};
+let tierMap     = {};  // imei → tier letter (from tier sheet)
+let venueMap    = {};  // venue name (lowercase) → tier letter (fallback)
 let debugLines  = [];
 
 // ── HELPERS ──────────────────────────────────────────────────────────
 function dbg(msg){ console.log(msg); debugLines.push(msg); }
 
 function findCol(headers, ...candidates){
+  // Pass 1: exact match
   for(const c of candidates){
     const idx = headers.indexOf(c.toLowerCase().trim());
     if(idx >= 0) return idx;
   }
+  // Pass 2: header includes candidate substring
   for(const c of candidates){
     const lc = c.toLowerCase().trim();
-    const idx = headers.findIndex(h => h.length > 1 && (h.includes(lc) || lc.includes(h)));
+    const idx = headers.findIndex(h => h.length > 1 && h.includes(lc));
+    if(idx >= 0) return idx;
+  }
+  // Pass 3: candidate includes header substring (e.g. 'station type' includes 'station')
+  for(const c of candidates){
+    const lc = c.toLowerCase().trim();
+    const idx = headers.findIndex(h => h.length > 1 && lc.includes(h));
     if(idx >= 0) return idx;
   }
   return -1;
@@ -358,35 +370,141 @@ function getCommRate(tier){
   return 0;
 }
 
+// ── TIER LOOKUP — 3-level priority ────────────────────────────────────
+// 1. directTier on the install row (read from install sheet itself)
+// 2. tierMap[imei] — IMEI matched against 2026.02.06 tier sheet
+// 3. venueMap[venue] — venue name matched against 2026.02.06 tier sheet
+function getTier(install){
+  if(!install) return '';
+  if(install.directTier) return install.directTier;
+  if(install.imei){
+    const t = tierMap[normImei(install.imei)] || tierMap[install.imei];
+    if(t) return t;
+  }
+  if(install.venue){
+    const t = venueMap[install.venue.toLowerCase().trim()];
+    if(t) return t;
+  }
+  return '';
+}
+
 // ── PARSE INSTALL SHEETS (2D array from getDataRange().getValues()) ──
 function parseInstallSheet(values, sheetName){
   if(!values||!Array.isArray(values)||values.length<2){ dbg('['+sheetName+'] empty/missing'); return []; }
 
+  // Find header row — first row with >2 non-empty cells within first 6 rows
   let hi=0;
-  for(let i=0;i<Math.min(values.length,5);i++){
+  for(let i=0;i<Math.min(values.length,6);i++){
     if(values[i].filter(c=>String(c||'').trim()).length>2){ hi=i; break; }
   }
-  const headers = values[hi].map(h=>String(h||'').trim().toLowerCase());
-  dbg('['+sheetName+'] '+values.length+' rows, headers: '+headers.slice(0,14).join(' | '));
+  const rawHeaders = values[hi];
+  const headers = rawHeaders.map(h=>String(h||'').trim().toLowerCase());
 
-  const vIdx  = findCol(headers,'venue','venue name','account','account name','location','business','client','company');
-  const rIdx  = findCol(headers,'rep','sales rep','rep name','agent','employee','salesperson','assigned rep');
-  const stIdx = findCol(headers,'status','install status','stage','phase','contract status');
-  const hwIdx = findCol(headers,'station','station type','hardware','model','device','charger type','unit type','equipment','product');
-  const imIdx = findCol(headers,'imei','device imei','serial','serial number','unit serial','device serial','imei #');
-  const mIdx  = findCol(headers,'market','dma','region','city','territory','market/dma');
-  const sigIdx= findCol(headers,'signed date','date signed','contract date','contract signed','sign date');
-  const schIdx= findCol(headers,'scheduled date','install date','scheduled install','schedule date','installation date');
-  const conIdx= findCol(headers,'contract','contract link','contract url','doc link','drive link');
+  // ── DEBUG: show ALL headers with column index ──────────────────────
+  dbg('━━━ ['+sheetName+'] '+values.length+' rows, header row='+hi+' ('+headers.filter(Boolean).length+' cols) ━━━');
+  headers.forEach((h,i)=>{ if(h) dbg('  col['+i+'] = "'+rawHeaders[i]+'"'); });
 
+  // ── COLUMN DETECTION — very wide net of name candidates ───────────
+  const vIdx  = findCol(headers,
+    'venue','venue name','venue/business','account','account name','business',
+    'business name','client','company','company name','location','location name',
+    'establishment','place','site','facility','partner','customer','name',
+    'property','bar','restaurant','shop','hotel','property name','place name');
+
+  const rIdx  = findCol(headers,
+    'rep','sales rep','rep name','agent','employee','salesperson','assigned rep',
+    'representative','account rep','field rep','installer','team member',
+    'sales person','assigned to','assigned','closer','contact rep','rep #',
+    'sales agent','rep/agent','field sales','salesperson name','account manager');
+
+  const stIdx = findCol(headers,
+    'status','install status','stage','phase','contract status','deal status',
+    'pipeline stage','current status','placement status','active status',
+    'deal stage','account status','outcome','disposition','progress','workflow',
+    'state','placement stage','contract stage','current stage','pipeline',
+    'contract phase','active?','installed?','install stage','lead status',
+    'opportunity stage','sales stage','process stage','lifecycle stage');
+
+  const hwIdx = findCol(headers,
+    'station','station type','hardware','model','device','charger type','unit type',
+    'equipment','product','f-series','fseries','charger','unit','charger model',
+    'hardware model','hardware type','device model','device type','equipment type',
+    'product type','asset type','asset','item','sku','type','unit model',
+    'f type','f series','ftype','fseries type','charger unit','charger hardware',
+    'hw','hw type','hw model','station model','device hardware');
+
+  const imIdx = findCol(headers,
+    'imei','device imei','serial','serial number','unit serial','device serial',
+    'imei #','serial #','device id','unit id','asset id','hardware id',
+    'device number','unit number','identifier','imei/serial','device imei #',
+    'imei number','esn','device esn','unit esn');
+
+  const mIdx  = findCol(headers,
+    'market','dma','region','city','territory','market/dma','dma region',
+    'market region','city/dma','sales territory','market area','geographic area',
+    'zone','area','metro','metro area');
+
+  const sigIdx= findCol(headers,
+    'signed date','date signed','contract date','contract signed','sign date',
+    'signature date','agreement date','signed on','contract executed',
+    'executed date','close date','closed date','signed/executed',
+    'date of signature','contract sign date','signed','contract sign');
+
+  const schIdx= findCol(headers,
+    'scheduled date','install date','scheduled install','schedule date',
+    'installation date','install scheduled','go live','go-live',
+    'activation date','launch date','deploy date','go live date',
+    'scheduled on','install on','deployment date','active date',
+    'live date','go live date','scheduled','installation');
+
+  const conIdx= findCol(headers,
+    'contract','contract link','contract url','doc link','drive link',
+    'agreement link','contract file','document link','docusign',
+    'contract doc','signed doc','agreement url');
+
+  // Milestone columns — try exact single-char first, then many name variants
   let s1Idx = headers.indexOf('s');
-  if(s1Idx<0) s1Idx = findCol(headers,'s1','milestone s');
-  let fIdx  = headers.indexOf('f');
-  if(fIdx<0)  fIdx  = findCol(headers,'f1','milestone f','first revenue');
-  let s2Idx = headers.indexOf('s2');
-  if(s2Idx<0) s2Idx = findCol(headers,'s2 milestone','milestone s2');
+  if(s1Idx<0) s1Idx = findCol(headers,
+    's1','milestone s','ms','survey','site survey','sign check',
+    'survey done','s milestone','phase 1','m1','step 1','step1',
+    'checkpoint 1','ch1','signed check','s complete','s done',
+    's status','survey complete','first milestone','milestone 1');
 
-  dbg('['+sheetName+'] venue='+vIdx+' rep='+rIdx+' status='+stIdx+' hw='+hwIdx+' imei='+imIdx+' S='+s1Idx+' F='+fIdx+' S2='+s2Idx);
+  let fIdx  = headers.indexOf('f');
+  if(fIdx<0) fIdx  = findCol(headers,
+    'f1','milestone f','mf','first','funded','first revenue','finalized',
+    'first pay','f check','f milestone','phase 2','m2','step 2','step2',
+    'checkpoint 2','ch2','f complete','f done','f status',
+    'first revenue check','second milestone','milestone 2');
+
+  let s2Idx = headers.indexOf('s2');
+  if(s2Idx<0) s2Idx = findCol(headers,
+    's2 milestone','milestone s2','ms2','second','second revenue',
+    'second pay','second payment','s2 check','phase 3','m3',
+    'step 3','step3','checkpoint 3','ch3','s2 complete','s2 done',
+    's2 status','second revenue check','third milestone','milestone 3');
+
+  // Direct tier column in this install sheet (primary lookup — no IMEI matching needed)
+  const dirTierIdx = findCol(headers,
+    'tier','commission tier','rep tier','tier level','commission level',
+    'tier a','tier b','tier c','category','class','level','placement tier',
+    'contract tier','deal tier','account tier','venue tier','site tier',
+    'comp tier','comp level','compensation tier','payout tier');
+
+  // ── DEBUG: show column map result ─────────────────────────────────
+  const colName=(idx)=> idx>=0 ? '"'+rawHeaders[idx]+'" ['+idx+']' : '❌ NOT FOUND';
+  dbg('  → venue='+colName(vIdx)+' rep='+colName(rIdx)+' status='+colName(stIdx));
+  dbg('  → station='+colName(hwIdx)+' imei='+colName(imIdx)+' market='+colName(mIdx));
+  dbg('  → signed='+colName(sigIdx)+' scheduled='+colName(schIdx));
+  dbg('  → tier(direct)='+colName(dirTierIdx));
+  dbg('  → S='+colName(s1Idx)+' F='+colName(fIdx)+' S2='+colName(s2Idx));
+
+  // ── DEBUG: show first data row values ─────────────────────────────
+  if(values.length > hi+1){
+    const fr=values[hi+1];
+    dbg('  First data row sample:');
+    fr.forEach((v,i)=>{ if(v!==''&&v!==null&&v!==undefined) dbg('    ['+i+']='+(typeof v)+': '+String(v).substring(0,60)); });
+  }
 
   const getStr =(row,idx)=> idx>=0&&idx<row.length ? String(row[idx]||'').trim() : '';
   const getBool=(row,idx)=>{
@@ -394,7 +512,7 @@ function parseInstallSheet(values, sheetName){
     const v=row[idx];
     if(typeof v==='boolean') return v;
     const s=String(v||'').trim().toLowerCase();
-    return s==='true'||s==='yes'||s==='1'||s==='✓'||s==='x'||s==='done';
+    return s==='true'||s==='yes'||s==='1'||s==='✓'||s==='x'||s==='done'||s==='complete'||s==='completed';
   };
 
   const results=[];
@@ -403,44 +521,100 @@ function parseInstallSheet(values, sheetName){
     if(!row||row.every(c=>!String(c||'').trim())) continue;
     const venue=getStr(row,vIdx);
     if(!venue) continue;
+    // Normalize tier: strip "Tier " prefix, uppercase → 'A','B','C'
+    const rawTier = getStr(row,dirTierIdx).toUpperCase().replace(/^TIER\s*/,'').trim();
+    const directTier = (rawTier==='A'||rawTier==='B'||rawTier==='C') ? rawTier : '';
     results.push({
       venue,
-      rep:      getStr(row,rIdx),
-      status:   getStr(row,stIdx),
-      station:  normalizeStation(getStr(row,hwIdx)),
-      imei:     getStr(row,imIdx),
-      market:   getStr(row,mIdx),
-      signed:   sigIdx>=0&&sigIdx<row.length ? row[sigIdx] : '',
-      scheduled:schIdx>=0&&schIdx<row.length ? row[schIdx] : '',
-      contract: getStr(row,conIdx),
-      s1:       getBool(row,s1Idx),
-      f1:       getBool(row,fIdx),
-      s2:       getBool(row,s2Idx),
-      is1099:   sheetName===IS_1099,
+      rep:        getStr(row,rIdx),
+      status:     getStr(row,stIdx),
+      station:    normalizeStation(getStr(row,hwIdx)),
+      imei:       getStr(row,imIdx),
+      market:     getStr(row,mIdx),
+      signed:     sigIdx>=0&&sigIdx<row.length ? row[sigIdx] : '',
+      scheduled:  schIdx>=0&&schIdx<row.length ? row[schIdx] : '',
+      contract:   getStr(row,conIdx),
+      s1:         getBool(row,s1Idx),
+      f1:         getBool(row,fIdx),
+      s2:         getBool(row,s2Idx),
+      directTier, // tier read directly from this install sheet (takes priority)
+      is1099:     sheetName===IS_1099,
       sheetName,
     });
   }
-  dbg('['+sheetName+'] parsed '+results.length+' rows');
+  dbg('['+sheetName+'] → '+results.length+' records parsed');
   return results;
 }
 
-// ── PARSE TIER SHEET ────────────────────────────────────────────────
+// ── IMEI NORMALIZATION — strips spaces/dashes for consistent comparison ─
+function normImei(s){
+  return String(s||'').replace(/[\s\-\.]/g,'').trim();
+}
+
+// ── PARSE TIER SHEET (2026.02.06 tab) ─────────────────────────────────
 function parseTierSheet(values){
-  if(!values||!Array.isArray(values)||values.length<2) return {};
-  const headers=values[0].map(h=>String(h||'').trim().toLowerCase());
-  const imeiIdx=findCol(headers,'imei','device imei','serial','serial number','unit serial');
-  const tierIdx=findCol(headers,'tier','tier level','commission tier','rep tier','category','class');
-  dbg('[tiers] imei='+imeiIdx+' tier='+tierIdx+' headers: '+headers.slice(0,10).join(' | '));
-  const map={};
-  if(imeiIdx>=0&&tierIdx>=0){
-    for(let i=1;i<values.length;i++){
-      const row=values[i];
-      const imei=String(row[imeiIdx]||'').trim();
-      const tier=String(row[tierIdx]||'').trim().toUpperCase().replace(/TIER\s*/i,'');
-      if(imei&&tier) map[imei]=tier;
+  if(!values||!Array.isArray(values)||values.length<2){ dbg('[tiers] empty/missing'); return {}; }
+
+  // Dynamic header row detection (same approach as parseInstallSheet)
+  let hi=0;
+  for(let i=0;i<Math.min(values.length,6);i++){
+    if(values[i].filter(c=>String(c||'').trim()).length>2){ hi=i; break; }
+  }
+  const rawHeaders=values[hi];
+  const headers=rawHeaders.map(h=>String(h||'').trim().toLowerCase());
+
+  dbg('━━━ [2026.02.06 tier sheet] '+values.length+' rows, header row='+hi+' ━━━');
+  headers.forEach((h,i)=>{ if(h) dbg('  col['+i+'] = "'+rawHeaders[i]+'"'); });
+
+  const imeiIdx=findCol(headers,
+    'imei','device imei','serial','serial number','unit serial','device serial',
+    'imei #','serial #','device id','unit id','hardware id','imei number',
+    'esn','device esn','device number','unit number');
+
+  const tierIdx=findCol(headers,
+    'tier','tier level','commission tier','rep tier','category','class',
+    'level','commission level','placement tier','contract tier','deal tier',
+    'account tier','venue tier','comp tier','comp level','compensation tier',
+    'payout tier','tier a','tier b','tier c','site tier','rate','rate tier',
+    'commission rate','rate level','pricing tier','service tier');
+
+  // Also try to infer tier from a venue/name column if no explicit tier col
+  const venueIdx=findCol(headers,
+    'venue','venue name','account','account name','business','business name',
+    'location','client','company','place','name');
+
+  dbg('  → imei='+imeiIdx+' tier='+tierIdx+' venue='+venueIdx+
+      (imeiIdx<0?' ⚠ IMEI COL NOT FOUND':'')+(tierIdx<0?' ⚠ TIER COL NOT FOUND':''));
+
+  const map={};   // keyed by normalized IMEI → tier letter
+  const venueMap={}; // keyed by lowercase venue name → tier letter (fallback)
+
+  for(let i=hi+1;i<values.length;i++){
+    const row=values[i];
+    if(!row||row.every(c=>!String(c||'').trim())) continue;
+
+    const rawTier = imeiIdx>=0&&tierIdx>=0
+      ? String(row[tierIdx]||'').trim().toUpperCase().replace(/^TIER\s*/,'')
+      : '';
+    const tier = (rawTier==='A'||rawTier==='B'||rawTier==='C') ? rawTier : '';
+    if(!tier) continue;
+
+    if(imeiIdx>=0){
+      const imei=normImei(String(row[imeiIdx]||''));
+      if(imei) map[imei]=tier;
+    }
+    if(venueIdx>=0){
+      const vn=String(row[venueIdx]||'').trim().toLowerCase();
+      if(vn) venueMap[vn]=tier;
     }
   }
-  dbg('[tiers] mapped '+Object.keys(map).length+' IMEIs');
+
+  dbg('[tiers] IMEI map: '+Object.keys(map).length+' entries, venue map: '+Object.keys(venueMap).length+' entries');
+  if(Object.keys(map).length>0)
+    dbg('  sample IMEIs: '+Object.keys(map).slice(0,5).join(', '));
+
+  // Attach venue fallback map so processData can use it
+  map['__venueMap__']=venueMap;
   return map;
 }
 
@@ -497,6 +671,7 @@ function processData(resp){
   debugLines=[];
   allInstalls=[];
   tierMap={};
+  venueMap={};
 
   SHEET_NAMES.forEach(name=>{
     const raw=resp[name];
@@ -509,7 +684,11 @@ function processData(resp){
   dbg('Total installs: '+allInstalls.length);
 
   const tierRaw=resp['__tiers__'];
-  if(tierRaw&&Array.isArray(tierRaw)) tierMap=parseTierSheet(tierRaw);
+  if(tierRaw&&Array.isArray(tierRaw)){
+    tierMap=parseTierSheet(tierRaw);
+    venueMap=tierMap['__venueMap__']||{};
+    delete tierMap['__venueMap__'];
+  }
 
   const spRaw  =resp['__superset__'];
   const usedCsv=resp['__superset_source__']==='csv_tab';
@@ -528,7 +707,13 @@ function processData(resp){
     txt.textContent='Superset: No Data';
   }
 
-  document.getElementById('debugBar').innerHTML=debugLines.join('\n');
+  document.getElementById('debugBar').innerHTML=debugLines
+    .map(l=>{
+      if(l.includes('❌')) return '<span class="err">'+l+'</span>';
+      if(l.includes('━━━')) return '<b>'+l+'</b>';
+      if(l.includes('→ ')) return l.replace(/("[^"]*" \[\d+\])/g,'<span class="ok">$1</span>').replace(/(❌ NOT FOUND)/g,'<span class="err">$1</span>');
+      return l;
+    }).join('\n');
 
   const reps=[...new Set(allInstalls.map(i=>i.rep).filter(Boolean))].sort();
   document.getElementById('filterRep').innerHTML='<option value="">All Reps</option>'+
@@ -576,7 +761,7 @@ function renderPlacements(){
     if(!repStats[r.rep]) repStats[r.rep]={count:0,active:0,tA:0,tB:0,tC:0};
     repStats[r.rep].count++;
     if(statusClass(r.status)==='st-active') repStats[r.rep].active++;
-    const t=tierMap[r.imei]||'';
+    const t=getTier(r);
     if(t==='A') repStats[r.rep].tA++;
     else if(t==='B') repStats[r.rep].tB++;
     else if(t==='C') repStats[r.rep].tC++;
@@ -604,15 +789,15 @@ function renderPlacements(){
     return;
   }
 
-  const tierBadge=imei=>{
-    const t=tierMap[imei]||'';
+  const tierBadge=install=>{
+    const t=getTier(install);
     if(t==='A') return `<span class="badge b-ta">Tier A</span>`;
     if(t==='B') return `<span class="badge b-tb">Tier B</span>`;
     if(t==='C') return `<span class="badge b-tc">Tier C △</span>`;
     return '<span style="color:var(--muted);font-size:12px">—</span>';
   };
-  const commVal=imei=>{
-    const t=tierMap[imei]||'';
+  const commVal=install=>{
+    const t=getTier(install);
     if(t==='A') return '$'+(+document.getElementById('commA').value||500).toLocaleString();
     if(t==='B') return '$'+(+document.getElementById('commB').value||350).toLocaleString();
     if(t==='C') return '$'+(+document.getElementById('commC').value||200).toLocaleString();
@@ -631,8 +816,8 @@ function renderPlacements(){
     <td style="text-align:center">${dot(r.s1)}</td>
     <td style="text-align:center">${dot(r.f1)}</td>
     <td style="text-align:center">${dot(r.s2)}</td>
-    <td>${tierBadge(r.imei)}</td>
-    <td style="font-weight:600">${commVal(r.imei)}</td>
+    <td>${tierBadge(r)}</td>
+    <td style="font-weight:600">${commVal(r)}</td>
     <td><span class="badge b-gray" style="font-size:10px">${shTag(r.sheetName)}</span></td>
   </tr>`).join('');
 }
@@ -650,7 +835,8 @@ function buildROIRows(){
       const install =getInstallInfo(sp.imei,sp.venue);
       const station =sp.station||(install?install.station:'F10');
       const imei    =sp.imei||(install?install.imei:'');
-      const tier    =tierMap[imei]||(install?tierMap[install.imei]:null);
+      // Use 3-level getTier: directTier → IMEI → venue name
+      const tier    =install?getTier(install):(venueMap[(sp.venue||'').toLowerCase().trim()]||'');
       const is1099  =install?install.is1099:false;
       const mkt     =sp.market||(install?install.market:'—')||'—';
       const hw      =getHWCost(station);
@@ -674,7 +860,7 @@ function buildROIRows(){
     });
   } else {
     return allInstalls.map(i=>{
-      const tier=tierMap[i.imei]||null;
+      const tier=getTier(i);
       const hw=getHWCost(i.station);
       const comm=(!i.is1099&&tier)?getCommRate(tier):0;
       const inv=hw+comm;
