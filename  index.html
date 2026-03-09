@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>City Network Live Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
+:root{
+  --accent:#f59e0b;--accent2:#3b82f6;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;
+  --card:#1e2130;--card2:#252840;--border:#2d3150;--text:#e2e8f0;--muted:#94a3b8
+}
+header{background:linear-gradient(135deg,#1a1f35 0%,#252840 100%);border-bottom:2px solid var(--accent);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{font-size:1.4rem;font-weight:700;color:var(--accent);letter-spacing:1px}
+.logo span{color:#fff}
+.header-meta{display:flex;align-items:center;gap:12px;font-size:.8rem;color:var(--muted)}
+#lastUpdated{color:var(--accent)}
+.tabs{display:flex;gap:0;background:#13162a;border-bottom:1px solid var(--border)}
+.tab{padding:12px 24px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;transition:all .2s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);background:#1a1f35}
+.tab:hover:not(.active){color:#fff}
+.view{display:none;padding:20px}
+.view.active{display:block}
+
+/* KPI cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.kpi-card.green::before{background:var(--green)}
+.kpi-card.blue::before{background:var(--accent2)}
+.kpi-card.red::before{background:var(--red)}
+.kpi-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.kpi-value{font-size:1.8rem;font-weight:700;color:#fff}
+.kpi-sub{font-size:.72rem;color:var(--muted);margin-top:4px}
+
+/* Tables */
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead tr{background:#1a1f35}
+thead th{padding:10px 12px;text-align:left;color:var(--accent);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:hover{background:#1a1f35}
+tbody td{padding:9px 12px;color:var(--text)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:600}
+.badge-green{background:#064e3b;color:#6ee7b7}
+.badge-yellow{background:#451a03;color:#fcd34d}
+.badge-red{background:#450a0a;color:#fca5a5}
+.badge-blue{background:#1e3a5f;color:#93c5fd}
+.badge-gray{background:#1e293b;color:#94a3b8}
+
+/* ROI Tracker */
+.roi-settings{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.roi-settings label{font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.roi-settings input,.roi-settings select{background:#13162a;border:1px solid var(--border);color:#fff;padding:6px 10px;border-radius:6px;font-size:.82rem;width:130px}
+.roi-settings .script-url-wrap{flex:1;min-width:220px}
+.roi-settings .script-url-wrap input{width:100%}
+.btn{padding:7px 16px;border:none;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:#d97706}
+.btn-sm{padding:4px 10px;font-size:.75rem}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Status badge */
+.superset-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#13162a;transition:all .2s;white-space:nowrap}
+.superset-badge:hover{border-color:var(--accent);background:#1a1f35}
+.superset-dot{font-size:1rem;line-height:1}
+
+/* ROI table specifics */
+.roi-table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+.progress-bar-bg{background:#1e293b;border-radius:4px;height:6px;width:80px;display:inline-block;vertical-align:middle}
+.progress-bar-fill{height:100%;border-radius:4px;background:var(--green)}
+
+/* Loading / Error */
+.loading-overlay{position:fixed;inset:0;background:rgba(15,17,23,.92);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px}
+.spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:#450a0a;border:1px solid var(--red);border-radius:10px;padding:16px 20px;color:#fca5a5;font-size:.85rem;max-width:500px;margin:20px auto}
+
+/* Superset modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#1e2130;border:1px solid var(--border);border-radius:14px;padding:24px;width:420px;max-width:95vw}
+.modal h3{color:var(--accent);margin-bottom:16px;font-size:1rem}
+.modal label{font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px;margin-top:12px}
+.modal input{width:100%;background:#13162a;border:1px solid var(--border);color:#fff;padding:8px 12px;border-radius:6px;font-size:.85rem}
+.modal-btns{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.status-msg{margin-top:10px;font-size:.8rem;padding:8px 12px;border-radius:6px;display:none}
+
+/* Section headers */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.section-title{font-size:1rem;font-weight:700;color:#fff}
+.section-sub{font-size:.78rem;color:var(--muted);margin-top:2px}
+
+/* Filter bar */
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.filter-bar select,.filter-bar input{background:#1e2130;border:1px solid var(--border);color:#fff;padding:6px 10px;border-radius:6px;font-size:.8rem}
+.filter-bar label{font-size:.78rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div style="color:var(--muted);font-size:.9rem">Loading dashboard data…</div>
+</div>
+
+<!-- Superset modal -->
+<div class="modal-bg" id="supersetModal">
+  <div class="modal">
+    <h3>⚡ Connect to Superset</h3>
+    <p style="font-size:.8rem;color:var(--muted)">Connect directly to Superset to pull live rental revenue. Requires Gamma or Admin role.</p>
+    <label>Superset URL</label>
+    <input type="text" id="spUrl" value="https://superset.getchargefuze.com"/>
+    <label>Username</label>
+    <input type="text" id="spUser" value="Chris Okoye"/>
+    <label>Password</label>
+    <input type="password" id="spPass" placeholder="Enter password"/>
+    <div class="status-msg" id="spStatus"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="document.getElementById('supersetModal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary" onclick="doConnectSuperset()">Connect</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div>
+    <div class="logo">CITY<span>NETWORK</span> <span style="color:var(--muted);font-size:.9rem;font-weight:400">Live Dashboard</span></div>
+  </div>
+  <div class="header-meta">
+    <span>Updated: <span id="lastUpdated">—</span></span>
+    <button class="btn btn-outline btn-sm" onclick="loadData()">↺ Refresh</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('overview')">📊 Overview</div>
+  <div class="tab" onclick="switchTab('installs')">📍 Installs</div>
+  <div class="tab" onclick="switchTab('roi')">💰 ROI Tracker</div>
+</div>
+
+<!-- ═══════════════ OVERVIEW TAB ═══════════════ -->
+<div class="view active" id="view-overview">
+  <div class="kpi-grid" id="overviewKPIs">
+    <div class="kpi-card"><div class="kpi-label">Total Installs</div><div class="kpi-value" id="kpi-total">—</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Active</div><div class="kpi-value" id="kpi-active">—</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Reps</div><div class="kpi-value" id="kpi-reps">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Commission</div><div class="kpi-value" id="kpi-commission">—</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Revenue (Superset)</div><div class="kpi-value" id="kpi-revenue">—</div><div class="kpi-sub" id="kpi-revenue-sub"></div></div>
+    <div class="kpi-card red"><div class="kpi-label">F15 Units</div><div class="kpi-value" id="kpi-f15">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">F10 Units</div><div class="kpi-value" id="kpi-f10">—</div></div>
+  </div>
+  <div class="error-box" id="overviewError" style="display:none"></div>
+</div>
+
+<!-- ═══════════════ INSTALLS TAB ═══════════════ -->
+<div class="view" id="view-installs">
+  <div class="section-header">
+    <div><div class="section-title">All Installs</div><div class="section-sub" id="installsCount"></div></div>
+  </div>
+  <div class="filter-bar">
+    <label>Sheet <select id="filterSheet" onchange="renderInstalls()"><option value="">All Sheets</option></select></label>
+    <label>Rep <select id="filterRep" onchange="renderInstalls()"><option value="">All Reps</option></select></label>
+    <label>Station <select id="filterStation" onchange="renderInstalls()"><option value="">All Stations</option></select></label>
+    <label>Status <select id="filterStatus" onchange="renderInstalls()"><option value="">All Statuses</option></select></label>
+    <input type="text" id="filterSearch" placeholder="Search…" oninput="renderInstalls()" style="width:160px"/>
+  </div>
+  <div class="table-wrap">
+    <table id="installsTable">
+      <thead><tr>
+        <th>Rep</th><th>Venue</th><th>Address</th><th>Station</th><th>IMEI</th><th>Install Date</th><th>Status</th><th>Sheet</th>
+      </tr></thead>
+      <tbody id="installsBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════ ROI TRACKER TAB ═══════════════ -->
+<div class="view" id="view-roi">
+  <div class="roi-settings">
+    <label>Hardware Cost Override
+      <select id="hwOverride" onchange="renderROI()">
+        <option value="">Auto (by station)</option>
+        <option value="500">$500 flat</option>
+        <option value="400">$400 flat</option>
+        <option value="300">$300 flat</option>
+      </select>
+    </label>
+    <label>Min Revenue Threshold ($)
+      <input type="number" id="minRevenue" value="0" min="0" onchange="renderROI()"/>
+    </label>
+    <label class="script-url-wrap">Apps Script URL
+      <input type="text" id="scriptUrl" placeholder="Paste Apps Script URL…"/>
+    </label>
+    <button class="btn btn-primary btn-sm" onclick="loadData()">Load Data</button>
+    <div class="superset-badge" id="supersetBadge" onclick="openSupersetModal()">
+      <span class="superset-dot" id="supersetDot">🔴</span>
+      <span id="supersetLabel">Superset: Not connected</span>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div><div class="section-title">ROI Tracker</div><div class="section-sub" id="roiCount"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select id="roiFilterSheet" onchange="renderROI()" style="background:#1e2130;border:1px solid var(--border);color:#fff;padding:5px 10px;border-radius:6px;font-size:.8rem">
+        <option value="">All Sheets</option>
+      </select>
+      <select id="roiFilterStation" onchange="renderROI()" style="background:#1e2130;border:1px solid var(--border);color:#fff;padding:5px 10px;border-radius:6px;font-size:.8rem">
+        <option value="">All Stations</option>
+      </select>
+      <input type="text" id="roiSearch" placeholder="Search…" oninput="renderROI()" style="background:#1e2130;border:1px solid var(--border);color:#fff;padding:5px 10px;border-radius:6px;font-size:.8rem;width:140px"/>
+    </div>
+  </div>
+
+  <div class="roi-table-wrap">
+    <table id="roiTable">
+      <thead><tr>
+        <th>Rep</th><th>Venue</th><th>Station</th><th>IMEI</th>
+        <th>HW Cost</th><th>Commission</th><th>Total Invest</th>
+        <th>Revenue</th><th>Net ROI</th><th>ROI %</th><th>Progress</th><th>Status</th>
+      </tr></thead>
+      <tbody id="roiBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════
+const SHEET_NAMES = ['Full Time Rep - Install','1099 B - Rep Install','CN Installs - Onboarding'];
+const IS_1099 = '1099 B - Rep Install';
+const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbwBFt_n1Lm5N5lWpzmB4OwnTyuL0q59-binDi2n6mTrIL4MZK_c0eAol6CygH1w5iFT/exec';
+const COMMISSION_RATES = { A:400, B:300, C:200 };
+const HW_COSTS = { F15:500, F10:400, F5:300 };
+const DEFAULT_HW = 400;
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let allInstalls = [];
+let tierMap = {};       // IMEI → tier letter
+let supersetData = [];  // [{imei, revenue, venue}]
+let supersetSource = null;
+let supersetConnected = false;
+
+// ═══════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const tabs = ['overview','installs','roi'];
+  document.querySelectorAll('.tab')[tabs.indexOf(name)].classList.add('active');
+  document.getElementById('view-' + name).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+// SCRIPT URL
+// ═══════════════════════════════════════════════════
+function getScriptUrl() {
+  const v = document.getElementById('scriptUrl').value.trim();
+  return v || DEFAULT_URL;
+}
+
+// ═══════════════════════════════════════════════════
+// JSONP FETCH
+// ═══════════════════════════════════════════════════
+function fetchViaJsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = 'cb_' + Date.now();
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
+      delete window[cb];
+      script.remove();
+      reject(new Error('Timeout — check Apps Script URL'));
+    }, 30000);
+    window[cb] = (data) => {
+      clearTimeout(timer);
+      delete window[cb];
+      script.remove();
+      resolve(data);
+    };
+    const sep = url.includes('?') ? '&' : '?';
+    script.src = url + sep + 'callback=' + cb;
+    script.onerror = () => { clearTimeout(timer); delete window[cb]; script.remove(); reject(new Error('Script load failed — check Apps Script URL')); };
+    document.head.appendChild(script);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// LOAD DATA (main entry)
+// ═══════════════════════════════════════════════════
+async function loadData() {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.style.display = 'flex';
+  try {
+    const resp = await fetchViaJsonp(getScriptUrl());
+    if (!resp.ok) throw new Error(resp.error || 'Apps Script returned an error');
+    processData(resp);   // resp IS the data — ok, __tiers__, sheet names, __superset__ all at top level
+    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+  } catch(err) {
+    document.getElementById('overviewError').textContent = '⚠ ' + err.message;
+    document.getElementById('overviewError').style.display = 'block';
+  } finally {
+    overlay.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// PROCESS DATA
+// ═══════════════════════════════════════════════════
+function processData(resp) {
+  // Parse tier sheet
+  tierMap = {};
+  const tiers = resp['__tiers__'] || [];
+  if (tiers.length > 1) {
+    const hdr = tiers[0].map(h => String(h).toLowerCase().trim());
+    const imeiCol = hdr.findIndex(h => h.includes('imei'));
+    const tierCol = hdr.findIndex(h => h.includes('tier'));
+    for (let r = 1; r < tiers.length; r++) {
+      const imei = String(tiers[r][imeiCol] || '').trim();
+      const tier = String(tiers[r][tierCol] || '').trim().toUpperCase();
+      if (imei && tier) tierMap[imei] = tier;
+    }
+  }
+
+  // Parse install sheets
+  allInstalls = [];
+  SHEET_NAMES.forEach(name => {
+    if (!resp[name]) return;
+    const rows = parseSheet(resp[name], name);
+    allInstalls.push(...rows);
+  });
+
+  // Handle Superset data
+  if (resp['__superset__'] !== undefined) {
+    if (resp['__superset__']) {
+      supersetData = processSuperset(resp['__superset__']);
+      supersetSource = resp['__superset_source__'] || 'api';
+      supersetConnected = true;
+      updateSupersetBadge('connected', supersetSource === 'csv_tab' ? 'Superset: CSV Tab' : 'Superset: Live API');
+    } else {
+      // Key present but null — API failed
+      supersetConnected = false;
+      const errMsg = resp['__superset_error__'] || 'API error';
+      updateSupersetBadge('error', 'Superset: ' + errMsg.substring(0, 40));
+    }
+  } else {
+    // Key absent — old script not deployed yet
+    updateSupersetBadge('pending', 'Superset: Deploy script');
+  }
+
+  populateFilters();
+  renderOverview();
+  renderInstalls();
+  renderROI();
+  document.getElementById('overviewError').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════
+// PARSE SHEET
+// ═══════════════════════════════════════════════════
+function parseSheet(rows, sheetName) {
+  if (!rows || rows.length < 2) return [];
+  const hdr = rows[0].map(h => String(h).toLowerCase().trim());
+  const col = k => hdr.findIndex(h => h.includes(k));
+
+  const repCol      = col('rep');
+  const venueCol    = col('venue') !== -1 ? col('venue') : col('location');
+  const addrCol     = col('address');
+  const stationCol  = col('station');
+  const imeiCol     = col('imei');
+  const dateCol     = col('date') !== -1 ? col('date') : col('install');
+  const statusCol   = col('status');
+
+  const result = [];
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    if (row.every(c => !String(c).trim())) continue;
+    result.push({
+      rep:        String(row[repCol] ?? '').trim(),
+      venue:      String(row[venueCol] ?? '').trim(),
+      address:    String(row[addrCol] ?? '').trim(),
+      station:    normalizeStation(row[stationCol]),
+      imei:       String(row[imeiCol] ?? '').trim(),
+      installDate:formatDate(row[dateCol]),
+      status:     normalizeStatus(String(row[statusCol] ?? '').trim()),
+      sheet:      sheetName,
+      is1099:     sheetName === IS_1099
+    });
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════════════════
+// STATION NORMALIZATION
+// ═══════════════════════════════════════════════════
+function normalizeStation(s) {
+  if (s === null || s === undefined) return '';
+  const str = String(s).replace(/[\[\]"']/g,'').trim();
+  if (!str) return '';
+  if (/f15/i.test(str)) return 'F15';
+  if (/f10/i.test(str)) return 'F10';
+  if (/f5/i.test(str))  return 'F5';
+  return str.toUpperCase();
+}
+
+// ═══════════════════════════════════════════════════
+// STATUS NORMALIZATION
+// ═══════════════════════════════════════════════════
+function normalizeStatus(s) {
+  if (!s) return 'Unknown';
+  const l = s.toLowerCase();
+  if (l.includes('active') || l === 'live') return 'Active';
+  if (l.includes('inactive') || l.includes('removed') || l.includes('churned')) return 'Inactive';
+  if (l.includes('pending') || l.includes('install')) return 'Pending';
+  if (l.includes('onboard')) return 'Onboarding';
+  return s;
+}
+
+// ═══════════════════════════════════════════════════
+// DATE FORMAT
+// ═══════════════════════════════════════════════════
+function formatDate(v) {
+  if (!v) return '';
+  if (v instanceof Date) return v.toLocaleDateString();
+  const d = new Date(v);
+  if (!isNaN(d)) return d.toLocaleDateString();
+  return String(v);
+}
+
+// ═══════════════════════════════════════════════════
+// PROCESS SUPERSET DATA
+// ═══════════════════════════════════════════════════
+function processSuperset(raw) {
+  // raw is { result: [{ data: [{...rows}] }] }
+  try {
+    const rows = raw.result?.[0]?.data || [];
+    return rows.map(r => {
+      // Flexible key matching
+      const keys = Object.keys(r);
+      const get = (...terms) => {
+        const k = keys.find(k => terms.some(t => k.toLowerCase().includes(t)));
+        return k ? r[k] : undefined;
+      };
+      return {
+        imei:    String(get('imei','serial') || '').trim(),
+        venue:   String(get('venue','location','site','place') || '').trim(),
+        revenue: parseFloat(get('revenue','rental','amount','total') || 0) || 0,
+        station: normalizeStation(get('station','type','model','unit'))
+      };
+    }).filter(r => r.imei || r.venue);
+  } catch(e) {
+    console.warn('processSuperset error:', e);
+    return [];
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// REVENUE LOOKUP
+// ═══════════════════════════════════════════════════
+function getRevenue(install) {
+  if (!supersetConnected || !supersetData.length) return null;
+  // Match by IMEI first
+  if (install.imei) {
+    const match = supersetData.find(s => s.imei && s.imei === install.imei);
+    if (match) return match.revenue;
+  }
+  // Fall back to venue name fuzzy match
+  if (install.venue) {
+    const vl = install.venue.toLowerCase();
+    const match = supersetData.find(s => s.venue && s.venue.toLowerCase().includes(vl.substring(0,8)));
+    if (match) return match.revenue;
+  }
+  return 0;
+}
+
+// ═══════════════════════════════════════════════════
+// HARDWARE COST
+// ═══════════════════════════════════════════════════
+function getHWCost(install) {
+  const override = document.getElementById('hwOverride').value;
+  if (override) return parseFloat(override);
+  return HW_COSTS[install.station] || DEFAULT_HW;
+}
+
+// ═══════════════════════════════════════════════════
+// COMMISSION
+// ═══════════════════════════════════════════════════
+function getCommission(install) {
+  if (install.is1099) return 0;
+  const tier = tierMap[install.imei];
+  if (!tier) return 0;
+  return COMMISSION_RATES[tier] || 0;
+}
+
+// ═══════════════════════════════════════════════════
+// POPULATE FILTERS
+// ═══════════════════════════════════════════════════
+function populateFilters() {
+  const sheets  = [...new Set(allInstalls.map(i => i.sheet))];
+  const reps    = [...new Set(allInstalls.map(i => i.rep).filter(Boolean))].sort();
+  const stations= [...new Set(allInstalls.map(i => i.station).filter(Boolean))].sort();
+  const statuses= [...new Set(allInstalls.map(i => i.status).filter(Boolean))].sort();
+
+  const fill = (id, arr) => {
+    const el = document.getElementById(id);
+    const cur = el.value;
+    el.innerHTML = '<option value="">All</option>' + arr.map(v => `<option value="${v}">${v}</option>`).join('');
+    if (arr.includes(cur)) el.value = cur;
+  };
+
+  fill('filterSheet', sheets);
+  fill('filterRep', reps);
+  fill('filterStation', stations);
+  fill('filterStatus', statuses);
+  fill('roiFilterSheet', sheets);
+  fill('roiFilterStation', stations);
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER OVERVIEW
+// ═══════════════════════════════════════════════════
+function renderOverview() {
+  const total = allInstalls.length;
+  const active = allInstalls.filter(i => i.status === 'Active').length;
+  const reps = new Set(allInstalls.map(i => i.rep).filter(Boolean)).size;
+  const totalComm = allInstalls.reduce((s,i) => s + getCommission(i), 0);
+  const f15 = allInstalls.filter(i => i.station === 'F15').length;
+  const f10 = allInstalls.filter(i => i.station === 'F10').length;
+
+  let totalRev = null;
+  if (supersetConnected) {
+    totalRev = supersetData.reduce((s,r) => s + (r.revenue || 0), 0);
+  }
+
+  document.getElementById('kpi-total').textContent = total;
+  document.getElementById('kpi-active').textContent = active;
+  document.getElementById('kpi-reps').textContent = reps;
+  document.getElementById('kpi-commission').textContent = '$' + totalComm.toLocaleString();
+  document.getElementById('kpi-revenue').textContent = totalRev !== null ? '$' + totalRev.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+  document.getElementById('kpi-revenue-sub').textContent = supersetSource === 'csv_tab' ? 'Source: CSV Tab' : supersetSource === 'api' ? 'Source: Live API' : 'Connect Superset';
+  document.getElementById('kpi-f15').textContent = f15;
+  document.getElementById('kpi-f10').textContent = f10;
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER INSTALLS
+// ═══════════════════════════════════════════════════
+function renderInstalls() {
+  const sheetF  = document.getElementById('filterSheet').value;
+  const repF    = document.getElementById('filterRep').value;
+  const stationF= document.getElementById('filterStation').value;
+  const statusF = document.getElementById('filterStatus').value;
+  const search  = document.getElementById('filterSearch').value.toLowerCase();
+
+  const filtered = allInstalls.filter(i => {
+    if (sheetF   && i.sheet   !== sheetF)   return false;
+    if (repF     && i.rep     !== repF)     return false;
+    if (stationF && i.station !== stationF) return false;
+    if (statusF  && i.status  !== statusF)  return false;
+    if (search && ![i.rep,i.venue,i.address,i.imei].join(' ').toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  document.getElementById('installsCount').textContent = `${filtered.length} of ${allInstalls.length} installs`;
+
+  const statusBadge = s => {
+    const map = { Active:'badge-green', Inactive:'badge-red', Pending:'badge-yellow', Onboarding:'badge-blue' };
+    return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+  };
+
+  document.getElementById('installsBody').innerHTML = filtered.map(i => `
+    <tr>
+      <td>${i.rep||'—'}</td>
+      <td>${i.venue||'—'}</td>
+      <td style="font-size:.75rem;color:var(--muted)">${i.address||'—'}</td>
+      <td><span class="badge badge-blue">${i.station||'—'}</span></td>
+      <td style="font-family:monospace;font-size:.77rem">${i.imei||'—'}</td>
+      <td>${i.installDate||'—'}</td>
+      <td>${statusBadge(i.status)}</td>
+      <td style="font-size:.72rem;color:var(--muted)">${i.sheet}</td>
+    </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">No installs found</td></tr>';
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER ROI
+// ═══════════════════════════════════════════════════
+function renderROI() {
+  const sheetF   = document.getElementById('roiFilterSheet').value;
+  const stationF = document.getElementById('roiFilterStation').value;
+  const search   = document.getElementById('roiSearch').value.toLowerCase();
+  const minRev   = parseFloat(document.getElementById('minRevenue').value) || 0;
+
+  const filtered = allInstalls.filter(i => {
+    if (sheetF   && i.sheet   !== sheetF)   return false;
+    if (stationF && i.station !== stationF) return false;
+    if (search && ![i.rep,i.venue,i.imei].join(' ').toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const rows = filtered.map(i => {
+    const hw   = getHWCost(i);
+    const comm = getCommission(i);
+    const inv  = hw + comm;
+    const rev  = getRevenue(i);
+    const net  = rev !== null ? rev - inv : null;
+    const pct  = (inv > 0 && rev !== null) ? (rev / inv * 100) : null;
+    return { ...i, hw, comm, inv, rev, net, pct };
+  }).filter(i => (i.rev === null ? true : i.rev >= minRev));
+
+  document.getElementById('roiCount').textContent = `${rows.length} installs`;
+
+  const fmt = v => v !== null && v !== undefined ? '$' + Math.abs(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+  const fmtPct = v => v !== null && v !== undefined ? v.toFixed(1) + '%' : '—';
+
+  const progressBar = pct => {
+    if (pct === null) return '—';
+    const fill = Math.min(100, Math.max(0, pct));
+    const color = pct >= 100 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
+    return `<div style="display:flex;align-items:center;gap:6px">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${fill}%;background:${color}"></div></div>
+      <span style="font-size:.72rem;color:var(--muted)">${fmtPct(pct)}</span>
+    </div>`;
+  };
+
+  const roiStatus = (net, rev) => {
+    if (rev === null) return `<span class="badge badge-gray">No Revenue Yet</span>`;
+    if (net >= 0)    return `<span class="badge badge-green">ROI Positive</span>`;
+    if (net >= -200) return `<span class="badge badge-yellow">Near Breakeven</span>`;
+    return `<span class="badge badge-red">Negative ROI</span>`;
+  };
+
+  document.getElementById('roiBody').innerHTML = rows.map(i => `
+    <tr>
+      <td>${i.rep||'—'}</td>
+      <td>${i.venue||'—'}</td>
+      <td><span class="badge badge-blue">${i.station||'—'}</span></td>
+      <td style="font-family:monospace;font-size:.75rem">${i.imei||'—'}</td>
+      <td>${fmt(i.hw)}</td>
+      <td>${i.comm ? fmt(i.comm) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td style="font-weight:600">${fmt(i.inv)}</td>
+      <td style="color:${i.rev===null?'var(--muted)':i.rev>=i.inv?'#10b981':'#f59e0b'}">${fmt(i.rev)}</td>
+      <td style="color:${i.net===null?'var(--muted)':i.net>=0?'#10b981':'#ef4444'};font-weight:600">${i.net!==null?(i.net>=0?'+':'-')+fmt(i.net):'—'}</td>
+      <td>${fmtPct(i.pct)}</td>
+      <td>${progressBar(i.pct)}</td>
+      <td>${roiStatus(i.net, i.rev)}</td>
+    </tr>`).join('') || '<tr><td colspan="12" style="text-align:center;color:var(--muted);padding:24px">No data</td></tr>';
+}
+
+// ═══════════════════════════════════════════════════
+// SUPERSET BADGE
+// ═══════════════════════════════════════════════════
+function updateSupersetBadge(state, label) {
+  const dot = document.getElementById('supersetDot');
+  const lbl = document.getElementById('supersetLabel');
+  const badge = document.getElementById('supersetBadge');
+  const dotMap = { connected:'🟢', pending:'🟡', error:'🔴' };
+  dot.textContent = dotMap[state] || '🔴';
+  lbl.textContent = label;
+  badge.title = label;
+}
+
+function openSupersetModal() {
+  document.getElementById('supersetModal').classList.add('open');
+}
+
+async function doConnectSuperset() {
+  const url  = document.getElementById('spUrl').value.trim();
+  const user = document.getElementById('spUser').value.trim();
+  const pass = document.getElementById('spPass').value.trim();
+  const status = document.getElementById('spStatus');
+  status.style.display = 'block';
+  status.style.background = '#1e3a5f';
+  status.style.color = '#93c5fd';
+  status.textContent = 'Connecting…';
+  try {
+    const resp = await fetch(url + '/api/v1/security/login', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ username:user, password:pass, provider:'db', refresh:true })
+    });
+    if (!resp.ok) throw new Error('Login failed: ' + resp.status);
+    const { access_token } = await resp.json();
+    status.style.background = '#064e3b';
+    status.style.color = '#6ee7b7';
+    status.textContent = '✓ Connected! Revenue data will load on next refresh.';
+    updateSupersetBadge('connected', 'Superset: Connected');
+    document.getElementById('supersetModal').classList.remove('open');
+  } catch(e) {
+    status.style.background = '#450a0a';
+    status.style.color = '#fca5a5';
+    status.textContent = '✗ ' + e.message + ' — Use the Apps Script middleware instead.';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('scriptUrl').value = DEFAULT_URL;
+  loadData();
+});
+</script>
+</body>
+</html>
