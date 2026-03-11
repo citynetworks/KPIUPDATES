@@ -1123,20 +1123,19 @@ function renderROI(){
     return 0;
   });
 
-  const all=buildROIRows();
-  const totRev   =all.reduce((s,r)=>s+r.rev,0);
-  const totAdRev =all.reduce((s,r)=>s+(r.adRev||0),0);
-  const totTotal =all.reduce((s,r)=>s+(r.totalRev||0),0);
-  const totPayout=all.reduce((s,r)=>s+(r.venuePayout||0),0);
-  document.getElementById('roi-kpi-total').textContent    = all.length.toLocaleString();
+  const totRev   =rows.reduce((s,r)=>s+r.rev,0);
+  const totAdRev =rows.reduce((s,r)=>s+(r.adRev||0),0);
+  const totTotal =rows.reduce((s,r)=>s+(r.totalRev||0),0);
+  const totPayout=rows.reduce((s,r)=>s+(r.venuePayout||0),0);
+  document.getElementById('roi-kpi-total').textContent    = rows.length.toLocaleString();
   document.getElementById('roi-kpi-rev').textContent      = fmtK(totRev);
   document.getElementById('roi-kpi-adrev').textContent    = fmtK(totAdRev);
   document.getElementById('roi-kpi-totalrev').textContent = fmtK(totTotal);
   document.getElementById('roi-kpi-payout').textContent   = fmtK(totPayout);
-  document.getElementById('roi-kpi-prof').textContent     = all.filter(r=>r.roiState==='profitable').length.toLocaleString();
+  document.getElementById('roi-kpi-prof').textContent     = rows.filter(r=>r.roiState==='profitable').length.toLocaleString();
 
   if(spData.length>0){
-    const topV=[...all].sort((a,b)=>b.totalRev-a.totalRev).slice(0,8);
+    const topV=[...rows].sort((a,b)=>b.totalRev-a.totalRev).slice(0,8);
     const maxV=topV[0]?.totalRev||1;
     document.getElementById('venueChart').innerHTML=topV.map(r=>`
       <div class="bar-row">
@@ -1229,10 +1228,9 @@ function renderPayout(){
     return 0;
   });
 
-  // KPI cards
-  const allRows=buildROIRows();
-  const totRent  =allRows.reduce((s,r)=>s+(r.rev||0),0);
-  const totAd    =allRows.reduce((s,r)=>s+(r.adRev||0),0);
+  // KPI cards — use filtered rows so totals match the current search
+  const totRent  =rows.reduce((s,r)=>s+r.rentRev,0);
+  const totAd    =rows.reduce((s,r)=>s+r.adRev,0);
   const totRentPay=totRent*rentPct;
   const totAdPay  =totAd*adPct;
   document.getElementById('pay-kpi-rent').textContent    =fmtK(totRent);
