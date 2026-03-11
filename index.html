@@ -129,6 +129,81 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
 .payout-split-val{font-weight:700;color:var(--text)}
 .payout-total-row{border-top:1px solid var(--border);padding-top:8px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:700}
 .teal{color:var(--teal)}
+
+/* ── RM DASHBOARD STYLES ── */
+.rm-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+.rm-tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;align-items:center;gap:7px}
+.rm-tab:hover{color:var(--text)}
+.rm-tab.active{color:var(--cf-blue);border-bottom-color:var(--cf-blue)}
+.rm-tab.santi.active{color:#8B5CF6;border-bottom-color:#8B5CF6}
+.rm-tab.shamel.active{color:#0D9488;border-bottom-color:#0D9488}
+.rm-panel{display:none}.rm-panel.active{display:block}
+
+.rm-header{border-radius:12px;padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.rm-header.santi{background:linear-gradient(135deg,#1E1040 0%,#2D1B69 100%);border-left:4px solid #8B5CF6}
+.rm-header.shamel{background:linear-gradient(135deg,#042F2E 0%,#0D3D3A 100%);border-left:4px solid #0D9488}
+.rm-name{font-size:20px;font-weight:800;color:#fff}
+.rm-role{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px;letter-spacing:.8px;text-transform:uppercase}
+.rm-markets{display:flex;gap:6px;flex-wrap:wrap}
+.rm-market-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.8)}
+
+.kpi-row-rm{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px}
+.kpi-rm{background:var(--card);border-radius:12px;padding:16px 18px;box-shadow:0 1px 6px rgba(0,0,0,.07);position:relative;overflow:hidden}
+.kpi-rm::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-rm.santi::before{background:linear-gradient(90deg,#8B5CF6,#6D28D9)}
+.kpi-rm.shamel::before{background:linear-gradient(90deg,#0D9488,#0F766E)}
+.kpi-rm-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px}
+.kpi-rm-value{font-size:26px;font-weight:800;line-height:1.1}
+.kpi-rm-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.kpi-rm-weight{font-size:10px;font-weight:700;position:absolute;top:12px;right:12px;padding:2px 7px;border-radius:10px;background:#F1F5F9;color:var(--muted)}
+
+/* Pacing bars */
+.pace-section{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 6px rgba(0,0,0,.07);margin-bottom:18px}
+.pace-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+.pace-subtitle{font-size:11px;color:var(--muted);margin-bottom:16px}
+.pace-kpi{margin-bottom:16px}
+.pace-kpi:last-child{margin-bottom:0}
+.pace-kpi-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.pace-kpi-label{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px}
+.pace-kpi-weight{font-size:10px;font-weight:600;color:var(--muted);background:#F1F5F9;padding:2px 7px;border-radius:8px}
+.pace-nums{font-size:12px;font-weight:700}
+.pace-track{height:12px;background:#E9EFF6;border-radius:6px;overflow:hidden;margin-bottom:4px}
+.pace-fill{height:100%;border-radius:6px;transition:width .5s ease;position:relative}
+.pace-fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.15) 0,rgba(255,255,255,.15) 6px,transparent 6px,transparent 12px)}
+.pace-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+.pace-status{font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px}
+.pace-on{background:#F0FDF4;color:#15803D}
+.pace-warn{background:#FFFBEB;color:#B45309}
+.pace-behind{background:#FEF2F2;color:#B91C1C}
+.pace-hit{background:#EFF6FF;color:#1D4ED8}
+
+/* Bonus pacing card */
+.bonus-pace{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 6px rgba(0,0,0,.07);margin-bottom:18px}
+.bonus-pace-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.bonus-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:12px}
+.bonus-row:last-child{border-bottom:none;padding-bottom:0}
+.bonus-kpi-name{font-size:13px;font-weight:600;color:var(--text);flex:1}
+.bonus-kpi-target{font-size:12px;color:var(--muted)}
+.bonus-kpi-status{font-size:12px;font-weight:700}
+.bonus-earned{font-size:14px;font-weight:800;color:var(--green);text-align:right;min-width:60px}
+.bonus-total-row{background:#F8FAFF;border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.bonus-total-label{font-size:13px;font-weight:700;color:var(--text)}
+.bonus-total-val{font-size:18px;font-weight:800;color:var(--green)}
+
+/* Rep roster table per DMA */
+.dma-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:18px}
+.dma-card{background:var(--card);border-radius:12px;padding:16px 18px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.dma-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dma-card-name{font-size:14px;font-weight:700;color:var(--text)}
+.dma-rep-count{font-size:22px;font-weight:800}
+.dma-rep-target{font-size:11px;color:var(--muted);margin-top:2px}
+.dma-rep-bar-bg{height:8px;border-radius:4px;background:#E9EFF6;overflow:hidden;margin:8px 0}
+.dma-rep-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.dma-rep-list{font-size:12px;color:var(--muted);max-height:100px;overflow-y:auto;line-height:1.8}
+.dma-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+
+/* General tracker tab styling */
+.gen-tracker-note{background:rgba(26,110,255,.06);border:1px solid rgba(26,110,255,.15);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--cf-blue);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 </style>
 </head>
 <body>
@@ -153,6 +228,7 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
   <div class="nav-btn active" id="tab-placement" onclick="switchTab('placement')">📋 Placement Tracker</div>
   <div class="nav-btn" id="tab-roi" onclick="switchTab('roi')">📊 ROI Tracker</div>
   <div class="nav-btn" id="tab-payout" onclick="switchTab('payout')">💸 Payout Calculator</div>
+  <div class="nav-btn" id="tab-rm" onclick="switchTab('rm')" style="border-left:1px solid rgba(255,255,255,.08);margin-left:8px;padding-left:22px">🎯 RM Dashboards</div>
 </nav>
 
 <!-- Settings bar: all 5 station types + 3 commission tiers -->
@@ -319,6 +395,372 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
       <tbody id="payoutBody"></tbody>
     </table>
   </div>
+</div>
+
+<!-- ═══ RM DASHBOARDS ═══ -->
+<div id="view-rm" class="view">
+
+  <!-- Sub-tabs -->
+  <div class="rm-tabs">
+    <div class="rm-tab active" id="rmtab-general" onclick="switchRMTab('general')">🌐 General Tracker</div>
+    <div class="rm-tab santi" id="rmtab-santi" onclick="switchRMTab('santi')">🟣 Santi — West / South</div>
+    <div class="rm-tab shamel" id="rmtab-shamel" onclick="switchRMTab('shamel')">🟢 Shamel — East Coast</div>
+  </div>
+
+  <!-- GENERAL TRACKER PANEL -->
+  <div id="rmpanel-general" class="rm-panel active">
+    <div class="gen-tracker-note">ℹ️ All installs across every DMA roll up here. Installs within Santi or Shamel's territories also appear in their respective tabs.</div>
+    <div class="kpi-row" style="margin-bottom:18px">
+      <div class="kpi"><div class="kpi-label">Total Installs</div><div class="kpi-value blue" id="gen-total">—</div><div class="kpi-sub">all DMAs combined</div></div>
+      <div class="kpi"><div class="kpi-label">Active Stations</div><div class="kpi-value green" id="gen-active">—</div><div class="kpi-sub">live across network</div></div>
+      <div class="kpi"><div class="kpi-label">Network Churn</div><div class="kpi-value" id="gen-churn" style="color:var(--orange)">—</div><div class="kpi-sub">inactive / total</div></div>
+      <div class="kpi"><div class="kpi-label">Total Active Reps</div><div class="kpi-value purple" id="gen-reps">—</div><div class="kpi-sub">unique across all regions</div></div>
+      <div class="kpi"><div class="kpi-label">Santi Territory</div><div class="kpi-value" id="gen-santi-installs" style="color:#8B5CF6">—</div><div class="kpi-sub">LA · Miami · TX · SF</div></div>
+      <div class="kpi"><div class="kpi-label">Shamel Territory</div><div class="kpi-value" id="gen-shamel-installs" style="color:#0D9488">—</div><div class="kpi-sub">NYC · Chicago</div></div>
+    </div>
+    <div class="sec-header">
+      <div class="sec-title" style="color:#fff">📋 All Installs</div>
+      <div class="sec-right">
+        <div class="search-wrap"><input class="search-input" id="genSearch" placeholder="Search venue, rep, market…" oninput="renderGeneral()"/></div>
+        <select class="fsel" id="genDMA" onchange="renderGeneral()">
+          <option value="">All DMAs</option>
+          <option value="santi">Santi's Markets</option>
+          <option value="shamel">Shamel's Markets</option>
+        </select>
+        <select class="fsel" id="genStatus" onchange="renderGeneral()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="signed">Signed</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="tcard">
+      <table>
+        <thead><tr><th>VENUE</th><th>REP</th><th>MARKET / DMA</th><th>STATUS</th><th>STATION</th><th>SIGNED</th><th>TERRITORY</th></tr></thead>
+        <tbody id="genBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SANTI PANEL -->
+  <div id="rmpanel-santi" class="rm-panel">
+    <div class="rm-header santi">
+      <div>
+        <div class="rm-name">Santi</div>
+        <div class="rm-role">West / South Regional Manager · 1099</div>
+      </div>
+      <div class="rm-markets">
+        <span class="rm-market-pill">🌴 Los Angeles</span>
+        <span class="rm-market-pill">🌊 Miami</span>
+        <span class="rm-market-pill">⭐ Texas (ATX / Houston)</span>
+        <span class="rm-market-pill">🌉 San Francisco</span>
+      </div>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="kpi-row-rm">
+      <div class="kpi-rm santi">
+        <div class="kpi-rm-weight">40%</div>
+        <div class="kpi-rm-label">Net New Installs</div>
+        <div class="kpi-rm-value" id="santi-installs" style="color:#8B5CF6">—</div>
+        <div class="kpi-rm-sub">target: 100/mo · 300/qtr</div>
+      </div>
+      <div class="kpi-rm santi">
+        <div class="kpi-rm-weight">35%</div>
+        <div class="kpi-rm-label">Active Reps</div>
+        <div class="kpi-rm-value" id="santi-reps" style="color:#8B5CF6">—</div>
+        <div class="kpi-rm-sub">target: 10 per DMA (40 total)</div>
+      </div>
+      <div class="kpi-rm santi">
+        <div class="kpi-rm-weight">25%</div>
+        <div class="kpi-rm-label">Churn Rate</div>
+        <div class="kpi-rm-value" id="santi-churn" style="color:#8B5CF6">—</div>
+        <div class="kpi-rm-sub">target: under 8%</div>
+      </div>
+      <div class="kpi-rm santi">
+        <div class="kpi-rm-label">Active Stations</div>
+        <div class="kpi-rm-value" id="santi-active" style="color:var(--green)">—</div>
+        <div class="kpi-rm-sub">live across 4 markets</div>
+      </div>
+      <div class="kpi-rm santi">
+        <div class="kpi-rm-label">Santi's Own Installs</div>
+        <div class="kpi-rm-value" id="santi-personal-installs" style="color:#F59E0B">—</div>
+        <div class="kpi-rm-sub">closed personally as rep</div>
+      </div>
+    </div>
+
+    <!-- Pacing tracker -->
+    <div class="pace-section">
+      <div class="pace-title">📈 Monthly Bonus Pacing <span id="santi-pace-period" style="font-size:11px;font-weight:500;color:var(--muted)"></span></div>
+      <div class="pace-subtitle">Based on current data vs monthly targets · Bonus pool: $750/mo</div>
+      <div class="pace-kpi">
+        <div class="pace-kpi-header">
+          <div class="pace-kpi-label">📦 Net New Installs <span class="pace-kpi-weight">40% · $300</span></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pace-nums" id="santi-pace-install-nums">— / 100</span>
+            <span class="pace-status" id="santi-pace-install-status">—</span>
+          </div>
+        </div>
+        <div class="pace-track"><div class="pace-fill" id="santi-pace-install-bar" style="background:#8B5CF6;width:0%"></div></div>
+        <div class="pace-meta"><span>0</span><span>Target: 100</span></div>
+      </div>
+      <div class="pace-kpi">
+        <div class="pace-kpi-header">
+          <div class="pace-kpi-label">👥 Active Reps Per DMA <span class="pace-kpi-weight">35% · $263</span></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pace-nums" id="santi-pace-reps-nums">— / 40</span>
+            <span class="pace-status" id="santi-pace-reps-status">—</span>
+          </div>
+        </div>
+        <div class="pace-track"><div class="pace-fill" id="santi-pace-reps-bar" style="background:#8B5CF6;width:0%"></div></div>
+        <div class="pace-meta"><span>0</span><span>Target: 10 per DMA</span></div>
+      </div>
+      <div class="pace-kpi">
+        <div class="pace-kpi-header">
+          <div class="pace-kpi-label">🔄 Churn Rate <span class="pace-kpi-weight">25% · $188</span></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pace-nums" id="santi-pace-churn-nums">—</span>
+            <span class="pace-status" id="santi-pace-churn-status">—</span>
+          </div>
+        </div>
+        <div class="pace-track"><div class="pace-fill" id="santi-pace-churn-bar" style="background:#8B5CF6;width:0%"></div></div>
+        <div class="pace-meta"><span>Best: 0%</span><span>Max OK: 8%</span></div>
+      </div>
+    </div>
+
+    <!-- Monthly bonus earned -->
+    <div class="bonus-pace">
+      <div class="bonus-pace-title">💰 Estimated Monthly Bonus Earned</div>
+      <div class="bonus-row">
+        <div class="bonus-kpi-name">Net New Installs</div>
+        <div class="bonus-kpi-target">Target: 100 installs</div>
+        <div class="bonus-earned" id="santi-bonus-install">—</div>
+      </div>
+      <div class="bonus-row">
+        <div class="bonus-kpi-name">Active Reps Per DMA</div>
+        <div class="bonus-kpi-target">Target: 10 per market</div>
+        <div class="bonus-earned" id="santi-bonus-reps">—</div>
+      </div>
+      <div class="bonus-row">
+        <div class="bonus-kpi-name">Churn Rate</div>
+        <div class="bonus-kpi-target">Target: &lt; 8%</div>
+        <div class="bonus-earned" id="santi-bonus-churn">—</div>
+      </div>
+      <div class="bonus-total-row">
+        <div class="bonus-total-label">Monthly Bonus (est.)</div>
+        <div class="bonus-total-val" id="santi-bonus-total">—</div>
+      </div>
+    </div>
+
+    <!-- Santi personal installs -->
+    <div class="sec-header">
+      <div class="sec-title" style="color:#fff">⚡ Santi's Personal Installs <span id="santi-personal-count" style="font-size:12px;font-weight:500;color:var(--muted);margin-left:6px"></span></div>
+      <div class="sec-right">
+        <select class="fsel" id="santiPersonalStatus" onchange="renderSantiPersonal()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="signed">Signed</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="tcard" style="margin-bottom:18px">
+      <table>
+        <thead><tr><th>VENUE</th><th>MARKET</th><th>STATUS</th><th>STATION</th><th>TIER</th><th>COMMISSION</th><th>SIGNED</th><th>SCHEDULED</th></tr></thead>
+        <tbody id="santiPersonalBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Rep roster by DMA -->
+    <div class="sec-header"><div class="sec-title" style="color:#fff">👥 Rep Roster by DMA</div></div>
+    <div class="dma-grid" id="santi-dma-grid"></div>
+
+    <!-- Installs table -->
+    <div class="sec-header">
+      <div class="sec-title" style="color:#fff">📋 Territory Installs</div>
+      <div class="sec-right">
+        <div class="search-wrap"><input class="search-input" id="santiSearch" placeholder="Search venue or rep…" oninput="renderSantiInstalls()"/></div>
+        <select class="fsel" id="santiMarket" onchange="renderSantiInstalls()">
+          <option value="">All Markets</option>
+          <option value="los angeles">Los Angeles</option>
+          <option value="miami">Miami</option>
+          <option value="texas">Texas (ATX / Houston)</option>
+          <option value="san francisco">San Francisco</option>
+        </select>
+        <select class="fsel" id="santiStatus" onchange="renderSantiInstalls()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="signed">Signed</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="tcard">
+      <table>
+        <thead><tr><th>VENUE</th><th>REP</th><th>MARKET</th><th>STATUS</th><th>STATION</th><th>SIGNED</th><th>SCHEDULED</th></tr></thead>
+        <tbody id="santiBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SHAMEL PANEL -->
+  <div id="rmpanel-shamel" class="rm-panel">
+    <div class="rm-header shamel">
+      <div>
+        <div class="rm-name">Shamel</div>
+        <div class="rm-role">East Coast Regional Manager · 1099</div>
+      </div>
+      <div class="rm-markets">
+        <span class="rm-market-pill">🗽 New York City</span>
+        <span class="rm-market-pill">🏙️ Chicago</span>
+      </div>
+    </div>
+
+    <div class="kpi-row-rm">
+      <div class="kpi-rm shamel">
+        <div class="kpi-rm-weight">40%</div>
+        <div class="kpi-rm-label">Net New Installs</div>
+        <div class="kpi-rm-value" id="shamel-installs" style="color:#0D9488">—</div>
+        <div class="kpi-rm-sub">target: 75/mo · 225/qtr</div>
+      </div>
+      <div class="kpi-rm shamel">
+        <div class="kpi-rm-weight">35%</div>
+        <div class="kpi-rm-label">Active Reps</div>
+        <div class="kpi-rm-value" id="shamel-reps" style="color:#0D9488">—</div>
+        <div class="kpi-rm-sub">target: 10 per DMA (20 total)</div>
+      </div>
+      <div class="kpi-rm shamel">
+        <div class="kpi-rm-weight">25%</div>
+        <div class="kpi-rm-label">Churn Rate</div>
+        <div class="kpi-rm-value" id="shamel-churn" style="color:#0D9488">—</div>
+        <div class="kpi-rm-sub">target: under 8%</div>
+      </div>
+      <div class="kpi-rm shamel">
+        <div class="kpi-rm-label">Active Stations</div>
+        <div class="kpi-rm-value" id="shamel-active" style="color:var(--green)">—</div>
+        <div class="kpi-rm-sub">live across 2 markets</div>
+      </div>
+      <div class="kpi-rm shamel">
+        <div class="kpi-rm-label">Shamel's Own Installs</div>
+        <div class="kpi-rm-value" id="shamel-personal-installs" style="color:#F59E0B">—</div>
+        <div class="kpi-rm-sub">closed personally as rep</div>
+      </div>
+    </div>
+
+    <div class="pace-section">
+      <div class="pace-title">📈 Monthly Bonus Pacing <span id="shamel-pace-period" style="font-size:11px;font-weight:500;color:var(--muted)"></span></div>
+      <div class="pace-subtitle">Based on current data vs monthly targets · Bonus pool: $583/mo</div>
+      <div class="pace-kpi">
+        <div class="pace-kpi-header">
+          <div class="pace-kpi-label">📦 Net New Installs <span class="pace-kpi-weight">40% · $233</span></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pace-nums" id="shamel-pace-install-nums">— / 75</span>
+            <span class="pace-status" id="shamel-pace-install-status">—</span>
+          </div>
+        </div>
+        <div class="pace-track"><div class="pace-fill" id="shamel-pace-install-bar" style="background:#0D9488;width:0%"></div></div>
+        <div class="pace-meta"><span>0</span><span>Target: 75</span></div>
+      </div>
+      <div class="pace-kpi">
+        <div class="pace-kpi-header">
+          <div class="pace-kpi-label">👥 Active Reps Per DMA <span class="pace-kpi-weight">35% · $204</span></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pace-nums" id="shamel-pace-reps-nums">— / 20</span>
+            <span class="pace-status" id="shamel-pace-reps-status">—</span>
+          </div>
+        </div>
+        <div class="pace-track"><div class="pace-fill" id="shamel-pace-reps-bar" style="background:#0D9488;width:0%"></div></div>
+        <div class="pace-meta"><span>0</span><span>Target: 10 per DMA</span></div>
+      </div>
+      <div class="pace-kpi">
+        <div class="pace-kpi-header">
+          <div class="pace-kpi-label">🔄 Churn Rate <span class="pace-kpi-weight">25% · $146</span></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pace-nums" id="shamel-pace-churn-nums">—</span>
+            <span class="pace-status" id="shamel-pace-churn-status">—</span>
+          </div>
+        </div>
+        <div class="pace-track"><div class="pace-fill" id="shamel-pace-churn-bar" style="background:#0D9488;width:0%"></div></div>
+        <div class="pace-meta"><span>Best: 0%</span><span>Max OK: 8%</span></div>
+      </div>
+    </div>
+
+    <div class="bonus-pace">
+      <div class="bonus-pace-title">💰 Estimated Monthly Bonus Earned</div>
+      <div class="bonus-row">
+        <div class="bonus-kpi-name">Net New Installs</div>
+        <div class="bonus-kpi-target">Target: 75 installs</div>
+        <div class="bonus-earned" id="shamel-bonus-install">—</div>
+      </div>
+      <div class="bonus-row">
+        <div class="bonus-kpi-name">Active Reps Per DMA</div>
+        <div class="bonus-kpi-target">Target: 10 per market</div>
+        <div class="bonus-earned" id="shamel-bonus-reps">—</div>
+      </div>
+      <div class="bonus-row">
+        <div class="bonus-kpi-name">Churn Rate</div>
+        <div class="bonus-kpi-target">Target: &lt; 8%</div>
+        <div class="bonus-earned" id="shamel-bonus-churn">—</div>
+      </div>
+      <div class="bonus-total-row">
+        <div class="bonus-total-label">Monthly Bonus (est.)</div>
+        <div class="bonus-total-val" id="shamel-bonus-total">—</div>
+      </div>
+    </div>
+
+    <!-- Shamel personal installs -->
+    <div class="sec-header">
+      <div class="sec-title" style="color:#fff">⚡ Shamel's Personal Installs <span id="shamel-personal-count" style="font-size:12px;font-weight:500;color:var(--muted);margin-left:6px"></span></div>
+      <div class="sec-right">
+        <select class="fsel" id="shamelPersonalStatus" onchange="renderShamelPersonal()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="signed">Signed</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="tcard" style="margin-bottom:18px">
+      <table>
+        <thead><tr><th>VENUE</th><th>MARKET</th><th>STATUS</th><th>STATION</th><th>TIER</th><th>COMMISSION</th><th>SIGNED</th><th>SCHEDULED</th></tr></thead>
+        <tbody id="shamelPersonalBody"></tbody>
+      </table>
+    </div>
+
+    <div class="sec-header"><div class="sec-title" style="color:#fff">👥 Rep Roster by DMA</div></div>
+    <div class="dma-grid" id="shamel-dma-grid"></div>
+
+    <div class="sec-header">
+      <div class="sec-title" style="color:#fff">📋 Territory Installs</div>
+      <div class="sec-right">
+        <div class="search-wrap"><input class="search-input" id="shamelSearch" placeholder="Search venue or rep…" oninput="renderShamelInstalls()"/></div>
+        <select class="fsel" id="shamelMarket" onchange="renderShamelInstalls()">
+          <option value="">All Markets</option>
+          <option value="new york">New York</option>
+          <option value="chicago">Chicago</option>
+        </select>
+        <select class="fsel" id="shamelStatus" onchange="renderShamelInstalls()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="signed">Signed</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="tcard">
+      <table>
+        <thead><tr><th>VENUE</th><th>REP</th><th>MARKET</th><th>STATUS</th><th>STATION</th><th>SIGNED</th><th>SCHEDULED</th></tr></thead>
+        <tbody id="shamelBody"></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <!-- Fallback modal -->
@@ -938,6 +1380,7 @@ function processData(resp){
 
   renderPlacements();
   renderROI();
+  renderRM();
 }
 
 // ── PLACEMENT TRACKER ────────────────────────────────────────────────
@@ -1147,7 +1590,7 @@ function renderROI(){
       </div>`).join('')||'<div style="color:var(--muted);font-size:13px">No data</div>';
 
     const mktMap={};
-    all.forEach(r=>{ const m=r.market||'Unknown'; mktMap[m]=(mktMap[m]||0)+(r.totalRev||0); });
+    rows.forEach(r=>{ const m=r.market||'Unknown'; mktMap[m]=(mktMap[m]||0)+(r.totalRev||0); });
     const topM=Object.entries(mktMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
     const maxM=topM[0]?.[1]||1;
     document.getElementById('marketChart').innerHTML=topM.map(([m,v])=>`
@@ -1268,6 +1711,7 @@ function switchTab(tab){
   document.getElementById('view-'+tab).classList.add('active');
   document.getElementById('tab-'+tab).classList.add('active');
   if(tab==='payout') renderPayout();
+  if(tab==='rm') renderRM();
 }
 function toggleDebug(){
   const b=document.getElementById('debugBar');
@@ -1302,6 +1746,378 @@ function loadData(url){
 }
 function showFileFallback(){ document.getElementById('fallbackModal').style.display='flex'; document.getElementById('urlInput').value=DEFAULT_URL; }
 function loadFromUrl(){ const u=document.getElementById('urlInput').value.trim(); document.getElementById('fallbackModal').style.display='none'; if(u) loadData(u); }
+
+// ── RM DASHBOARD ─────────────────────────────────────────────────────
+
+// DMA membership — match against install.market field (case-insensitive)
+const SANTI_DMAS  = ['los angeles','miami','texas','dallas','houston','austin','atx','san francisco','sf','dfw'];
+const SHAMEL_DMAS = ['new york','nyc','chicago','new york city'];
+
+function inSanti(install){
+  const m=(install.market||'').toLowerCase();
+  return SANTI_DMAS.some(d=>m.includes(d));
+}
+function inShamel(install){
+  const m=(install.market||'').toLowerCase();
+  return SHAMEL_DMAS.some(d=>m.includes(d));
+}
+
+// Normalize market into canonical DMA labels
+function canonicalDMA(market){
+  const m=(market||'').toLowerCase();
+  if(m.includes('los angeles')||m.includes('la ')|| m==='la') return 'Los Angeles';
+  if(m.includes('miami')) return 'Miami';
+  if(m.includes('texas')||m.includes('dallas')||m.includes('houston')||m.includes('dfw')||m.includes('austin')||m.includes('atx')) return 'Texas (ATX / Houston)';
+  if(m.includes('san francisco')||m.includes('sf')) return 'San Francisco';
+  if(m.includes('new york')||m.includes('nyc')) return 'New York';
+  if(m.includes('chicago')) return 'Chicago';
+  return market||'Unknown';
+}
+
+function paceStatus(pct, isChurn=false){
+  if(isChurn){
+    if(pct<=8)  return ['pace-on','✅ On Track'];
+    if(pct<=12) return ['pace-warn','⚠️ Warning'];
+    return ['pace-behind','❌ Over Limit'];
+  }
+  if(pct>=100) return ['pace-hit','✅ Hit'];
+  if(pct>=70)  return ['pace-on','📈 On Track'];
+  if(pct>=40)  return ['pace-warn','⚠️ Pacing Low'];
+  return ['pace-behind','❌ Behind'];
+}
+
+function calcBonus(kpiHit, pool){ return kpiHit ? pool : 0; }
+
+function renderDMAGrid(installs, dmas, containerId, color){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+
+  // group reps by canonical DMA
+  const dmaData = {};
+  dmas.forEach(d=>{ dmaData[d]={reps:new Set(),active:0,total:0}; });
+
+  installs.forEach(r=>{
+    const dma = canonicalDMA(r.market);
+    if(!dmaData[dma]) return;
+    if(r.rep) dmaData[dma].reps.add(r.rep);
+    dmaData[dma].total++;
+    if(statusClass(r.status)==='st-active') dmaData[dma].active++;
+  });
+
+  el.innerHTML = dmas.map(dma=>{
+    const d = dmaData[dma]||{reps:new Set(),active:0,total:0};
+    const repCount = d.reps.size;
+    const pct = Math.min(100,(repCount/10)*100);
+    const barColor = repCount>=10?'var(--green)':repCount>=7?'var(--orange)':'var(--red)';
+    const statusCls = repCount>=10?'pace-hit':repCount>=7?'pace-warn':'pace-behind';
+    const statusTxt = repCount>=10?'✅ Full':repCount>=7?'⚠️ Low':'❌ Under';
+    const repList = [...d.reps].sort().slice(0,8).join(', ')+(d.reps.size>8?` +${d.reps.size-8} more`:'');
+
+    return `<div class="dma-card">
+      <div class="dma-card-header">
+        <div class="dma-card-name">${dma}</div>
+        <span class="dma-status ${statusCls}">${statusTxt}</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <div class="dma-rep-count" style="color:${color}">${repCount}</div>
+        <div class="dma-rep-target">/ 10 reps target</div>
+      </div>
+      <div class="dma-rep-bar-bg"><div class="dma-rep-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${d.active} active stations · ${d.total} total installs</div>
+      <div class="dma-rep-list">${repList||'<span style="color:var(--red)">No reps assigned</span>'}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderRM(){
+  if(!allInstalls.length) return;
+
+  const now = new Date();
+  const mo  = now.toLocaleString('default',{month:'long'});
+  const period = `${mo} ${now.getFullYear()}`;
+
+  // ── SANTI ─────────────────────────────────────────────────────────
+  const santiAll    = allInstalls.filter(inSanti);
+  const santiActive = santiAll.filter(r=>statusClass(r.status)==='st-active');
+  const santiInact  = santiAll.filter(r=>statusClass(r.status)==='st-inactive');
+  const santiTotal  = santiAll.length;
+  const santiChurnPct = santiTotal>0 ? +((santiInact.length/santiTotal)*100).toFixed(1) : 0;
+  const santiReps   = new Set(santiAll.map(r=>r.rep).filter(Boolean)).size;
+  // Count installs this month (signed or scheduled)
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const santiInstallsMo = santiAll.filter(r=>{
+    const d = r.scheduled ? new Date(r.scheduled) : r.signed ? new Date(r.signed) : null;
+    return d && d >= thisMonthStart;
+  }).length;
+
+  document.getElementById('santi-installs').textContent = santiInstallsMo;
+  document.getElementById('santi-active').textContent   = santiActive.length;
+  document.getElementById('santi-reps').textContent     = santiReps;
+  document.getElementById('santi-churn').textContent    = santiChurnPct+'%';
+
+  // Pacing
+  const santiInstallPct = Math.min(150, (santiInstallsMo/100)*100);
+  const santiRepsPct    = Math.min(150, (santiReps/40)*100); // 4 DMAs × 10
+  const santiChurnOK    = santiChurnPct<=8;
+  const santiChurnWarn  = santiChurnPct<=12;
+
+  document.getElementById('santi-pace-period').textContent = period;
+  document.getElementById('santi-pace-install-nums').textContent = `${santiInstallsMo} / 100`;
+  document.getElementById('santi-pace-reps-nums').textContent    = `${santiReps} / 40`;
+  document.getElementById('santi-pace-churn-nums').textContent   = `${santiChurnPct}%`;
+
+  document.getElementById('santi-pace-install-bar').style.width = Math.min(100,santiInstallPct)+'%';
+  document.getElementById('santi-pace-reps-bar').style.width    = Math.min(100,santiRepsPct)+'%';
+  // Churn bar inverted: 0% churn = full bar (good), 12%+ = empty
+  const churnBarPct = santiChurnOK ? 100 : santiChurnWarn ? 50 : 0;
+  document.getElementById('santi-pace-churn-bar').style.width  = churnBarPct+'%';
+  document.getElementById('santi-pace-churn-bar').style.background = santiChurnOK?'var(--green)':santiChurnWarn?'var(--orange)':'var(--red)';
+
+  const [isCls,isTxt]=paceStatus(santiInstallPct);
+  const [rsCls,rsTxt]=paceStatus(santiRepsPct);
+  const [cCls,cTxt]  =paceStatus(santiChurnPct, true);
+  document.getElementById('santi-pace-install-status').className=`pace-status ${isCls}`;
+  document.getElementById('santi-pace-install-status').textContent=isTxt;
+  document.getElementById('santi-pace-reps-status').className=`pace-status ${rsCls}`;
+  document.getElementById('santi-pace-reps-status').textContent=rsTxt;
+  document.getElementById('santi-pace-churn-status').className=`pace-status ${cCls}`;
+  document.getElementById('santi-pace-churn-status').textContent=cTxt;
+
+  // Bonus calc
+  const sInstallBonus = santiInstallsMo>=100 ? 300 : 0;
+  const sRepsBonus    = santiReps>=40 ? 263 : santiReps>=28 ? 131 : 0; // 40=full, 28=(7×4 DMAs)=partial
+  const sChurnBonus   = santiChurnOK ? 188 : santiChurnWarn ? 94 : 0;
+  const sTotalBonus   = sInstallBonus+sRepsBonus+sChurnBonus;
+
+  document.getElementById('santi-bonus-install').textContent = sInstallBonus>0?`+$${sInstallBonus}`:'$0';
+  document.getElementById('santi-bonus-install').style.color = sInstallBonus>0?'var(--green)':'var(--red)';
+  document.getElementById('santi-bonus-reps').textContent    = sRepsBonus>0?`+$${sRepsBonus}`:'$0';
+  document.getElementById('santi-bonus-reps').style.color    = sRepsBonus>0?'var(--green)':sRepsBonus===131?'var(--orange)':'var(--red)';
+  document.getElementById('santi-bonus-churn').textContent   = sChurnBonus>0?`+$${sChurnBonus}`:'$0';
+  document.getElementById('santi-bonus-churn').style.color   = santiChurnOK?'var(--green)':santiChurnWarn?'var(--orange)':'var(--red)';
+  document.getElementById('santi-bonus-total').textContent   = `$${sTotalBonus}`;
+
+  // Personal installs (RM as rep)
+  const santiPersonal = allInstalls.filter(r => isRMRep(r.rep, 'santi'));
+  document.getElementById('santi-personal-installs').textContent = santiPersonal.length;
+
+  // DMA grid
+  renderDMAGrid(santiAll, ['Los Angeles','Miami','Texas (ATX / Houston)','San Francisco'], 'santi-dma-grid', '#8B5CF6');
+  renderSantiInstalls();
+  renderSantiPersonal();
+
+  // ── SHAMEL ────────────────────────────────────────────────────────
+  const shamelAll    = allInstalls.filter(inShamel);
+  const shamelActive = shamelAll.filter(r=>statusClass(r.status)==='st-active');
+  const shamelInact  = shamelAll.filter(r=>statusClass(r.status)==='st-inactive');
+  const shamelTotal  = shamelAll.length;
+  const shamelChurnPct = shamelTotal>0 ? +((shamelInact.length/shamelTotal)*100).toFixed(1) : 0;
+  const shamelReps   = new Set(shamelAll.map(r=>r.rep).filter(Boolean)).size;
+  const shamelInstallsMo = shamelAll.filter(r=>{
+    const d = r.scheduled ? new Date(r.scheduled) : r.signed ? new Date(r.signed) : null;
+    return d && d >= thisMonthStart;
+  }).length;
+
+  document.getElementById('shamel-installs').textContent = shamelInstallsMo;
+  document.getElementById('shamel-active').textContent   = shamelActive.length;
+  document.getElementById('shamel-reps').textContent     = shamelReps;
+  document.getElementById('shamel-churn').textContent    = shamelChurnPct+'%';
+
+  const shamelInstallPct = Math.min(150,(shamelInstallsMo/75)*100);
+  const shamelRepsPct    = Math.min(150,(shamelReps/20)*100);
+  const shamelChurnOK    = shamelChurnPct<=8;
+  const shamelChurnWarn  = shamelChurnPct<=12;
+
+  document.getElementById('shamel-pace-period').textContent = period;
+  document.getElementById('shamel-pace-install-nums').textContent = `${shamelInstallsMo} / 75`;
+  document.getElementById('shamel-pace-reps-nums').textContent    = `${shamelReps} / 20`;
+  document.getElementById('shamel-pace-churn-nums').textContent   = `${shamelChurnPct}%`;
+
+  document.getElementById('shamel-pace-install-bar').style.width = Math.min(100,shamelInstallPct)+'%';
+  document.getElementById('shamel-pace-reps-bar').style.width    = Math.min(100,shamelRepsPct)+'%';
+  const sChurnBarPct = shamelChurnOK?100:shamelChurnWarn?50:0;
+  document.getElementById('shamel-pace-churn-bar').style.width      = sChurnBarPct+'%';
+  document.getElementById('shamel-pace-churn-bar').style.background = shamelChurnOK?'var(--green)':shamelChurnWarn?'var(--orange)':'var(--red)';
+
+  const [i2Cls,i2Txt]=paceStatus(shamelInstallPct);
+  const [r2Cls,r2Txt]=paceStatus(shamelRepsPct);
+  const [c2Cls,c2Txt]=paceStatus(shamelChurnPct,true);
+  document.getElementById('shamel-pace-install-status').className=`pace-status ${i2Cls}`;
+  document.getElementById('shamel-pace-install-status').textContent=i2Txt;
+  document.getElementById('shamel-pace-reps-status').className=`pace-status ${r2Cls}`;
+  document.getElementById('shamel-pace-reps-status').textContent=r2Txt;
+  document.getElementById('shamel-pace-churn-status').className=`pace-status ${c2Cls}`;
+  document.getElementById('shamel-pace-churn-status').textContent=c2Txt;
+
+  const shInstallBonus = shamelInstallsMo>=75 ? 233 : 0;
+  const shRepsBonus    = shamelReps>=20 ? 204 : shamelReps>=14 ? 102 : 0;
+  const shChurnBonus   = shamelChurnOK ? 146 : shamelChurnWarn ? 73 : 0;
+  const shTotalBonus   = shInstallBonus+shRepsBonus+shChurnBonus;
+
+  document.getElementById('shamel-bonus-install').textContent = shInstallBonus>0?`+$${shInstallBonus}`:'$0';
+  document.getElementById('shamel-bonus-install').style.color = shInstallBonus>0?'var(--green)':'var(--red)';
+  document.getElementById('shamel-bonus-reps').textContent    = shRepsBonus>0?`+$${shRepsBonus}`:'$0';
+  document.getElementById('shamel-bonus-reps').style.color    = shRepsBonus>0?'var(--green)':shRepsBonus===102?'var(--orange)':'var(--red)';
+  document.getElementById('shamel-bonus-churn').textContent   = shChurnBonus>0?`+$${shChurnBonus}`:'$0';
+  document.getElementById('shamel-bonus-churn').style.color   = shamelChurnOK?'var(--green)':shamelChurnWarn?'var(--orange)':'var(--red)';
+  document.getElementById('shamel-bonus-total').textContent   = `$${shTotalBonus}`;
+
+  // Personal installs (RM as rep)
+  const shamelPersonal = allInstalls.filter(r => isRMRep(r.rep,'shamel') || isRMRep(r.rep,'shamal') || isRMRep(r.rep,'chamel'));
+  document.getElementById('shamel-personal-installs').textContent = shamelPersonal.length;
+
+  renderDMAGrid(shamelAll, ['New York','Chicago'], 'shamel-dma-grid', '#0D9488');
+  renderShamelInstalls();
+  renderShamelPersonal();
+
+  // ── GENERAL ───────────────────────────────────────────────────────
+  const totalActive = allInstalls.filter(r=>statusClass(r.status)==='st-active').length;
+  const totalInact  = allInstalls.filter(r=>statusClass(r.status)==='st-inactive').length;
+  const networkChurn= allInstalls.length>0?+((totalInact/allInstalls.length)*100).toFixed(1):0;
+  document.getElementById('gen-total').textContent          = allInstalls.length;
+  document.getElementById('gen-active').textContent         = totalActive;
+  document.getElementById('gen-churn').textContent          = networkChurn+'%';
+  document.getElementById('gen-reps').textContent           = new Set(allInstalls.map(r=>r.rep).filter(Boolean)).size;
+  document.getElementById('gen-santi-installs').textContent = santiAll.length;
+  document.getElementById('gen-shamel-installs').textContent= shamelAll.length;
+  renderGeneral();
+}
+
+function renderGeneral(){
+  const q     =(document.getElementById('genSearch')?.value||'').toLowerCase();
+  const dmaF  = document.getElementById('genDMA')?.value||'';
+  const stF   =(document.getElementById('genStatus')?.value||'').toLowerCase();
+
+  let rows = allInstalls.filter(r=>{
+    if(q&&!(r.venue.toLowerCase().includes(q)||(r.rep||'').toLowerCase().includes(q)||(r.market||'').toLowerCase().includes(q))) return false;
+    if(dmaF==='santi'&&!inSanti(r)) return false;
+    if(dmaF==='shamel'&&!inShamel(r)) return false;
+    if(stF&&!statusClass(r.status).includes(stF.slice(0,4))) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('genBody');
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🌐</div>No installs match filters</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(r=>{
+    const territory = inSanti(r)
+      ? `<span class="badge" style="background:#EDE9FF;color:#6D28D9">🟣 Santi</span>`
+      : inShamel(r)
+      ? `<span class="badge" style="background:#F0FDFA;color:#0F766E">🟢 Shamel</span>`
+      : `<span class="badge b-gray">Unassigned</span>`;
+    return `<tr>
+      <td style="font-weight:600;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.venue}</td>
+      <td>${r.rep||'—'}</td>
+      <td style="font-size:12px;color:var(--muted)">${r.market||'—'}</td>
+      <td><span class="badge ${statusClass(r.status)}">${r.status||'Unknown'}</span></td>
+      <td>${stationBadge(r.station)}</td>
+      <td style="font-size:12px;color:var(--muted)">${fmtDate(r.signed)}</td>
+      <td>${territory}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderRMInstalls(installs, bodyId, searchId, marketId, statusId){
+  const q   =(document.getElementById(searchId)?.value||'').toLowerCase();
+  const mkt =(document.getElementById(marketId)?.value||'').toLowerCase();
+  const stF =(document.getElementById(statusId)?.value||'').toLowerCase();
+
+  let rows = installs.filter(r=>{
+    if(q&&!(r.venue.toLowerCase().includes(q)||(r.rep||'').toLowerCase().includes(q))) return false;
+    if(mkt&&!(r.market||'').toLowerCase().includes(mkt)) return false;
+    if(stF&&!statusClass(r.status).includes(stF.slice(0,4))) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById(bodyId);
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📋</div>No installs match filters</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(r=>`<tr>
+    <td style="font-weight:600;max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.venue}</td>
+    <td>${r.rep||'—'}</td>
+    <td style="font-size:12px;color:var(--muted)">${r.market||'—'}</td>
+    <td><span class="badge ${statusClass(r.status)}">${r.status||'Unknown'}</span></td>
+    <td>${stationBadge(r.station)}</td>
+    <td style="font-size:12px;color:var(--muted)">${fmtDate(r.signed)}</td>
+    <td style="font-size:12px;color:var(--muted)">${fmtDate(r.scheduled)}</td>
+  </tr>`).join('');
+}
+
+// ── PERSONAL INSTALL RENDERS ─────────────────────────────────────────
+// Match rep name loosely — "Santi", "Santiago", "Santee" etc.
+function isRMRep(repField, rmName){
+  if(!repField) return false;
+  return repField.toLowerCase().includes(rmName.toLowerCase());
+}
+
+function renderPersonalInstalls(installs, bodyId, countId, statusSelId, rmLabel){
+  const stF = (document.getElementById(statusSelId)?.value||'').toLowerCase();
+  let rows = installs.filter(r=>{
+    if(stF && !statusClass(r.status).includes(stF.slice(0,4))) return false;
+    return true;
+  });
+
+  const countEl = document.getElementById(countId);
+  if(countEl) countEl.textContent = rows.length + ' installs';
+
+  const tbody = document.getElementById(bodyId);
+  if(!tbody) return;
+
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚡</div>No personal installs found for ${rmLabel} — rep name may not match sheet data</div></td></tr>`;
+    return;
+  }
+
+  const tierBadge = install => {
+    const t = getTier(install);
+    if(t==='A') return `<span class="badge b-ta">Tier A</span>`;
+    if(t==='B') return `<span class="badge b-tb">Tier B</span>`;
+    if(t==='C') return `<span class="badge b-tc">Tier C</span>`;
+    return '<span style="color:var(--muted);font-size:12px">—</span>';
+  };
+  const commVal = install => {
+    const amt = getCommissionAmt(install);
+    return amt>0 ? '$'+amt.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}) : '—';
+  };
+
+  tbody.innerHTML = rows.map(r=>`<tr>
+    <td style="font-weight:600;max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.venue}">${r.venue}</td>
+    <td style="font-size:12px;color:var(--muted)">${r.market||'—'}</td>
+    <td><span class="badge ${statusClass(r.status)}">${r.status||'Unknown'}</span></td>
+    <td>${stationBadge(r.station)}</td>
+    <td>${tierBadge(r)}</td>
+    <td style="font-weight:600">${commVal(r)}</td>
+    <td style="font-size:12px;color:var(--muted)">${fmtDate(r.signed)}</td>
+    <td style="font-size:12px;color:var(--muted)">${fmtDate(r.scheduled)}</td>
+  </tr>`).join('');
+}
+
+function renderSantiPersonal(){
+  const personal = allInstalls.filter(r => isRMRep(r.rep, 'santi'));
+  renderPersonalInstalls(personal, 'santiPersonalBody', 'santi-personal-count', 'santiPersonalStatus', 'Santi');
+}
+function renderShamelPersonal(){
+  const personal = allInstalls.filter(r => isRMRep(r.rep, 'shamel') || isRMRep(r.rep, 'shamal') || isRMRep(r.rep, 'chamel'));
+  renderPersonalInstalls(personal, 'shamelPersonalBody', 'shamel-personal-count', 'shamelPersonalStatus', 'Shamel');
+}
+
+function renderSantiInstalls(){
+  renderRMInstalls(allInstalls.filter(inSanti),'santiBody','santiSearch','santiMarket','santiStatus');
+}
+function renderShamelInstalls(){
+  renderRMInstalls(allInstalls.filter(inShamel),'shamelBody','shamelSearch','shamelMarket','shamelStatus');
+}
+
+function switchRMTab(tab){
+  document.querySelectorAll('.rm-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.rm-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('rmtab-'+tab).classList.add('active');
+  document.getElementById('rmpanel-'+tab).classList.add('active');
+}
 
 loadData();
 loadAdRevenue();
