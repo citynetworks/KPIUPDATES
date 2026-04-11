@@ -504,7 +504,7 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
 const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbxXfAIFDKVJBr2bPLlkoDrTi0oXY4ahqtMgBF2T7tuJdT79jzFePf5qxfTp83qurpt_/exec';
 // ── DIRECT GOOGLE SHEETS LOADER ──────────────────────────────────────
 const GS_SHEET_ID = '1aRP9xWFsqOoh-zAXKI4olsCjn29Q_sf-1xKsHUptLQs';
-// Use sheet NAMES for gviz (null = use name param, more reliable than GIDs)
+// Tab GIDs — user confirmed gid 1440533466; update others from the spreadsheet URL
 const GS_GIDS = {
   'Full Time Rep - Install':  null,   // use sheet name
   '1099 B - Rep Install':     null,   // use sheet name
@@ -1476,7 +1476,7 @@ function gvizTo2D(resp){
 function loadSheetViaGviz(sheetId, nameParam, onDone){
   const cb='__gviz'+(++_cbIdx);
   const tag=document.createElement('script');
-  tag.src='https://docs.google.com/spreadsheets/d/'+sheetId+'/gviz/tq?tqx=out:json&'+nameParam+'&callback='+cb;
+  tag.src='https://docs.google.com/spreadsheets/d/'+sheetId+'/gviz/tq?tqx=out:json;responseHandler:'+cb+'&'+nameParam;
   const cleanup=()=>{ try{document.head.removeChild(tag);}catch(e){} };
   tag.onerror=()=>{ cleanup(); onDone(null); };
   window[cb]=(resp)=>{ delete window[cb]; cleanup(); onDone(gvizTo2D(resp)); };
@@ -1509,31 +1509,32 @@ async function loadFromGoogleSheets(){
     });
   })));
 
-  // Load tiers via gviz (skip — no tier tab configured)
+
+  // Load tiers via gviz (skipped — no tier tab configured)
 
   // Load Superset_Revenue via gviz
-  await new Promise(resolve=>loadSheetViaGviz(sheetId,'sheet='+encodeURIComponent('Superset_Revenue'),rows=>{
-      if(rows&&rows.length>1){
-        const hdr=rows[0].map(h=>String(h||'').trim().toLowerCase());
-        const vI=findCol(hdr,'venue_name','venue name','venue','account');
-        const rI=findCol(hdr,'net rental r','net rental','net revenue','revenue');
-        const mI=findCol(hdr,'dma','market','region','city');
-        const sI=findCol(hdr,'station_type','station','model');
-        const iI=findCol(hdr,'imei','serial');
-        spData=rows.slice(1).filter(row=>row[vI]).map(row=>({
-          venue:String(row[vI]||'').trim(),
-          revenue:parseFloat(String(row[rI]||'0').replace(/[$,]/g,''))||0,
-          market:String(row[mI]||'').trim(),
-          station:normalizeStation(String(row[sI]||'')),
-          imei:String(row[iI]||'').trim(),
-        }));
-        dbg('[Superset_Revenue] gviz → '+spData.length+' rows');
-        const pill=document.getElementById('spPill');
-        const txt=document.getElementById('spPillTxt');
-        if(spData.length>0){ pill.className='superset-pill ok'; txt.textContent='Superset: '+spData.length.toLocaleString()+' venues'; }
-      }
-      resolve();
-    }));
+  await new Promise(resolve=>loadSheetViaGviz(sheetId,'sheet=Superset_Revenue',rows=>{
+    if(rows&&rows.length>1){
+      const hdr=rows[0].map(h=>String(h||'').trim().toLowerCase());
+      const vI=findCol(hdr,'venue_name','venue name','venue','account');
+      const rI=findCol(hdr,'net rental r','net rental','net revenue','revenue');
+      const mI=findCol(hdr,'dma','market','region','city');
+      const sI=findCol(hdr,'station_type','station','model');
+      const iI=findCol(hdr,'imei','serial');
+      spData=rows.slice(1).filter(row=>row[vI]).map(row=>({
+        venue:String(row[vI]||'').trim(),
+        revenue:parseFloat(String(row[rI]||'0').replace(/[$,]/g,''))||0,
+        market:String(row[mI]||'').trim(),
+        station:normalizeStation(String(row[sI]||'')),
+        imei:String(row[iI]||'').trim(),
+      }));
+      dbg('[Superset_Revenue] gviz → '+spData.length+' rows');
+      const pill=document.getElementById('spPill');
+      const txt=document.getElementById('spPillTxt');
+      if(spData.length>0){ pill.className='superset-pill ok'; txt.textContent='Superset: '+spData.length.toLocaleString()+' venues'; }
+    }
+    resolve();
+  }));
 
   if(loaded===0){
     dbg('gviz failed — falling back to Apps Script JSONP');
@@ -1552,6 +1553,7 @@ async function loadFromGoogleSheets(){
   if(document.getElementById('tab-rm').classList.contains('active')) renderRM();
 
 }
+
 
 // ── DATA LOADING ─────────────────────────────────────────────────────
 let _cbIdx=0;
