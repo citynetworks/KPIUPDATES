@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>chargeFUZE · City Network Placement Tracker</title>
+<title>chargeFUZE · City Network KPI Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0B1120;--cf-dark:#0B1120;--cf-mid:#10192E;
   --card:#fff;--border:#DDE3EF;--text:#1A2340;--muted:#7A87A0;
   --green:#22C55E;--orange:#F59E0B;--red:#EF4444;--blue:#1A6EFF;--purple:#8B5CF6;
-  --teal:#0D9488;--cf-blue:#1A6EFF;--row-hover:#F8FAFF;
+  --teal:#0D9488;--cf-blue:#1A6EFF;--row-hover:#F8FAFF;--cf-cyan:#00D4FF;
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 header{background:linear-gradient(135deg,var(--cf-dark) 0%,var(--cf-mid) 100%);border-bottom:2px solid var(--cf-blue);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:100}
@@ -129,21 +129,105 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
 .payout-split-val{font-weight:700;color:var(--text)}
 .payout-total-row{border-top:1px solid var(--border);padding-top:8px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:700}
 .teal{color:var(--teal)}
+
+/* ══════════════════════════════════════════════════════════════════
+   REGIONAL MANAGER DASHBOARD STYLES
+══════════════════════════════════════════════════════════════════ */
+.rm-section-label{font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.5);padding:18px 0 10px;border-top:1px solid rgba(255,255,255,.07);margin-top:8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.rm-section-label:first-child{border-top:none;padding-top:0}
+.rm-territory-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+@media(max-width:900px){.rm-territory-grid{grid-template-columns:1fr}}
+.rm-card{background:var(--card);border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.09);overflow:hidden}
+.rm-card-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.rm-name{font-size:19px;font-weight:800;color:var(--text)}
+.rm-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.rm-toggle-group{display:flex;gap:4px;flex-shrink:0}
+.rm-toggle-btn{padding:4px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s}
+.rm-toggle-btn.active{background:var(--cf-blue);border-color:var(--cf-blue);color:#fff}
+.rm-mini-kpis{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border)}
+.rm-mini-kpi{padding:12px 16px;border-right:1px solid var(--border)}
+.rm-mini-kpi:last-child{border-right:none}
+.rm-mini-kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px}
+.rm-mini-kpi-value{font-size:20px;font-weight:800;line-height:1}
+.rm-mini-kpi-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.rm-market-list{padding:14px 20px}
+.rm-market-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #EEF2FB;font-size:13px}
+.rm-market-row:last-child{border-bottom:none}
+.rm-market-name{font-weight:600;color:var(--text);min-width:168px;flex-shrink:0}
+.rm-market-bar{flex:1;min-width:60px;max-width:120px}
+.rm-market-bar-track{height:7px;background:#E9EFF6;border-radius:4px;overflow:hidden;margin-top:4px}
+.rm-market-bar-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.rm-market-reps{font-weight:800;font-size:14px;min-width:40px;text-align:right}
+.rm-market-kpi{min-width:90px;text-align:right}
+.rm-kpi-bars{padding:12px 20px;background:#FAFBFF;border-top:1px solid var(--border)}
+.rm-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.rm-bar-label{font-size:12px;font-weight:600;color:var(--text);flex:1;min-width:0}
+.rm-bar-track{width:90px;height:7px;background:#E9EFF6;border-radius:4px;overflow:hidden;flex-shrink:0}
+.rm-bar-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.rm-bar-pct{font-size:11px;font-weight:700;min-width:34px;text-align:right;color:var(--muted)}
+.rm-bonus-footer{background:linear-gradient(135deg,#0B1120,#10192E);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.rm-bonus-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.5)}
+.rm-bonus-value{font-size:18px;font-weight:800;color:var(--cf-cyan)}
+.rm-bonus-max{font-size:12px;color:rgba(255,255,255,.35);margin-left:5px}
+.rm-bonus-note{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px}
+/* Bonus attainment cards */
+.bonus-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+@media(max-width:900px){.bonus-grid{grid-template-columns:1fr}}
+.bonus-card{background:var(--card);border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.09);overflow:hidden}
+.bonus-card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.bonus-card-name{font-size:15px;font-weight:800;color:var(--text)}
+.bonus-card-period{font-size:11px;font-weight:700;color:var(--muted);background:#F1F5F9;padding:3px 10px;border-radius:20px}
+.bonus-kpi-rows{padding:16px 20px}
+.bonus-kpi-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#F8FAFF;border-radius:10px;margin-bottom:7px}
+.bonus-kpi-name{flex:1;font-size:12px;font-weight:600;color:var(--text)}
+.bonus-kpi-weight{font-size:11px;color:var(--muted);min-width:28px}
+.bonus-kpi-bar{width:70px;height:6px;background:#E9EFF6;border-radius:4px;overflow:hidden;flex-shrink:0}
+.bonus-kpi-bar-fill{height:100%;border-radius:4px;transition:width .5s}
+.bonus-kpi-pct{font-size:11px;font-weight:700;min-width:32px;text-align:right}
+.bonus-kpi-earned{font-size:12px;font-weight:700;color:var(--teal);min-width:70px;text-align:right}
+.bonus-kpi-max{font-size:11px;color:var(--muted)}
+.bonus-total{padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#F8FAFF}
+.bonus-total-label{font-size:13px;font-weight:700;color:var(--text)}
+.bonus-total-earned{font-size:18px;font-weight:800;color:var(--green)}
+.bonus-total-max{font-size:12px;color:var(--muted);margin-left:4px}
+.bonus-footer{padding:10px 20px;background:linear-gradient(135deg,#0B1120,#10192E);border-top:1px solid rgba(255,255,255,.07)}
+.bonus-footer-note{font-size:11px;color:rgba(255,255,255,.4)}
+.bonus-quarterly-note{font-size:12px;font-weight:600;color:var(--cf-cyan);margin-top:4px}
+/* Pipeline table */
+.pipeline-type-ft{background:#EFF6FF;color:#1D4ED8}
+.pipeline-type-1099{background:#F0FDF4;color:#166534}
+.pipeline-type-ob{background:#FAF5FF;color:#6D28D9}
+/* DMA table custom */
+.kpi-credit-full{background:#F0FDF4;color:#15803D}
+.kpi-credit-partial{background:#FFFBEB;color:#B45309}
+.kpi-credit-none{background:#FEF2F2;color:#B91C1C}
+.kpi-credit-nodata{background:#F1F5F9;color:#475569}
 </style>
 </head>
 <body>
 
 <header>
   <div class="brand">
-    <div class="brand-icon">CF</div>
+    <img id="cfLogoImg" class="cf-logo-img" alt="chargeFUZE"
+         src="https://www.chargefuze.com/cdn/shop/files/chargeFUZE_White_Logo.png"
+         style="height:36px;width:auto;object-fit:contain;display:block">
+    <div id="cfLogoFallback" style="display:none;align-items:center;gap:10px">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><polygon points="14,2 8,13 13,13 10,22 20,9 15,9" fill="#00D4FF"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">charge<span style="color:var(--cf-cyan)">FUZE</span></div>
+      </div>
+    </div>
+    <div class="brand-sub-divider" style="width:1px;height:28px;background:rgba(255,255,255,.15);margin:0 6px 0 2px"></div>
     <div>
-      <div class="brand-name">charge<span>FUZE</span></div>
-      <div class="brand-sub">City Network · Placement Tracker</div>
+      <div class="brand-name" style="font-size:15px;opacity:.6">City Network</div>
+      <div class="brand-sub">KPI Dashboard</div>
     </div>
   </div>
   <div class="header-right">
     <div class="sync-badge"><div class="sync-dot loading" id="syncDot"></div><span id="syncLabel">Loading…</span></div>
-    <button class="hbtn" onclick="loadData()">↻ Refresh</button>
+    <button class="hbtn" onclick="loadFromGoogleSheets()">↻ Refresh</button>
     <button class="hbtn" onclick="toggleDebug()">⚙ Debug</button>
     <button class="hbtn" onclick="showFileFallback()">📄 File fallback</button>
   </div>
@@ -153,6 +237,7 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
   <div class="nav-btn active" id="tab-placement" onclick="switchTab('placement')">📋 Placement Tracker</div>
   <div class="nav-btn" id="tab-roi" onclick="switchTab('roi')">📊 ROI Tracker</div>
   <div class="nav-btn" id="tab-payout" onclick="switchTab('payout')">💸 Payout Calculator</div>
+  <div class="nav-btn" id="tab-rm" onclick="switchTab('rm')">🗺 Regional Manager</div>
 </nav>
 
 <!-- Settings bar: all 5 station types + 3 commission tiers -->
@@ -322,6 +407,86 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
 </div>
 
 <!-- Fallback modal -->
+
+
+
+
+<div id="view-rm" class="view">
+
+  <!-- ─— CITY NETWORK OVERVIEW ─— -->
+  <div class="rm-section-label">🌐 City Network Overview</div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Active 1099 Reps</div><div class="kpi-value blue" id="rm-kpi-1099">—</div><div class="kpi-sub">network-wide</div></div>
+    <div class="kpi"><div class="kpi-label">Active Stations</div><div class="kpi-value green" id="rm-kpi-stations">—</div><div class="kpi-sub">live &amp; earning</div></div>
+    <div class="kpi"><div class="kpi-label">Net New Installs (MTD)</div><div class="kpi-value teal" id="rm-kpi-mtd">—</div><div class="kpi-sub">signed or scheduled this month</div></div>
+    <div class="kpi"><div class="kpi-label">Onboarding Pipeline</div><div class="kpi-value purple" id="rm-kpi-ob">—</div><div class="kpi-sub">reps in CN onboarding</div></div>
+    <div class="kpi"><div class="kpi-label">Network Churn Rate</div><div class="kpi-value orange" id="rm-kpi-churn">—</div><div class="kpi-sub">inactive / total stations</div></div>
+    <div class="kpi"><div class="kpi-label">Self Installs</div><div class="kpi-value yellow" id="rm-kpi-self">—</div><div class="kpi-sub">full-time rep installs</div></div>
+  </div>
+
+  <!-- Territory cards -->
+  <div class="rm-section-label">🗺 Territory Performance</div>
+  <div class="rm-territory-grid">
+    <div id="rm-santi-card" class="rm-card"></div>
+    <div id="rm-shamel-card" class="rm-card"></div>
+  </div>
+
+  <!-- DMA Rep Roster -->
+  <div class="sec-header">
+    <div class="sec-title">📍 DMA Rep Roster &amp; Install Targets</div>
+    <div class="sec-right">
+      <select class="fsel" id="rmDMAFilter" onchange="renderRM()">
+        <option value="">All RMs</option>
+        <option value="santi">Santi (West/South)</option>
+        <option value="shamel">Shamel (East Coast)</option>
+      </select>
+    </div>
+  </div>
+  <div class="tcard">
+    <table>
+      <thead>
+        <tr>
+          <th>MARKET</th><th>RM</th><th>ACTIVE 1099s</th><th>ROSTER SIZE</th>
+          <th>TARGET</th><th>KPI STATUS</th><th>NET INSTALLS (MTD)</th>
+          <th>SELF INSTALLS</th><th>CHURN %</th>
+        </tr>
+      </thead>
+      <tbody id="rmDMABody"></tbody>
+    </table>
+  </div>
+
+  <!-- Rep Pipeline -->
+  <div class="sec-header">
+    <div class="sec-title">👥 Rep Pipeline</div>
+    <div class="sec-right">
+      <select class="fsel" id="rmPipelineFilter" onchange="renderRM()">
+        <option value="">All Reps</option>
+        <option value="onboarding-active">Newly Onboarded</option>
+        <option value="onboarding-pending">Onboarding Applications</option>
+        <option value="self">Self Installs (FT)</option>
+        <option value="1099">1099 Reps</option>
+      </select>
+      <div class="search-wrap"><input class="search-input" id="rmPipelineSearch" placeholder="Search rep or venue…" oninput="renderRM()"/></div>
+    </div>
+  </div>
+  <div class="tcard">
+    <table>
+      <thead>
+        <tr>
+          <th>REP NAME</th><th>TYPE</th><th>MARKET</th><th>VENUE</th>
+          <th>STATUS</th><th>SIGNED DATE</th><th>STATION</th><th>RM TERRITORY</th>
+        </tr>
+      </thead>
+      <tbody id="rmPipelineBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Bonus Attainment -->
+  <div class="rm-section-label">💰 Bonus Attainment (Monthly)</div>
+  <div class="bonus-grid" id="rmBonusGrid"></div>
+
+</div>
+
 <div id="fallbackModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:14px;padding:28px;width:500px;max-width:95vw">
     <h3 style="margin-bottom:12px;font-size:16px">📄 File Fallback</h3>
@@ -336,7 +501,17 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
 
 <script>
 // ── CONSTANTS ────────────────────────────────────────────────────────
-const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbwBFt_n1Lm5N5lWpzmB4OwnTyuL0q59-binDi2n6mTrIL4MZK_c0eAol6CygH1w5iFT/exec';
+const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbxXfAIFDKVJBr2bPLlkoDrTi0oXY4ahqtMgBF2T7tuJdT79jzFePf5qxfTp83qurpt_/exec';
+// ── DIRECT GOOGLE SHEETS LOADER ──────────────────────────────────────
+const GS_SHEET_ID = '1aRP9xWFsqOoh-zAXKI4olsCjn29Q_sf-1xKsHUptLQs';
+// Use sheet NAMES for gviz (null = use name param, more reliable than GIDs)
+const GS_GIDS = {
+  'Full Time Rep - Install':  null,   // use sheet name
+  '1099 B - Rep Install':     null,   // use sheet name
+  'CN Installs - Onboarding': null,   // use sheet name
+  '__tiers__':                null,
+  'Superset_Revenue':         null,   // use sheet name
+};
 const SHEET_NAMES = ['Full Time Rep - Install','1099 B - Rep Install','CN Installs - Onboarding'];
 const IS_1099     = '1099 B - Rep Install';
 
@@ -938,6 +1113,7 @@ function processData(resp){
 
   renderPlacements();
   renderROI();
+  if(document.getElementById('tab-rm').classList.contains('active')) renderRM();
 }
 
 // ── PLACEMENT TRACKER ────────────────────────────────────────────────
@@ -1270,10 +1446,111 @@ function switchTab(tab){
   document.getElementById('view-'+tab).classList.add('active');
   document.getElementById('tab-'+tab).classList.add('active');
   if(tab==='payout') renderPayout();
+  if(tab==='rm') renderRM();
 }
 function toggleDebug(){
   const b=document.getElementById('debugBar');
   b.style.display=b.style.display==='none'?'block':'none';
+}
+
+// ── GOOGLE SHEETS DIRECT CSV LOADER ──────────────────────────────────
+// Converts a CSV row string into an array (same format as Apps Script 2D arrays)
+function parseCSV2D(text){
+  return text.split(/\r?\n/).map(line=>parseCSVLine(line));
+}
+
+// ── GOOGLE VISUALIZATION API (JSONP) LOADER ─────────────────────────
+// Works from file://, GitHub Pages, or any HTTPS host — uses logged-in Google session (no public sharing required)
+function gvizTo2D(resp){
+  try{
+    const table=resp.table;
+    if(!table) return [];
+    const headers=table.cols.map(c=>String(c.label||c.id||''));
+    const rows=(table.rows||[]).map(row=>
+      (row.c||[]).map(cell=>(cell&&cell.v!==null&&cell.v!==undefined)?cell.v:'')
+    );
+    return [headers,...rows];
+  } catch(e){ return []; }
+}
+
+function loadSheetViaGviz(sheetId, nameParam, onDone){
+  const cb='__gviz'+(++_cbIdx);
+  const tag=document.createElement('script');
+  tag.src='https://docs.google.com/spreadsheets/d/'+sheetId+'/gviz/tq?tqx=out:json&'+nameParam+'&callback='+cb;
+  const cleanup=()=>{ try{document.head.removeChild(tag);}catch(e){} };
+  tag.onerror=()=>{ cleanup(); onDone(null); };
+  window[cb]=(resp)=>{ delete window[cb]; cleanup(); onDone(gvizTo2D(resp)); };
+  document.head.appendChild(tag);
+}
+
+async function loadFromGoogleSheets(){
+  // Always use gviz JSONP — works from file://, GitHub Pages, and any HTTPS host
+  const dot=document.getElementById('syncDot');
+  const lbl=document.getElementById('syncLabel');
+  dot.classList.add('loading'); lbl.textContent='Loading from Google Sheets…';
+  allInstalls=[]; tierDataMap={}; venueDataMap={};
+  tierMap=tierDataMap; venueMap=venueDataMap; debugLines=[];
+
+  const sheetId=GS_SHEET_ID;
+  let loaded=0;
+
+  // Load each install sheet via gviz
+  await Promise.all(SHEET_NAMES.map(name=>new Promise(resolve=>{
+    const gid=GS_GIDS[name];
+    const param=gid!=null?'gid='+gid:'sheet='+encodeURIComponent(name);
+    loadSheetViaGviz(sheetId, param, rows=>{
+      if(rows&&rows.length>1){
+        const parsed=parseInstallSheet(rows,name);
+        allInstalls=allInstalls.concat(parsed);
+        dbg('['+name+'] gviz → '+parsed.length+' records');
+        loaded++;
+      } else { dbg('['+name+'] gviz empty or failed'); }
+      resolve();
+    });
+  })));
+
+  // Load tiers via gviz (skip — no tier tab configured)
+
+  // Load Superset_Revenue via gviz
+  await new Promise(resolve=>loadSheetViaGviz(sheetId,'sheet='+encodeURIComponent('Superset_Revenue'),rows=>{
+      if(rows&&rows.length>1){
+        const hdr=rows[0].map(h=>String(h||'').trim().toLowerCase());
+        const vI=findCol(hdr,'venue_name','venue name','venue','account');
+        const rI=findCol(hdr,'net rental r','net rental','net revenue','revenue');
+        const mI=findCol(hdr,'dma','market','region','city');
+        const sI=findCol(hdr,'station_type','station','model');
+        const iI=findCol(hdr,'imei','serial');
+        spData=rows.slice(1).filter(row=>row[vI]).map(row=>({
+          venue:String(row[vI]||'').trim(),
+          revenue:parseFloat(String(row[rI]||'0').replace(/[$,]/g,''))||0,
+          market:String(row[mI]||'').trim(),
+          station:normalizeStation(String(row[sI]||'')),
+          imei:String(row[iI]||'').trim(),
+        }));
+        dbg('[Superset_Revenue] gviz → '+spData.length+' rows');
+        const pill=document.getElementById('spPill');
+        const txt=document.getElementById('spPillTxt');
+        if(spData.length>0){ pill.className='superset-pill ok'; txt.textContent='Superset: '+spData.length.toLocaleString()+' venues'; }
+      }
+      resolve();
+    }));
+
+  if(loaded===0){
+    dbg('gviz failed — falling back to Apps Script JSONP');
+    dot.classList.remove('loading'); lbl.textContent='Trying Apps Script…';
+    loadData();
+    return;
+  }
+
+  const n=new Date();
+  lbl.textContent='Synced '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0');
+  dot.style.background='var(--green)'; dot.classList.remove('loading');
+  const reps=[...new Set(allInstalls.map(i=>i.rep).filter(Boolean))].sort();
+  document.getElementById('filterRep').innerHTML='<option value="">All Reps</option>'+
+    reps.map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+  renderPlacements(); renderROI();
+  if(document.getElementById('tab-rm').classList.contains('active')) renderRM();
+
 }
 
 // ── DATA LOADING ─────────────────────────────────────────────────────
@@ -1285,7 +1562,7 @@ function loadData(url){
   dot.classList.add('loading'); lbl.textContent='Syncing…';
   const cb='__cb'+(++_cbIdx);
   const tag=document.createElement('script');
-  tag.onerror=()=>{ dot.classList.remove('loading'); lbl.textContent='Load failed'; dot.style.background='var(--red)'; };
+  tag.onerror=()=>{ dot.classList.remove('loading'); lbl.textContent='Load failed — check Apps Script URL'; dot.style.background='var(--red)'; setTimeout(showFileFallback,1000); };
   window[cb]=resp=>{
     delete window[cb]; document.head.removeChild(tag);
     dot.classList.remove('loading');
@@ -1305,8 +1582,408 @@ function loadData(url){
 function showFileFallback(){ document.getElementById('fallbackModal').style.display='flex'; document.getElementById('urlInput').value=DEFAULT_URL; }
 function loadFromUrl(){ const u=document.getElementById('urlInput').value.trim(); document.getElementById('fallbackModal').style.display='none'; if(u) loadData(u); }
 
-loadData();
+
+// ── REGIONAL MANAGER DASHBOARD ──────────────────────────────────────
+
+const SANTI_MARKETS = ['los angeles','la','miami','texas','atx','houston','san francisco','sf','bay area','socal','west','south'];
+const SHAMEL_MARKETS = ['new york','nyc','chicago','ny','new york city','east','northeast'];
+
+const RM_CONFIG = {
+  santi: {
+    name:'Santi', title:'West / South Markets', color:'#1A6EFF',
+    marketLabels:['Los Angeles','Miami','Texas (ATX/Houston)','San Francisco'],
+    monthlyTarget:20, quarterlyTarget:50,
+    monthly:{installs:300,reps:263,churn:188,total:750},
+    quarterly:{installs:1350,reps:1181,churn:844,total:3375},
+  },
+  shamel: {
+    name:'Shamel', title:'East Coast Markets', color:'#0D9488',
+    marketLabels:['New York City','Chicago'],
+    monthlyTarget:20, quarterlyTarget:50,
+    monthly:{installs:233,reps:204,churn:146,total:583},
+    quarterly:{installs:1050,reps:919,churn:656,total:2625},
+  }
+};
+
+const rmViewMode = {santi:'monthly',shamel:'monthly'};
+
+function rmGetRM(market){
+  const ml=(market||'').toLowerCase();
+  if(SANTI_MARKETS.some(m=>ml.includes(m))) return 'santi';
+  if(SHAMEL_MARKETS.some(m=>ml.includes(m))) return 'shamel';
+  return null;
+}
+
+function rmIsThisMonth(dateVal){
+  if(!dateVal) return false;
+  const d=dateVal instanceof Date?dateVal:new Date(dateVal);
+  if(isNaN(d)) return false;
+  const n=new Date();
+  return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();
+}
+
+function rmChurnColor(pct){
+  if(pct<10) return 'var(--green)';
+  if(pct<=15) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+function rmKPICredit(active1099){
+  if(active1099>=10) return {label:'Full Credit',cls:'kpi-credit-full',pct:100};
+  if(active1099>=7)  return {label:'Partial (50%)',cls:'kpi-credit-partial',pct:50};
+  if(active1099>0)   return {label:'No Credit',cls:'kpi-credit-none',pct:0};
+  return {label:'No Data',cls:'kpi-credit-nodata',pct:0};
+}
+
+function rmGetMarketStats(){
+  const stats={};
+  allInstalls.forEach(inst=>{
+    const mkt=inst.market||'Unknown';
+    if(!stats[mkt]) stats[mkt]={
+      market:mkt, rm:rmGetRM(mkt),
+      allReps:new Set(), active1099:new Set(),
+      total:0, active:0, inactive:0, scheduled:0, selfInstalls:0, netNewMTD:0,
+    };
+    const ms=stats[mkt];
+    const sc=statusClass(inst.status);
+    if(inst.rep) ms.allReps.add(inst.rep);
+    if(inst.is1099&&sc==='st-active'&&inst.rep) ms.active1099.add(inst.rep);
+    ms.total++;
+    if(sc==='st-active') ms.active++;
+    if(sc==='st-inactive') ms.inactive++;
+    if(sc==='st-scheduled') ms.scheduled++;
+    if(inst.sheetName==='Full Time Rep - Install') ms.selfInstalls++;
+    if(rmIsThisMonth(inst.signed)||rmIsThisMonth(inst.scheduled)) ms.netNewMTD++;
+  });
+  return stats;
+}
+
+function rmTerritoryCard(rmKey){
+  const cfg=RM_CONFIG[rmKey];
+  const vm=rmViewMode[rmKey]||'monthly';
+  const b=vm==='monthly'?cfg.monthly:cfg.quarterly;
+  const stats=rmGetMarketStats();
+  const rmInstalls=allInstalls.filter(i=>rmGetRM(i.market)===rmKey);
+
+  const active1099=new Set(rmInstalls.filter(i=>i.is1099&&statusClass(i.status)==='st-active'&&i.rep).map(i=>i.rep)).size;
+  const netNewMTD=rmInstalls.filter(i=>rmIsThisMonth(i.signed)||rmIsThisMonth(i.scheduled)).length;
+  const tgt=vm==='monthly'?cfg.monthlyTarget:cfg.quarterlyTarget;
+  const inactive=rmInstalls.filter(i=>statusClass(i.status)==='st-inactive').length;
+  const active=rmInstalls.filter(i=>statusClass(i.status)==='st-active').length;
+  const churn=(active+inactive)>0?(inactive/(active+inactive)*100):0;
+  const churnCol=rmChurnColor(churn);
+
+  // Bonus attainment
+  const installPct=Math.min((netNewMTD/tgt)*100,100);
+  // Rep KPI: average credit across markets
+  let totalRepCredit=0, repMarketCount=0;
+  cfg.marketLabels.forEach(ml=>{
+    const mKey=Object.keys(stats).find(k=>k.toLowerCase().includes(ml.toLowerCase().split('(')[0].trim())||ml.toLowerCase().includes(k.toLowerCase()));
+    const ms=mKey?stats[mKey]:null;
+    const a1=ms?ms.active1099.size:0;
+    totalRepCredit+=(a1>=10?1:a1>=7?0.5:0);
+    repMarketCount++;
+  });
+  const repPct=(repMarketCount>0?(totalRepCredit/repMarketCount)*100:0);
+  const churnPct=churn<10?100:churn<=15?50:0;
+
+  const installBonus=(installPct>=100?b.installs:0);
+  const repBonus=Math.round(b.reps*(repPct/100));
+  const churnBonus=(churnPct===100?b.churn:churnPct===50?Math.round(b.churn*0.5):0);
+  const totalBonus=installBonus+repBonus+churnBonus;
+
+  const installColor=installPct>=100?'var(--green)':installPct>=60?'var(--orange)':'var(--red)';
+  const repColor=repPct>=100?'var(--green)':repPct>=50?'var(--orange)':'var(--red)';
+
+  // Market breakdown rows
+  let mktRows='';
+  cfg.marketLabels.forEach(ml=>{
+    const mKey=Object.keys(stats).find(k=>{
+      const kl=k.toLowerCase(), mll=ml.toLowerCase().split('(')[0].trim();
+      return kl.includes(mll)||mll.includes(kl);
+    });
+    const ms=mKey?stats[mKey]:null;
+    const a1=ms?ms.active1099.size:0;
+    const {label,cls}=rmKPICredit(a1);
+    const barW=Math.min((a1/10)*100,100);
+    const barCol=a1>=10?'var(--green)':a1>=7?'var(--orange)':'var(--red)';
+    mktRows+=`<div class="rm-market-row">
+      <div class="rm-market-name">${ml}</div>
+      <div class="rm-market-bar">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="rm-market-bar-track" style="flex:1">
+            <div class="rm-market-bar-fill" style="width:${barW}%;background:${barCol}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="rm-market-reps" style="color:${barCol}">${a1}<span style="font-size:11px;font-weight:400;color:var(--muted)">/10</span></div>
+      <div class="rm-market-kpi"><span class="badge ${cls}" style="font-size:10px">${label}</span></div>
+    </div>`;
+  });
+
+  return `<div class="rm-card-head">
+    <div>
+      <div class="rm-name">${cfg.name}</div>
+      <div class="rm-sub">${cfg.title}</div>
+    </div>
+    <div class="rm-toggle-group">
+      <button class="rm-toggle-btn ${vm==='monthly'?'active':''}" onclick="rmViewMode['${rmKey}']='monthly';renderRM()">Monthly</button>
+      <button class="rm-toggle-btn ${vm==='quarterly'?'active':''}" onclick="rmViewMode['${rmKey}']='quarterly';renderRM()">Quarterly</button>
+    </div>
+  </div>
+  <div class="rm-mini-kpis">
+    <div class="rm-mini-kpi">
+      <div class="rm-mini-kpi-label">Active 1099s</div>
+      <div class="rm-mini-kpi-value" style="color:var(--blue)">${active1099}</div>
+      <div class="rm-mini-kpi-sub">across all DMAs</div>
+    </div>
+    <div class="rm-mini-kpi">
+      <div class="rm-mini-kpi-label">Net Installs${vm==='monthly'?' (MTD)':' (QTD)'}</div>
+      <div class="rm-mini-kpi-value" style="color:${installColor}">${netNewMTD}</div>
+      <div class="rm-mini-kpi-sub">target: ${tgt}+</div>
+    </div>
+    <div class="rm-mini-kpi">
+      <div class="rm-mini-kpi-label">Churn Rate</div>
+      <div class="rm-mini-kpi-value" style="color:${churnCol}">${churn.toFixed(1)}%</div>
+      <div class="rm-mini-kpi-sub">${churn<10?'✅ Full credit':churn<=15?'⚠️ Partial':'❌ No credit'}</div>
+    </div>
+  </div>
+  <div class="rm-market-list">${mktRows}</div>
+  <div class="rm-kpi-bars">
+    <div class="rm-bar-row">
+      <div class="rm-bar-label">Net New Installs <span style="color:var(--muted);font-weight:400">(40%)</span></div>
+      <div class="rm-bar-track"><div class="rm-bar-fill" style="width:${installPct}%;background:${installColor}"></div></div>
+      <div class="rm-bar-pct" style="color:${installColor}">${Math.round(installPct)}%</div>
+    </div>
+    <div class="rm-bar-row">
+      <div class="rm-bar-label">Active Reps/DMA <span style="color:var(--muted);font-weight:400">(35%)</span></div>
+      <div class="rm-bar-track"><div class="rm-bar-fill" style="width:${repPct}%;background:${repColor}"></div></div>
+      <div class="rm-bar-pct" style="color:${repColor}">${Math.round(repPct)}%</div>
+    </div>
+    <div class="rm-bar-row">
+      <div class="rm-bar-label">Churn Rate <span style="color:var(--muted);font-weight:400">(25%)</span></div>
+      <div class="rm-bar-track"><div class="rm-bar-fill" style="width:${churnPct}%;background:${churnCol}"></div></div>
+      <div class="rm-bar-pct" style="color:${churnCol}">${churnPct}%</div>
+    </div>
+  </div>
+  <div class="rm-bonus-footer">
+    <div>
+      <div class="rm-bonus-label">Est. ${vm==='monthly'?'Monthly':'Quarterly'} Bonus</div>
+      <div class="rm-bonus-note">${vm==='monthly'?'Paid by 10th of following month':'Reviewed with Beck & Sierra'}</div>
+    </div>
+    <div style="text-align:right">
+      <span class="rm-bonus-value">${fmtUSD(totalBonus)}</span>
+      <span class="rm-bonus-max">/ ${fmtUSD(b.total)}</span>
+    </div>
+  </div>`;
+}
+
+function rmBonusCard(rmKey){
+  const cfg=RM_CONFIG[rmKey];
+  const b=cfg.monthly;
+  const stats=rmGetMarketStats();
+  const rmInstalls=allInstalls.filter(i=>rmGetRM(i.market)===rmKey);
+
+  const netNewMTD=rmInstalls.filter(i=>rmIsThisMonth(i.signed)||rmIsThisMonth(i.scheduled)).length;
+  const inactive=rmInstalls.filter(i=>statusClass(i.status)==='st-inactive').length;
+  const active=rmInstalls.filter(i=>statusClass(i.status)==='st-active').length;
+  const churn=(active+inactive)>0?(inactive/(active+inactive)*100):0;
+
+  let totalRepCredit=0,repMarketCount=0;
+  cfg.marketLabels.forEach(ml=>{
+    const mKey=Object.keys(stats).find(k=>{const kl=k.toLowerCase(),mll=ml.toLowerCase().split('(')[0].trim();return kl.includes(mll)||mll.includes(kl);});
+    const ms=mKey?stats[mKey]:null;
+    const a1=ms?ms.active1099.size:0;
+    totalRepCredit+=(a1>=10?1:a1>=7?0.5:0);
+    repMarketCount++;
+  });
+  const repAttain=(repMarketCount>0?totalRepCredit/repMarketCount:0);
+  const installAttain=Math.min(netNewMTD/cfg.monthlyTarget,1);
+  const churnAttain=churn<10?1:churn<=15?0.5:0;
+
+  const installEarned=installAttain>=1?b.installs:0;
+  const repEarned=Math.round(b.reps*repAttain);
+  const churnEarned=churnAttain===1?b.churn:churnAttain===0.5?Math.round(b.churn*0.5):0;
+  const totalEarned=installEarned+repEarned+churnEarned;
+  const projQ=totalEarned*3;
+
+  const kpiItems=[
+    {name:'Net New Installs',weight:'40%',attain:Math.round(installAttain*100),earned:installEarned,max:b.installs,color:installAttain>=1?'var(--green)':installAttain>=0.5?'var(--orange)':'var(--red)'},
+    {name:'Active Reps / DMA',weight:'35%',attain:Math.round(repAttain*100),earned:repEarned,max:b.reps,color:repAttain>=1?'var(--green)':repAttain>=0.5?'var(--orange)':'var(--red)'},
+    {name:'Churn Rate',weight:'25%',attain:churnAttain*100,earned:churnEarned,max:b.churn,color:churnAttain===1?'var(--green)':churnAttain===0.5?'var(--orange)':'var(--red)'},
+  ];
+
+  const rows=kpiItems.map(k=>`<div class="bonus-kpi-item">
+    <div class="bonus-kpi-name">${k.name}</div>
+    <div class="bonus-kpi-weight">${k.weight}</div>
+    <div class="bonus-kpi-bar"><div class="bonus-kpi-bar-fill" style="width:${k.attain}%;background:${k.color}"></div></div>
+    <div class="bonus-kpi-pct" style="color:${k.color}">${k.attain}%</div>
+    <div class="bonus-kpi-earned">${fmtUSD(k.earned)}</div>
+    <div class="bonus-kpi-max" style="font-size:11px;color:var(--muted);min-width:48px">/ ${fmtUSD(k.max)}</div>
+  </div>`).join('');
+
+  return `<div class="bonus-card-head">
+    <div class="bonus-card-name">${cfg.name}</div>
+    <span class="bonus-card-period">Monthly</span>
+  </div>
+  <div class="bonus-kpi-rows">${rows}</div>
+  <div class="bonus-total">
+    <div class="bonus-total-label">Total Earned</div>
+    <div>
+      <span class="bonus-total-earned">${fmtUSD(totalEarned)}</span>
+      <span class="bonus-total-max">/ ${fmtUSD(b.total)}</span>
+    </div>
+  </div>
+  <div class="bonus-footer">
+    <div class="bonus-footer-note">Monthly bonuses paid by 10th of following month · Disputes go to Chris first</div>
+    <div class="bonus-quarterly-note">Projected quarterly (×3): ${fmtUSD(projQ)} / ${fmtUSD(cfg.quarterly.total)}</div>
+  </div>`;
+}
+
+function renderRM(){
+  if(!document.getElementById('view-rm').classList.contains('active')) return;
+
+  if(!allInstalls.length){
+    ['rm-kpi-1099','rm-kpi-stations','rm-kpi-mtd','rm-kpi-ob','rm-kpi-churn','rm-kpi-self'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.textContent='—';
+    });
+    const dmabody=document.getElementById('rmDMABody');
+    if(dmabody) dmabody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">🔌</div>Connect to data source and click ↻ Refresh to load RM metrics</div></td></tr>`;
+    const pipBody=document.getElementById('rmPipelineBody');
+    if(pipBody) pipBody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👥</div>No rep data loaded yet</div></td></tr>`;
+    const bonusGrid=document.getElementById('rmBonusGrid');
+    if(bonusGrid) bonusGrid.innerHTML='<div class="bonus-card" style="padding:24px;color:var(--muted);font-size:13px">Load data to see bonus attainment</div>';
+    document.getElementById('rm-santi-card').innerHTML='<div style="padding:24px;color:var(--muted);text-align:center;font-size:13px">No data loaded</div>';
+    document.getElementById('rm-shamel-card').innerHTML='<div style="padding:24px;color:var(--muted);text-align:center;font-size:13px">No data loaded</div>';
+    return;
+  }
+
+  // ── Network overview KPIs ────────────────────────────────────────────
+  const active1099Net=new Set(allInstalls.filter(i=>i.is1099&&statusClass(i.status)==='st-active'&&i.rep).map(i=>i.rep)).size;
+  const activeStations=allInstalls.filter(i=>statusClass(i.status)==='st-active').length;
+  const netNewMTD=allInstalls.filter(i=>rmIsThisMonth(i.signed)||rmIsThisMonth(i.scheduled)).length;
+  const obPipeline=allInstalls.filter(i=>i.sheetName==='CN Installs - Onboarding').length;
+  const allInactive=allInstalls.filter(i=>statusClass(i.status)==='st-inactive').length;
+  const allActive=allInstalls.filter(i=>statusClass(i.status)==='st-active').length;
+  const networkChurn=(allActive+allInactive)>0?(allInactive/(allActive+allInactive)*100):0;
+  const selfInstalls=allInstalls.filter(i=>i.sheetName==='Full Time Rep - Install').length;
+
+  document.getElementById('rm-kpi-1099').textContent=active1099Net.toLocaleString();
+  document.getElementById('rm-kpi-stations').textContent=activeStations.toLocaleString();
+  document.getElementById('rm-kpi-mtd').textContent=netNewMTD.toLocaleString();
+  document.getElementById('rm-kpi-ob').textContent=obPipeline.toLocaleString();
+  document.getElementById('rm-kpi-churn').textContent=networkChurn.toFixed(1)+'%';
+  document.getElementById('rm-kpi-self').textContent=selfInstalls.toLocaleString();
+
+  // ── Territory cards ──────────────────────────────────────────────────
+  document.getElementById('rm-santi-card').innerHTML=rmTerritoryCard('santi');
+  document.getElementById('rm-shamel-card').innerHTML=rmTerritoryCard('shamel');
+
+  // ── DMA Rep Roster ───────────────────────────────────────────────────
+  const dmaFilter=document.getElementById('rmDMAFilter')?.value||'';
+  const stats=rmGetMarketStats();
+  const dmaRows=Object.values(stats)
+    .filter(ms=>!dmaFilter||ms.rm===dmaFilter)
+    .sort((a,b)=>(a.rm||'zzz').localeCompare(b.rm||'zzz')||a.market.localeCompare(b.market));
+
+  const dmaBody=document.getElementById('rmDMABody');
+  if(!dmaRows.length){
+    dmaBody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📍</div>No markets match filter</div></td></tr>`;
+  } else {
+    const churnCol=pct=>pct<10?'var(--green)':pct<=15?'var(--orange)':'var(--red)';
+    dmaBody.innerHTML=dmaRows.map(ms=>{
+      const rmName=ms.rm?RM_CONFIG[ms.rm].name:'—';
+      const a1=ms.active1099.size;
+      const {label,cls}=rmKPICredit(a1);
+      const churnPct=(ms.active+ms.inactive)>0?(ms.inactive/(ms.active+ms.inactive)*100):0;
+      return `<tr>
+        <td style="font-weight:600">${ms.market}</td>
+        <td style="color:var(--muted);font-size:12px">${rmName}</td>
+        <td style="font-weight:700;color:${a1>=10?'var(--green)':a1>=7?'var(--orange)':'var(--red)'}">${a1}</td>
+        <td>${ms.allReps.size}</td>
+        <td style="color:var(--muted)">10</td>
+        <td><span class="badge ${cls}">${label}</span></td>
+        <td style="font-weight:600">${ms.netNewMTD}</td>
+        <td style="color:var(--muted)">${ms.selfInstalls}</td>
+        <td style="font-weight:700;color:${churnCol(churnPct)}">${churnPct.toFixed(1)}%</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── Rep Pipeline ─────────────────────────────────────────────────────
+  const pipFilter=document.getElementById('rmPipelineFilter')?.value||'';
+  const pipSearch=(document.getElementById('rmPipelineSearch')?.value||'').toLowerCase();
+
+  let pipRows=allInstalls.filter(inst=>{
+    if(pipSearch&&!(inst.rep||'').toLowerCase().includes(pipSearch)&&!(inst.venue||'').toLowerCase().includes(pipSearch)) return false;
+    if(pipFilter==='onboarding-active') return inst.sheetName==='CN Installs - Onboarding'&&statusClass(inst.status)==='st-active';
+    if(pipFilter==='onboarding-pending') return inst.sheetName==='CN Installs - Onboarding'&&statusClass(inst.status)!=='st-active';
+    if(pipFilter==='self') return inst.sheetName==='Full Time Rep - Install';
+    if(pipFilter==='1099') return inst.is1099;
+    return true;
+  });
+
+  const pipBody=document.getElementById('rmPipelineBody');
+  if(!pipRows.length){
+    pipBody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👥</div>No reps match filter</div></td></tr>`;
+  } else {
+    const typeTag=inst=>{
+      if(inst.sheetName==='CN Installs - Onboarding') return '<span class="badge pipeline-type-ob">Onboarding</span>';
+      if(inst.is1099) return '<span class="badge pipeline-type-1099">1099</span>';
+      return '<span class="badge pipeline-type-ft">Full Time</span>';
+    };
+    const rmTag=inst=>{
+      const k=rmGetRM(inst.market);
+      if(!k) return '—';
+      return `${RM_CONFIG[k].name} · ${RM_CONFIG[k].title}`;
+    };
+    pipBody.innerHTML=pipRows.map(inst=>`<tr>
+      <td style="font-weight:600">${inst.rep||'—'}</td>
+      <td>${typeTag(inst)}</td>
+      <td style="color:var(--muted);font-size:12px">${inst.market||'—'}</td>
+      <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${inst.venue}">${inst.venue||'—'}</td>
+      <td><span class="badge ${statusClass(inst.status)}">${inst.status||'Unknown'}</span></td>
+      <td style="font-size:12px;color:var(--muted)">${fmtDate(inst.signed)}</td>
+      <td>${stationBadge(inst.station)}</td>
+      <td style="font-size:11px;color:var(--muted)">${rmTag(inst)}</td>
+    </tr>`).join('');
+  }
+
+  // ── Bonus attainment cards ───────────────────────────────────────────
+  const bonusGrid=document.getElementById('rmBonusGrid');
+  bonusGrid.innerHTML=Object.keys(RM_CONFIG).map(rmKey=>`<div class="bonus-card">${rmBonusCard(rmKey)}</div>`).join('');
+}
+
+// ── LOGO FALLBACK LOGIC ────────────────────────────────────────────────
+(function(){
+  const candidateUrls=[
+    'https://www.chargefuze.com/cdn/shop/files/chargeFUZE_White_Logo.png',
+    'https://www.chargefuze.com/cdn/shop/files/chargefuze-logo-white.png',
+    'https://www.chargefuze.com/cdn/shop/files/ChargeFUZE-logo.png',
+  ];
+  let attempt=0;
+  function tryNext(img){
+    if(attempt<candidateUrls.length){
+      img.src=candidateUrls[attempt++];
+    } else {
+      img.style.display='none';
+      const fb=document.getElementById('cfLogoFallback');
+      if(fb) fb.style.display='flex';
+    }
+  }
+  window.addEventListener('DOMContentLoaded',function(){
+    const img=document.getElementById('cfLogoImg');
+    if(!img) return;
+    img.onerror=function(){ tryNext(img); };
+    tryNext(img);
+  });
+})();
+
+
+// Try Google Sheets direct load; falls back to Apps Script automatically
+loadFromGoogleSheets();
 loadAdRevenue();
 </script>
 </body>
 </html>
+<!-- ――― REGIONAL MANAGER DASHBOARD ――― -->
