@@ -279,7 +279,7 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
   <div id="debugBar" class="debug-bar"></div>
   <div class="kpi-row">
     <div class="kpi"><div class="kpi-label">Total Contracts</div><div class="kpi-value blue" id="kpi-total">—</div><div class="kpi-sub">across all reps</div></div>
-    <div class="kpi"><div class="kpi-label">Active Stations</div><div class="kpi-value green" id="kpi-active">—</div><div class="kpi-sub">live &amp; earning</div></div>
+    
     <div class="kpi"><div class="kpi-label">Scheduled</div><div class="kpi-value orange" id="kpi-sched">—</div><div class="kpi-sub">installs pending</div></div>
     <div class="kpi"><div class="kpi-label">Signed / Pending</div><div class="kpi-value yellow" id="kpi-signed">—</div><div class="kpi-sub">contracts signed</div></div>
     <div class="kpi"><div class="kpi-label">Reps</div><div class="kpi-value purple" id="kpi-reps">—</div><div class="kpi-sub">unique reps</div></div>
@@ -417,7 +417,7 @@ select.fsel{background:var(--card);border:1px solid var(--border);border-radius:
   <div class="rm-section-label">🌐 City Network Overview</div>
   <div class="kpi-row">
     <div class="kpi"><div class="kpi-label">Active 1099 Reps</div><div class="kpi-value blue" id="rm-kpi-1099">—</div><div class="kpi-sub">network-wide</div></div>
-    <div class="kpi"><div class="kpi-label">Active Stations</div><div class="kpi-value green" id="rm-kpi-stations">—</div><div class="kpi-sub">live &amp; earning</div></div>
+    
     <div class="kpi"><div class="kpi-label">Net New Installs (MTD)</div><div class="kpi-value teal" id="rm-kpi-mtd">—</div><div class="kpi-sub">signed or scheduled this month</div></div>
     <div class="kpi"><div class="kpi-label">Onboarding Pipeline</div><div class="kpi-value purple" id="rm-kpi-ob">—</div><div class="kpi-sub">reps in CN onboarding</div></div>
     <div class="kpi"><div class="kpi-label">Network Churn Rate</div><div class="kpi-value orange" id="rm-kpi-churn">—</div><div class="kpi-sub">inactive / total stations</div></div>
@@ -509,11 +509,15 @@ const GS_GIDS = {
   'Full Time Rep - Install':  null,   // use sheet name
   '1099 B - Rep Install':     null,   // use sheet name
   'CN Installs - Onboarding': null,   // use sheet name
+  'Submissions':              null,   // use sheet name
   '__tiers__':                null,
   'Superset_Revenue':         null,   // use sheet name
 };
-const SHEET_NAMES = ['Full Time Rep - Install','1099 B - Rep Install','CN Installs - Onboarding'];
-const IS_1099     = '1099 B - Rep Install';
+const SHEET_NAMES = ['Full Time Rep - Install','1099 B - Rep Install','CN Installs - Onboarding','Submissions'];
+const IS_1099    = '1099 B - Rep Install';
+const IS_FT      = 'Full Time Rep - Install';
+const IS_SUBMIT  = 'Submissions';
+const IS_ONBOARD = 'CN Installs - Onboarding';
 
 // ── STATE ────────────────────────────────────────────────────────────
 let allInstalls = [];
@@ -903,7 +907,7 @@ function parseInstallSheet(values, sheetName){
       f1:         getBool(row,fIdx),
       s2:         getBool(row,s2Idx),
       directTier, // tier read directly from this install sheet (takes priority)
-      is1099:     sheetName===IS_1099,
+      is1099:     sheetName===IS_1099||sheetName===IS_SUBMIT,
       sheetName,
     });
   }
@@ -1141,7 +1145,6 @@ function renderPlacements(){
   });
 
   document.getElementById('kpi-total').textContent  = allInstalls.length.toLocaleString();
-  document.getElementById('kpi-active').textContent = allInstalls.filter(r=>statusClass(r.status)==='st-active').length.toLocaleString();
   document.getElementById('kpi-sched').textContent  = allInstalls.filter(r=>statusClass(r.status)==='st-scheduled').length.toLocaleString();
   document.getElementById('kpi-signed').textContent = allInstalls.filter(r=>statusClass(r.status)==='st-signed').length.toLocaleString();
   document.getElementById('kpi-reps').textContent   = new Set(allInstalls.map(r=>r.rep).filter(Boolean)).size.toLocaleString();
@@ -1846,7 +1849,6 @@ function renderRM(){
   if(!document.getElementById('view-rm').classList.contains('active')) return;
 
   if(!allInstalls.length){
-    ['rm-kpi-1099','rm-kpi-stations','rm-kpi-mtd','rm-kpi-ob','rm-kpi-churn','rm-kpi-self'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.textContent='—';
     });
     const dmabody=document.getElementById('rmDMABody');
@@ -1871,7 +1873,6 @@ function renderRM(){
   const selfInstalls=allInstalls.filter(i=>i.sheetName==='Full Time Rep - Install').length;
 
   document.getElementById('rm-kpi-1099').textContent=active1099Net.toLocaleString();
-  document.getElementById('rm-kpi-stations').textContent=activeStations.toLocaleString();
   document.getElementById('rm-kpi-mtd').textContent=netNewMTD.toLocaleString();
   document.getElementById('rm-kpi-ob').textContent=obPipeline.toLocaleString();
   document.getElementById('rm-kpi-churn').textContent=networkChurn.toFixed(1)+'%';
